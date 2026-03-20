@@ -1,0 +1,197 @@
+/* Layout principal */
+body {
+    font-size: 0.9rem;
+    background-color: #f8f9fa;
+}
+
+.main-content {
+    margin-top: 56px;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #212529;
+    min-height: calc(100vh - 56px);
+    margin-top: 56px;
+    padding-top: 0;
+}
+
+.sidebar .nav-link {
+    color: #adb5bd;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    margin: 0.1rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255,255,255,0.1);
+}
+
+.sidebar .nav-link.active {
+    color: #fff;
+    background-color: #0d6efd;
+}
+
+.sidebar .nav-link i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Semáforo */
+.status-circle {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.status-circle-lg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Tarjetas de perspectiva */
+.perspective-card {
+    border-left: 4px solid;
+    transition: transform 0.2s;
+}
+
+.perspective-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Tarjetas de IE */
+.ie-card {
+    border-left: 3px solid #0d6efd;
+    background: #fff;
+}
+
+/* Barra de progreso custom */
+.progress-sm {
+    height: 8px;
+}
+
+/* Mapa estratégico */
+.mapa-perspectiva {
+    border: 2px solid;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    min-height: 100px;
+}
+
+.mapa-ie {
+    background: #fff;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mapa-ie:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: scale(1.02);
+}
+
+/* Matriz de riesgos */
+.risk-matrix {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.risk-matrix td {
+    width: 33.33%;
+    height: 80px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
+    font-size: 0.85rem;
+}
+
+.risk-cell-critico { background-color: #f8d7da; }
+.risk-cell-alto { background-color: #fff3cd; }
+.risk-cell-medio { background-color: #d1ecf1; }
+.risk-cell-bajo { background-color: #d4edda; }
+
+/* Gantt simple */
+.gantt-bar {
+    height: 24px;
+    border-radius: 4px;
+    position: relative;
+    min-width: 20px;
+}
+
+.gantt-bar-progress {
+    height: 100%;
+    border-radius: 4px;
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        margin-top: 0;
+    }
+}
+
+/* Cards de dashboard */
+.dashboard-card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.dashboard-card .card-body {
+    padding: 1.25rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Tablas */
+.table th {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+
+/* Print */
+@media print {
+    .sidebar, .navbar, .btn, .no-print {
+        display: none !important;
+    }
+    .main-content {
+        margin-top: 0;
+        margin-left: 0 !important;
+    }
+    .col-md-10 {
+        width: 100% !important;
+    }
+}
+
+/* Evaluación IA */
+.ia-response {
+    background-color: #f0f7ff;
+    border: 1px solid #b8daff;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.ia-response h1, .ia-response h2, .ia-response h3 {
+    color: #0d6efd;
+}
