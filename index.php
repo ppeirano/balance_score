@@ -278,6 +278,9 @@ switch ($page) {
             case 'subir':
                 require __DIR__ . '/models/ArchivoAdjunto.php';
                 ArchivoAdjunto::subir($pdo, $_POST, $_FILES);
+                $redir = $_POST['redirect'] ?? 'index.php?page=dashboard';
+                header("Location: " . $redir);
+                exit;
                 break;
             case 'descargar':
                 require __DIR__ . '/models/ArchivoAdjunto.php';
