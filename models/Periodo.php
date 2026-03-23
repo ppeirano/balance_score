@@ -45,6 +45,6 @@ class Periodo {
             $stmt->execute([$id]);
         }
 
-        redirect('periodos.php');
+        redirect('index.php?page=periodos');
     }
 }

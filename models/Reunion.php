@@ -55,6 +55,6 @@ class Reunion {
             ]);
             flash('success', 'Reunion creada correctamente.');
         }
-        redirect('reuniones.php');
+        redirect('index.php?page=reuniones');
     }
 }

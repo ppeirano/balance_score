@@ -77,7 +77,7 @@ class Kpi {
             ]);
             flash('success', 'KPI creado correctamente.');
         }
-        redirect('kpis.php');
+        redirect('index.php?page=kpis');
     }
 
     static function registrarValor($pdo, $data) {
@@ -127,7 +127,7 @@ class Kpi {
         }
 
         flash('success', 'Valor registrado correctamente.');
-        redirect('kpi_detalle.php?id=' . $data['kpi_id']);
+        redirect('index.php?page=kpis&action=historial&id=' . $data['kpi_id']);
     }
 
     static function getHistorial($pdo, $kpiId) {

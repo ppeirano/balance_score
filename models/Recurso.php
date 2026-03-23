@@ -49,6 +49,9 @@ class Recurso {
             ]);
             flash('success', 'Recurso creado correctamente.');
         }
-        redirect('actividad_detalle.php?id=' . $data['actividad_id']);
+        $stmt2 = $pdo->prepare("SELECT plan_accion_id FROM actividades WHERE id = ?");
+        $stmt2->execute([$data['actividad_id']]);
+        $act = $stmt2->fetch();
+        redirect('index.php?page=planes&action=detalle&id=' . ($act['plan_accion_id'] ?? ''));
     }
 }

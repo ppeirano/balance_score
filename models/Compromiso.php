@@ -63,6 +63,6 @@ class Compromiso {
             ]);
             flash('success', 'Compromiso creado correctamente.');
         }
-        redirect('reunion_detalle.php?id=' . $data['reunion_id']);
+        redirect('index.php?page=reuniones&action=detalle&id=' . $data['reunion_id']);
     }
 }

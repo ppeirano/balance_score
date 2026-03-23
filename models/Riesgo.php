@@ -71,7 +71,7 @@ class Riesgo {
             ]);
             flash('success', 'Riesgo creado correctamente.');
         }
-        redirect('riesgos.php');
+        redirect('index.php?page=riesgos');
     }
 
     static function getMatriz($pdo) {
