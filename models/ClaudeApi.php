@@ -72,7 +72,7 @@ class ClaudeApi {
 
             default:
                 flash('error', 'Tipo de evaluacion no valido.');
-                redirect('ia.php');
+                redirect('index.php?page=evaluacion');
                 return;
         }
 
@@ -80,7 +80,7 @@ class ClaudeApi {
 
         if ($respuesta === false) {
             flash('error', 'Error al comunicarse con la API de Claude.');
-            redirect('ia.php');
+            redirect('index.php?page=evaluacion');
             return;
         }
 
@@ -92,7 +92,7 @@ class ClaudeApi {
         $stmt->execute([$tipo, $entidadId, $prompt, $respuesta]);
 
         flash('success', 'Evaluacion generada correctamente.');
-        redirect('ia.php?id=' . $pdo->lastInsertId());
+        redirect('index.php?page=evaluacion&id=' . $pdo->lastInsertId());
     }
 
     static function recopilarDatosGenerales($pdo) {
