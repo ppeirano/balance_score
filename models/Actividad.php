@@ -76,6 +76,6 @@ class Actividad {
         $stmt = $pdo->prepare("UPDATE planes_accion SET avance = ? WHERE id = ?");
         $stmt->execute([$avance, $data['plan_accion_id']]);
 
-        redirect('plan_detalle.php?id=' . $data['plan_accion_id']);
+        redirect('index.php?page=planes&action=detalle&id=' . $data['plan_accion_id']);
     }
 }

@@ -47,6 +47,6 @@ class Hito {
             ]);
             flash('success', 'Hito creado correctamente.');
         }
-        redirect('plan_detalle.php?id=' . $data['plan_accion_id']);
+        redirect('index.php?page=planes&action=detalle&id=' . $data['plan_accion_id']);
     }
 }
