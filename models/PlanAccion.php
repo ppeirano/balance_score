@@ -79,7 +79,7 @@ class PlanAccion {
             ]);
             flash('success', 'Plan de accion creado correctamente.');
         }
-        redirect('planes.php');
+        redirect('index.php?page=planes');
     }
 
     static function getOwners($pdo) {
