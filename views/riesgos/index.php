@@ -17,13 +17,13 @@ require_once __DIR__ . '/../layout/header.php';
     <div class="card-header"><h6 class="mb-0">Matriz de Riesgos</h6></div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="risk-matrix">
+            <table class="risk-matrix" style="table-layout:fixed; width:100%">
                 <thead>
                     <tr>
-                        <th class="text-center" style="width:15%">Probabilidad \ Impacto</th>
-                        <th class="text-center">Bajo</th>
-                        <th class="text-center">Medio</th>
-                        <th class="text-center">Alto</th>
+                        <th class="text-center" style="width:25%">Probabilidad \ Impacto</th>
+                        <th class="text-center" style="width:25%">Bajo</th>
+                        <th class="text-center" style="width:25%">Medio</th>
+                        <th class="text-center" style="width:25%">Alto</th>
                     </tr>
                 </thead>
                 <tbody>

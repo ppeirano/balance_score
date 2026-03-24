@@ -109,8 +109,7 @@ body {
     border-collapse: collapse;
 }
 
-.risk-matrix td {
-    width: 33.33%;
+.risk-matrix td, .risk-matrix th {
     height: 80px;
     text-align: center;
     vertical-align: middle;
