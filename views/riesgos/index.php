@@ -36,7 +36,7 @@ require_once __DIR__ . '/../layout/header.php';
                         <td class="fw-bold text-center"><?= ucfirst($prob) ?></td>
                         <?php foreach ($impacts as $imp):
                             $nivel = calcularNivelRiesgo($prob, $imp);
-                            $count = $matriz[$prob][$imp] ?? 0;
+                            $count = $matriz[$prob][$imp]['total'] ?? 0;
                         ?>
                         <td class="risk-cell-<?= $nivel ?>">
                             <?php if ($count > 0): ?>
@@ -77,7 +77,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= nivelRiesgoBadge($r['nivel']) ?></td>
                     <td><?= sanitize(mb_substr($r['descripcion'], 0, 80)) ?><?= mb_strlen($r['descripcion']) > 80 ? '...' : '' ?></td>
                     <td>
-                        <?= $r['ie_codigo'] ? '<span class="badge bg-primary">' . sanitize($r['ie_codigo']) . '</span>' : '' ?>
+                        <?= $r['iniciativa_codigo'] ? '<span class="badge bg-primary">' . sanitize($r['iniciativa_codigo']) . '</span>' : '' ?>
                         <?= $r['plan_nombre'] ? '<small class="text-muted">' . sanitize($r['plan_nombre']) . '</small>' : '' ?>
                     </td>
                     <td><?= ucfirst($r['probabilidad']) ?></td>
