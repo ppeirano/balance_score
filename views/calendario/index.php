@@ -185,6 +185,27 @@ function nuevoSeguimiento(fecha) {
 // Variable para almacenar el evento seleccionado actualmente
 let eventoActual = null;
 
+// Auto-abrir modal si vienen parámetros por URL
+function autoAbrirDesdeURL() {
+    const params = new URLSearchParams(window.location.search);
+    const tipo = params.get('tipo');
+    const entidadId = params.get('entidad_id');
+    const nombre = params.get('nombre');
+    if (tipo && entidadId) {
+        document.getElementById('seg_entidad_tipo').value = tipo;
+        cambiarEntidad();
+        document.getElementById('seg_entidad_id').value = entidadId;
+        document.getElementById('seg_titulo').value = 'Seguimiento: ' + (nombre || '');
+        document.getElementById('seg_fecha').value = '';
+        document.getElementById('seg_hora').value = '';
+        document.getElementById('seg_descripcion').value = '';
+        document.getElementById('seg_completado').checked = false;
+        document.getElementById('seg_id').value = '';
+        document.getElementById('modalTitle').textContent = 'Nuevo Seguimiento';
+        new bootstrap.Modal(document.getElementById('modalSeguimiento')).show();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const calEl = document.getElementById('calendario');
     const calendar = new FullCalendar.Calendar(calEl, {
@@ -239,6 +260,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     calendar.render();
+
+    // Auto-abrir modal si hay parámetros en la URL
+    autoAbrirDesdeURL();
 
     // Botón editar en detalle modal
     document.getElementById('btnEditar').addEventListener('click', function() {

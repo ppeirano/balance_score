@@ -128,6 +128,12 @@ require_once __DIR__ . '/../layout/header.php';
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-check-lg me-1"></i><?= $esEdicion ? 'Actualizar' : 'Crear' ?> Actividad
                 </button>
+                <?php if ($esEdicion): ?>
+                    <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=actividad&entidad_id=<?= $actividad['id'] ?>&nombre=<?= urlencode($actividad['codigo'] . ' - ' . $actividad['descripcion']) ?>"
+                       class="btn btn-outline-info">
+                        <i class="bi bi-calendar-event me-1"></i>Agendar Seguimiento
+                    </a>
+                <?php endif; ?>
                 <?php if ($planAccionId): ?>
                     <a href="<?= BASE_URL ?>index.php?page=planes&action=detalle&id=<?= $planAccionId ?>" class="btn btn-secondary">Cancelar</a>
                 <?php else: ?>

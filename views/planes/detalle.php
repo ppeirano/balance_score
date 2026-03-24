@@ -78,6 +78,9 @@ require_once __DIR__ . '/../layout/header.php';
         </div>
     </div>
     <div class="d-flex gap-2">
+        <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=plan&entidad_id=<?= $plan['id'] ?>&nombre=<?= urlencode($plan['codigo'] . ' - ' . $plan['nombre']) ?>" class="btn btn-outline-info">
+            <i class="bi bi-calendar-event me-1"></i>Agendar Seguimiento
+        </a>
         <a href="<?= BASE_URL ?>index.php?page=planes&action=editar&id=<?= $plan['id'] ?>" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
         </a>
@@ -180,6 +183,10 @@ require_once __DIR__ . '/../layout/header.php';
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
+                                        <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=actividad&entidad_id=<?= $act['id'] ?>&nombre=<?= urlencode($act['codigo'] . ' - ' . $act['descripcion']) ?>"
+                                           class="btn btn-outline-info" title="Agendar seguimiento">
+                                            <i class="bi bi-calendar-event"></i>
+                                        </a>
                                         <a href="<?= BASE_URL ?>index.php?page=actividades&action=editar&id=<?= $act['id'] ?>"
                                            class="btn btn-outline-warning" title="Editar">
                                             <i class="bi bi-pencil"></i>
@@ -285,6 +292,10 @@ require_once __DIR__ . '/../layout/header.php';
                                     <span class="badge <?= $hitoBadge ?>"><?= ucfirst(sanitize($hito['estado'])) ?></span>
                                 </td>
                                 <td>
+                                    <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=hito&entidad_id=<?= $hito['id'] ?>&nombre=<?= urlencode($hito['nombre']) ?>"
+                                       class="btn btn-sm btn-outline-info me-1" title="Agendar seguimiento">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </a>
                                     <?php if ($hito['estado'] !== 'alcanzado'): ?>
                                         <form method="POST" action="<?= BASE_URL ?>index.php?page=hitos&action=cambiar_estado&id=<?= $hito['id'] ?>" class="d-inline">
                                             <input type="hidden" name="plan_accion_id" value="<?= $plan['id'] ?>">
