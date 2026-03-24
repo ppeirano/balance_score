@@ -22,7 +22,7 @@ require_once __DIR__ . '/../layout/header.php';
     <div class="card-body">
         <details>
             <summary class="mb-2" style="cursor:pointer;">Ver evaluación completa</summary>
-            <div class="ia-response mt-2"><?= $e['respuesta'] ?></div>
+            <div class="ia-response mt-2 markdown-body" data-markdown="<?= htmlspecialchars($e['respuesta'], ENT_QUOTES, 'UTF-8') ?>"></div>
         </details>
     </div>
 </div>
@@ -31,5 +31,13 @@ require_once __DIR__ . '/../layout/header.php';
 <?php if (empty($evaluaciones)): ?>
 <div class="alert alert-info">No hay evaluaciones registradas.</div>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.markdown-body[data-markdown]').forEach(function(el) {
+        el.innerHTML = marked.parse(el.dataset.markdown);
+    });
+});
+</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

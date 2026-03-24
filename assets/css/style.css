@@ -185,12 +185,110 @@ body {
 
 /* Evaluación IA */
 .ia-response {
-    background-color: #f0f7ff;
-    border: 1px solid #b8daff;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 2rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #333;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
-.ia-response h1, .ia-response h2, .ia-response h3 {
+.ia-response h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
     color: #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+    padding-bottom: 0.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.ia-response h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0d6efd;
+    border-bottom: 1px solid #b8daff;
+    padding-bottom: 0.4rem;
+    margin-top: 1.3rem;
+    margin-bottom: 0.8rem;
+}
+
+.ia-response h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #495057;
+    margin-top: 1.2rem;
+    margin-bottom: 0.6rem;
+}
+
+.ia-response h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #495057;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.ia-response p {
+    margin-bottom: 0.6rem;
+}
+
+.ia-response ul, .ia-response ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.ia-response li {
+    margin-bottom: 0.3rem;
+}
+
+.ia-response strong {
+    color: #212529;
+}
+
+.ia-response hr {
+    border: none;
+    border-top: 1px solid #dee2e6;
+    margin: 1.2rem 0;
+}
+
+.ia-response table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+}
+
+.ia-response table th,
+.ia-response table td {
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+}
+
+.ia-response table th {
+    background-color: #e9ecef;
+    font-weight: 600;
+}
+
+.ia-response table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.ia-response blockquote {
+    border-left: 4px solid #0d6efd;
+    padding: 0.5rem 1rem;
+    margin: 0.8rem 0;
+    background-color: #e8f0fe;
+    border-radius: 0 4px 4px 0;
+}
+
+.ia-response code {
+    background-color: #e9ecef;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.85em;
 }

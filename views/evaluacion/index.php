@@ -106,9 +106,7 @@ require_once __DIR__ . '/../layout/header.php';
         <h6 class="mb-0"><i class="bi bi-robot me-2"></i>Resultado de la Evaluación</h6>
         <a href="<?= BASE_URL ?>index.php?page=evaluacion&action=historial" class="btn btn-sm btn-outline-secondary">Ver Historial</a>
     </div>
-    <div class="card-body ia-response">
-        <?= $_SESSION['ultima_evaluacion'] ?>
-    </div>
+    <div class="card-body ia-response markdown-body" data-markdown="<?= htmlspecialchars($_SESSION['ultima_evaluacion'], ENT_QUOTES, 'UTF-8') ?>"></div>
 </div>
 <?php unset($_SESSION['ultima_evaluacion']); endif; ?>
 
@@ -117,5 +115,13 @@ require_once __DIR__ . '/../layout/header.php';
         <i class="bi bi-clock-history me-1"></i>Ver Historial de Evaluaciones
     </a>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.markdown-body[data-markdown]').forEach(function(el) {
+        el.innerHTML = marked.parse(el.dataset.markdown);
+    });
+});
+</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
