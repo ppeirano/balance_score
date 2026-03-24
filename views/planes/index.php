@@ -24,7 +24,7 @@ if ($filtroEstado !== '') {
     $params[] = $filtroEstado;
 }
 
-$sql .= " ORDER BY ie.codigo, pa.prioridad";
+$sql .= " ORDER BY ie.codigo, pa.codigo";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $planes = $stmt->fetchAll();
