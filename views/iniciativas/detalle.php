@@ -153,15 +153,16 @@ require_once __DIR__ . '/../layout/header.php';
                             elseif ($avancePda >= 40) $barClassPda = 'bg-warning';
                             elseif ($avancePda >= 20) $barClassPda = 'bg-info';
 
-                            $prioridadTexto = 'Baja';
-                            $prioridadBadge = 'bg-info text-dark';
-                            if ($pda['prioridad'] <= 2) {
-                                $prioridadTexto = 'Alta';
-                                $prioridadBadge = 'bg-danger';
-                            } elseif ($pda['prioridad'] <= 5) {
-                                $prioridadTexto = 'Media';
-                                $prioridadBadge = 'bg-warning text-dark';
-                            }
+                            $prioridadMap = [
+                                1 => ['texto' => 'Muy Alta', 'badge' => 'bg-danger'],
+                                2 => ['texto' => 'Alta', 'badge' => 'bg-danger'],
+                                3 => ['texto' => 'Media', 'badge' => 'bg-warning text-dark'],
+                                4 => ['texto' => 'Baja', 'badge' => 'bg-info text-dark'],
+                                5 => ['texto' => 'Muy Baja', 'badge' => 'bg-secondary'],
+                            ];
+                            $prio = $prioridadMap[(int)$pda['prioridad']] ?? $prioridadMap[3];
+                            $prioridadTexto = $prio['texto'];
+                            $prioridadBadge = $prio['badge'];
                             ?>
                             <tr>
                                 <td><span class="badge bg-secondary"><?= sanitize($pda['codigo']) ?></span></td>

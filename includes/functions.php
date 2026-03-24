@@ -45,13 +45,15 @@ function estadoBadge($estado) {
 
 // Badge de prioridad
 function prioridadBadge($prioridad) {
-    $clases = [
-        'alta' => 'bg-danger',
-        'media' => 'bg-warning text-dark',
-        'baja' => 'bg-info text-dark'
+    $map = [
+        1 => ['texto' => 'Muy Alta', 'badge' => 'bg-danger'],
+        2 => ['texto' => 'Alta', 'badge' => 'bg-danger'],
+        3 => ['texto' => 'Media', 'badge' => 'bg-warning text-dark'],
+        4 => ['texto' => 'Baja', 'badge' => 'bg-info text-dark'],
+        5 => ['texto' => 'Muy Baja', 'badge' => 'bg-secondary'],
     ];
-    $clase = $clases[$prioridad] ?? 'bg-secondary';
-    return '<span class="badge ' . $clase . '">' . ucfirst($prioridad) . '</span>';
+    $prio = $map[(int)$prioridad] ?? $map[3];
+    return '<span class="badge ' . $prio['badge'] . '">' . $prio['texto'] . '</span>';
 }
 
 // Flash messages

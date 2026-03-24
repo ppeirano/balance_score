@@ -89,8 +89,14 @@ require_once __DIR__ . '/../layout/header.php';
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="prioridad" class="form-label">Prioridad</label>
-                    <input type="number" class="form-control" id="prioridad" name="prioridad"
-                           value="<?= $esEdicion ? (int)$plan['prioridad'] : 1 ?>" min="1">
+                    <?php $prioridadActual = $esEdicion ? (int)$plan['prioridad'] : 3; ?>
+                    <select class="form-select" id="prioridad" name="prioridad">
+                        <option value="1" <?= $prioridadActual === 1 ? 'selected' : '' ?>>1 - Muy Alta</option>
+                        <option value="2" <?= $prioridadActual === 2 ? 'selected' : '' ?>>2 - Alta</option>
+                        <option value="3" <?= $prioridadActual === 3 ? 'selected' : '' ?>>3 - Media</option>
+                        <option value="4" <?= $prioridadActual === 4 ? 'selected' : '' ?>>4 - Baja</option>
+                        <option value="5" <?= $prioridadActual === 5 ? 'selected' : '' ?>>5 - Muy Baja</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label for="peso" class="form-label">Peso (%)</label>
