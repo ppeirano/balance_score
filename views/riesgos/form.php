@@ -48,7 +48,7 @@ $esEditar = ($riesgo !== null);
                         <option value="">Ninguno</option>
                         <?php foreach ($planes as $p): ?>
                             <option value="<?= $p['id'] ?>" <?= ($riesgo && $riesgo['plan_accion_id'] == $p['id']) ? 'selected' : '' ?>>
-                                <?= sanitize($p['ie_codigo'] . ' - ' . $p['codigo'] . ': ' . $p['nombre']) ?>
+                                <?= sanitize($p['iniciativa_codigo'] . ' - ' . $p['codigo'] . ': ' . $p['nombre']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
