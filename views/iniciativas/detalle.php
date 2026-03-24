@@ -29,7 +29,7 @@ $stmtPdas = $pdo->prepare("
     SELECT pa.*
     FROM planes_accion pa
     WHERE pa.iniciativa_id = ?
-    ORDER BY pa.prioridad ASC, pa.codigo ASC
+    ORDER BY pa.codigo ASC
 ");
 $stmtPdas->execute([$id]);
 $pdas = $stmtPdas->fetchAll();
