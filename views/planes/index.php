@@ -138,6 +138,12 @@ require_once __DIR__ . '/../layout/header.php';
                                         <form method="POST" action="<?= BASE_URL ?>index.php?page=planes&action=eliminar&id=<?= $plan['id'] ?>"
                                               class="d-inline"
                                               onsubmit="return confirm('¿Está seguro de que desea eliminar este plan de acción?');">
+                                            <?php if ($filtroIE): ?>
+                                                <input type="hidden" name="ie" value="<?= $filtroIE ?>">
+                                            <?php endif; ?>
+                                            <?php if ($filtroEstado !== ''): ?>
+                                                <input type="hidden" name="estado" value="<?= sanitize($filtroEstado) ?>">
+                                            <?php endif; ?>
                                             <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
                                                 <i class="bi bi-trash"></i>
                                             </button>

@@ -45,7 +45,11 @@ switch ($page) {
                     $stmt->execute([$id]);
                     flash('success', 'Plan de acción eliminado.');
                 }
-                redirect('index.php?page=planes');
+                $filterParams = [];
+                if (!empty($_POST['ie'])) $filterParams[] = 'ie=' . (int)$_POST['ie'];
+                if (!empty($_POST['estado'])) $filterParams[] = 'estado=' . urlencode($_POST['estado']);
+                $filterQuery = $filterParams ? '&' . implode('&', $filterParams) : '';
+                redirect('index.php?page=planes' . $filterQuery);
                 break;
             default:
                 require __DIR__ . '/views/planes/index.php';
