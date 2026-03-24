@@ -70,4 +70,43 @@ class Iniciativa {
         if ($totalPeso == 0) return 0;
         return round($sumaPonderada / $totalPeso);
     }
+
+    static function guardar($pdo, $data) {
+        if (!empty($data['id'])) {
+            $stmt = $pdo->prepare("UPDATE iniciativas_estrategicas SET
+                perspectiva_id = ?, periodo_id = ?, codigo = ?, nombre = ?, descripcion = ?, orden = ?
+                WHERE id = ?");
+            $stmt->execute([
+                $data['perspectiva_id'],
+                $data['periodo_id'] ?: null,
+                trim($data['codigo']),
+                trim($data['nombre']),
+                trim($data['descripcion'] ?? ''),
+                (int)($data['orden'] ?? 0),
+                $data['id']
+            ]);
+            flash('success', 'Iniciativa actualizada.');
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO iniciativas_estrategicas
+                (perspectiva_id, periodo_id, codigo, nombre, descripcion, orden)
+                VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $data['perspectiva_id'],
+                $data['periodo_id'] ?: null,
+                trim($data['codigo']),
+                trim($data['nombre']),
+                trim($data['descripcion'] ?? ''),
+                (int)($data['orden'] ?? 0)
+            ]);
+            flash('success', 'Iniciativa creada.');
+        }
+        redirect('index.php?page=iniciativas');
+    }
+
+    static function eliminar($pdo, $id) {
+        $stmt = $pdo->prepare("DELETE FROM iniciativas_estrategicas WHERE id = ?");
+        $stmt->execute([$id]);
+        flash('success', 'Iniciativa eliminada.');
+        redirect('index.php?page=iniciativas');
+    }
 }

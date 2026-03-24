@@ -79,6 +79,12 @@ require_once __DIR__ . '/../layout/header.php';
 <!-- Header de la IE -->
 <div class="card mb-4" style="border-left: 5px solid <?= sanitize($ie['perspectiva_color']) ?>;">
     <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div></div>
+            <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=editar&id=<?= (int)$ie['id'] ?>" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-pencil me-1"></i>Editar IE
+            </a>
+        </div>
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h2 class="mb-1">

@@ -50,6 +50,9 @@ require_once __DIR__ . '/../layout/header.php';
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-bullseye me-2"></i>Iniciativas Estrat&eacute;gicas</h2>
+    <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=crear" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nueva IE
+    </a>
 </div>
 
 <div class="accordion" id="accordionPerspectivas">
@@ -126,10 +129,22 @@ require_once __DIR__ . '/../layout/header.php';
                                             </div>
                                         </td>
                                         <td class="text-end">
-                                            <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>"
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye me-1"></i>Ver
-                                            </a>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>"
+                                                   class="btn btn-outline-primary" title="Ver detalle">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=editar&id=<?= (int)$ie['id'] ?>"
+                                                   class="btn btn-outline-secondary" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form method="POST" action="<?= BASE_URL ?>index.php?page=iniciativas&action=eliminar&id=<?= (int)$ie['id'] ?>"
+                                                      class="d-inline" onsubmit="return confirm('¿Eliminar esta IE y todos sus planes/actividades?');">
+                                                    <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

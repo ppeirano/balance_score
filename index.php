@@ -19,6 +19,19 @@ switch ($page) {
         break;
     case 'iniciativas':
         switch ($action) {
+            case 'crear':
+            case 'editar':
+                require __DIR__ . '/views/iniciativas/form.php';
+                break;
+            case 'guardar':
+                require __DIR__ . '/models/Iniciativa.php';
+                Iniciativa::guardar($pdo, $_POST);
+                break;
+            case 'eliminar':
+                require __DIR__ . '/models/Iniciativa.php';
+                if ($id) Iniciativa::eliminar($pdo, $id);
+                else redirect('index.php?page=iniciativas');
+                break;
             case 'detalle':
                 require __DIR__ . '/views/iniciativas/detalle.php';
                 break;
