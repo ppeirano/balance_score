@@ -15,7 +15,23 @@ switch ($page) {
         require __DIR__ . '/views/dashboard/index.php';
         break;
     case 'mapa':
-        require __DIR__ . '/views/mapa/index.php';
+        switch ($action) {
+            case 'guardar_relacion':
+                $stmt = $pdo->prepare("INSERT INTO relaciones_causa_efecto (iniciativa_origen_id, iniciativa_destino_id, descripcion) VALUES (?, ?, ?)");
+                $stmt->execute([$_POST['iniciativa_origen_id'], $_POST['iniciativa_destino_id'], trim($_POST['descripcion'] ?? '')]);
+                flash('success', 'Relación creada.');
+                redirect('index.php?page=mapa');
+                break;
+            case 'eliminar_relacion':
+                if ($id) {
+                    $pdo->prepare("DELETE FROM relaciones_causa_efecto WHERE id = ?")->execute([$id]);
+                    flash('success', 'Relación eliminada.');
+                }
+                redirect('index.php?page=mapa');
+                break;
+            default:
+                require __DIR__ . '/views/mapa/index.php';
+        }
         break;
     case 'iniciativas':
         switch ($action) {

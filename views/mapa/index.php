@@ -106,10 +106,46 @@ require_once __DIR__ . '/../layout/header.php';
 
 <!-- Relaciones Causa-Efecto -->
 <div class="card mb-4">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Relaciones Causa-Efecto</h5>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#nuevaRelacion">
+            <i class="bi bi-plus-lg me-1"></i>Agregar
+        </button>
     </div>
     <div class="card-body">
+        <!-- Formulario nueva relación -->
+        <div class="collapse mb-3" id="nuevaRelacion">
+            <div class="card card-body bg-light">
+                <form method="POST" action="<?= BASE_URL ?>index.php?page=mapa&action=guardar_relacion" class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Origen (causa)</label>
+                        <select class="form-select form-select-sm" name="iniciativa_origen_id" required>
+                            <option value="">-- Seleccionar IE --</option>
+                            <?php foreach ($iniciativas as $ie): ?>
+                                <option value="<?= $ie['id'] ?>"><?= sanitize($ie['codigo'] . ' - ' . $ie['nombre']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Destino (efecto)</label>
+                        <select class="form-select form-select-sm" name="iniciativa_destino_id" required>
+                            <option value="">-- Seleccionar IE --</option>
+                            <?php foreach ($iniciativas as $ie): ?>
+                                <option value="<?= $ie['id'] ?>"><?= sanitize($ie['codigo'] . ' - ' . $ie['nombre']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Descripción</label>
+                        <input type="text" class="form-control form-control-sm" name="descripcion" placeholder="Ej: Capacitación mejora ejecución">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-sm btn-primary w-100">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <?php if (!empty($relaciones)): ?>
             <div class="list-group list-group-flush">
                 <?php foreach ($relaciones as $rel): ?>
@@ -128,11 +164,16 @@ require_once __DIR__ . '/../layout/header.php';
                         </span>
                         <span class="fw-semibold me-2"><?= sanitize($rel['destino_nombre']) ?></span>
                         <?php if (!empty($rel['descripcion'])): ?>
-                            <br class="d-md-none">
-                            <small class="text-muted ms-md-3 mt-1 mt-md-0 d-block d-md-inline">
+                            <small class="text-muted ms-md-3 mt-1 mt-md-0">
                                 <i class="bi bi-info-circle me-1"></i><?= sanitize($rel['descripcion']) ?>
                             </small>
                         <?php endif; ?>
+                        <form method="POST" action="<?= BASE_URL ?>index.php?page=mapa&action=eliminar_relacion&id=<?= $rel['id'] ?>"
+                              class="ms-auto" onsubmit="return confirm('¿Eliminar esta relación?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
                     </div>
                 <?php endforeach; ?>
             </div>
