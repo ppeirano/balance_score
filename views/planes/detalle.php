@@ -170,7 +170,14 @@ require_once __DIR__ . '/../layout/header.php';
                                     </form>
                                 </td>
                                 <td><?= formatDate($act['fecha_limite']) ?></td>
-                                <td><?= sanitize($act['observaciones'] ?? '-') ?></td>
+                                <td>
+                                    <?= sanitize($act['observaciones'] ?? '-') ?>
+                                    <?php if (!empty($adjuntosAct[$act['id']])): ?>
+                                        <span class="badge bg-secondary ms-1" title="<?= count($adjuntosAct[$act['id']]) ?> archivo(s) adjunto(s)">
+                                            <i class="bi bi-paperclip"></i> <?= count($adjuntosAct[$act['id']]) ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="<?= BASE_URL ?>index.php?page=actividades&action=editar&id=<?= $act['id'] ?>"
@@ -229,50 +236,6 @@ require_once __DIR__ . '/../layout/header.php';
                                     </td>
                                 </tr>
                             <?php endif; ?>
-                            <!-- Adjuntos de esta actividad -->
-                            <tr class="table-light">
-                                <td colspan="7" class="ps-5">
-                                    <strong><i class="bi bi-paperclip me-1"></i>Archivos Adjuntos:</strong>
-                                    <?php if (!empty($adjuntosAct[$act['id']])): ?>
-                                        <ul class="list-group list-group-flush mt-1 mb-2">
-                                            <?php foreach ($adjuntosAct[$act['id']] as $adj): ?>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
-                                                    <div>
-                                                        <i class="bi bi-file-earmark me-1"></i>
-                                                        <?= sanitize($adj['nombre_original']) ?>
-                                                        <small class="text-muted ms-2">(<?= round($adj['tamano'] / 1024, 1) ?> KB)</small>
-                                                    </div>
-                                                    <div class="d-flex gap-1">
-                                                        <a href="<?= BASE_URL ?>index.php?page=adjuntos&action=descargar&id=<?= $adj['id'] ?>"
-                                                           class="btn btn-sm btn-outline-primary" title="Descargar">
-                                                            <i class="bi bi-download"></i>
-                                                        </a>
-                                                        <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=eliminar&id=<?= $adj['id'] ?>"
-                                                              class="d-inline"
-                                                              onsubmit="return confirm('¿Eliminar este archivo?');">
-                                                            <input type="hidden" name="redirect" value="index.php?page=planes&action=detalle&id=<?= $plan['id'] ?>">
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        </ul>
-                                    <?php endif; ?>
-                                    <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=subir" enctype="multipart/form-data" class="mt-1">
-                                        <input type="hidden" name="entidad_tipo" value="actividad">
-                                        <input type="hidden" name="entidad_id" value="<?= $act['id'] ?>">
-                                        <input type="hidden" name="redirect" value="index.php?page=planes&action=detalle&id=<?= $plan['id'] ?>">
-                                        <div class="input-group input-group-sm" style="max-width: 500px;">
-                                            <input type="file" class="form-control form-control-sm" name="archivo" required>
-                                            <button type="submit" class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-upload me-1"></i>Subir
-                                            </button>
-                                        </div>
-                                    </form>
-                                </td>
-                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>

@@ -138,4 +138,58 @@ require_once __DIR__ . '/../layout/header.php';
     </div>
 </div>
 
+<?php if ($esEdicion): ?>
+<!-- Archivos Adjuntos -->
+<?php
+    require_once __DIR__ . '/../../models/ArchivoAdjunto.php';
+    $adjuntos = ArchivoAdjunto::getByEntidad($pdo, 'actividad', $actividad['id']);
+?>
+<div class="card mt-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-paperclip me-2"></i>Archivos Adjuntos</h5>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($adjuntos)): ?>
+            <ul class="list-group mb-3">
+                <?php foreach ($adjuntos as $adj): ?>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark me-1"></i>
+                            <?= sanitize($adj['nombre_original']) ?>
+                            <small class="text-muted ms-2">(<?= round($adj['tamano'] / 1024, 1) ?> KB)</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="<?= BASE_URL ?>index.php?page=adjuntos&action=descargar&id=<?= $adj['id'] ?>"
+                               class="btn btn-sm btn-outline-primary" title="Descargar">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=eliminar&id=<?= $adj['id'] ?>"
+                                  class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar este archivo?');">
+                                <input type="hidden" name="redirect" value="index.php?page=actividades&action=editar&id=<?= $actividad['id'] ?>">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=subir" enctype="multipart/form-data">
+            <input type="hidden" name="entidad_tipo" value="actividad">
+            <input type="hidden" name="entidad_id" value="<?= $actividad['id'] ?>">
+            <input type="hidden" name="redirect" value="index.php?page=actividades&action=editar&id=<?= $actividad['id'] ?>">
+            <div class="input-group">
+                <input type="file" class="form-control" name="archivo" required>
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="bi bi-upload me-1"></i>Subir Archivo
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
