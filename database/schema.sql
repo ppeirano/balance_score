@@ -202,6 +202,19 @@ CREATE TABLE archivos_adjuntos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Seguimientos (eventos de calendario)
+CREATE TABLE seguimientos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entidad_tipo ENUM('plan','actividad','hito') NOT NULL,
+    entidad_id INT NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT DEFAULT NULL,
+    fecha DATE NOT NULL,
+    hora TIME DEFAULT NULL,
+    completado TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Evaluaciones IA
 CREATE TABLE evaluaciones_ia (
     id INT AUTO_INCREMENT PRIMARY KEY,

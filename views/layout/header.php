@@ -74,6 +74,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link <?= activeNav('calendario', $page) ?>" href="<?= BASE_URL ?>index.php?page=calendario">
+                                <i class="bi bi-calendar-event me-2"></i>Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link <?= activeNav('responsables', $page) ?>" href="<?= BASE_URL ?>index.php?page=responsables">
                                 <i class="bi bi-person-badge me-2"></i>Responsables
                             </a>
