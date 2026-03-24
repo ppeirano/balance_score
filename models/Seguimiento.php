@@ -96,6 +96,12 @@ class Seguimiento {
         redirect('index.php?page=calendario');
     }
 
+    static function completar($pdo, $id) {
+        $pdo->prepare("UPDATE seguimientos SET completado = 1 WHERE id = ?")->execute([$id]);
+        flash('success', 'Seguimiento marcado como completado.');
+        redirect('index.php?page=calendario');
+    }
+
     static function eliminar($pdo, $id) {
         $pdo->prepare("DELETE FROM seguimientos WHERE id = ?")->execute([$id]);
         flash('success', 'Seguimiento eliminado.');

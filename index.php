@@ -279,6 +279,12 @@ switch ($page) {
                 require __DIR__ . '/models/Seguimiento.php';
                 Seguimiento::guardar($pdo, $_POST);
                 break;
+            case 'completar':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    require __DIR__ . '/models/Seguimiento.php';
+                    Seguimiento::completar($pdo, $id);
+                }
+                break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
                     require __DIR__ . '/models/Seguimiento.php';

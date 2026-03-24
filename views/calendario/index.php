@@ -23,6 +23,23 @@ $hitos = $pdo->query("
     ORDER BY pa.codigo, h.fecha_prevista
 ")->fetchAll();
 
+// Obtener próximos seguimientos (no completados, desde hoy)
+$proximosSeguimientos = $pdo->query("
+    SELECT s.*,
+        CASE s.entidad_tipo
+            WHEN 'plan' THEN CONCAT(pa.codigo, ' - ', pa.nombre)
+            WHEN 'actividad' THEN CONCAT('Act. ', a.codigo, ' - ', a.descripcion)
+            WHEN 'hito' THEN h.nombre
+        END AS entidad_nombre
+    FROM seguimientos s
+    LEFT JOIN planes_accion pa ON s.entidad_tipo = 'plan' AND s.entidad_id = pa.id
+    LEFT JOIN actividades a ON s.entidad_tipo = 'actividad' AND s.entidad_id = a.id
+    LEFT JOIN hitos h ON s.entidad_tipo = 'hito' AND s.entidad_id = h.id
+    WHERE s.fecha >= CURDATE() AND s.completado = 0
+    ORDER BY s.fecha ASC, s.hora ASC
+    LIMIT 20
+")->fetchAll();
+
 $pageTitle = 'Calendario de Seguimientos';
 require_once __DIR__ . '/../layout/header.php';
 ?>
@@ -47,6 +64,77 @@ require_once __DIR__ . '/../layout/header.php';
         <div id="calendario"></div>
     </div>
 </div>
+
+<!-- Próximos Eventos -->
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-clock me-2"></i>Próximos Eventos</h5>
+        <span class="badge bg-light text-dark"><?= count($proximosSeguimientos) ?> pendiente(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <?php if (empty($proximosSeguimientos)): ?>
+            <div class="alert alert-info mb-0 m-3">No hay seguimientos próximos pendientes.</div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Asociado a</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $hoy = date('Y-m-d');
+                        $tipoColores = ['plan' => 'primary', 'actividad' => 'success', 'hito' => 'warning'];
+                        $tipoLabels = ['plan' => 'Plan', 'actividad' => 'Actividad', 'hito' => 'Hito'];
+                        foreach ($proximosSeguimientos as $seg):
+                            $esHoy = ($seg['fecha'] === $hoy);
+                            $esMañana = ($seg['fecha'] === date('Y-m-d', strtotime('+1 day')));
+                        ?>
+                            <tr class="<?= $esHoy ? 'table-warning' : '' ?>">
+                                <td>
+                                    <?php if ($esHoy): ?>
+                                        <span class="badge bg-warning text-dark">Hoy</span>
+                                    <?php elseif ($esMañana): ?>
+                                        <span class="badge bg-info text-dark">Mañana</span>
+                                    <?php else: ?>
+                                        <?= date('d/m/Y', strtotime($seg['fecha'])) ?>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?= $seg['hora'] ? date('H:i', strtotime($seg['hora'])) : '<span class="text-muted">-</span>' ?></td>
+                                <td><strong><?= sanitize($seg['titulo']) ?></strong></td>
+                                <td>
+                                    <span class="badge bg-<?= $tipoColores[$seg['entidad_tipo']] ?? 'secondary' ?>">
+                                        <?= $tipoLabels[$seg['entidad_tipo']] ?? $seg['entidad_tipo'] ?>
+                                    </span>
+                                </td>
+                                <td><?= sanitize($seg['entidad_nombre'] ?? '-') ?></td>
+                                <td class="text-muted"><?= sanitize(mb_strimwidth($seg['descripcion'] ?? '-', 0, 60, '...')) ?></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-success" title="Marcar como completado"
+                                            onclick="completarSeguimiento(<?= $seg['id'] ?>)">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Form oculto para completar seguimiento -->
+<form id="formCompletar" method="POST" style="display:none;">
+    <!-- action se setea dinámicamente via JS -->
+</form>
 
 <!-- Modal Crear/Editar Seguimiento -->
 <div class="modal fade" id="modalSeguimiento" tabindex="-1">
@@ -157,6 +245,13 @@ const entidades = {
 };
 
 const tipoLabels = { plan: 'Plan de Acción', actividad: 'Actividad', hito: 'Hito' };
+
+function completarSeguimiento(id) {
+    if (!confirm('¿Marcar este seguimiento como completado?')) return;
+    const form = document.getElementById('formCompletar');
+    form.action = '<?= BASE_URL ?>index.php?page=calendario&action=completar&id=' + id;
+    form.submit();
+}
 
 function cambiarEntidad() {
     const tipo = document.getElementById('seg_entidad_tipo').value;
