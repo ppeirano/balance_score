@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../models/Riesgo.php';
 require_once __DIR__ . '/../../models/Iniciativa.php';
 require_once __DIR__ . '/../../models/PlanAccion.php';
+require_once __DIR__ . '/../../models/Responsable.php';
 
 $riesgo = null;
 if ($id) {
@@ -9,6 +10,7 @@ if ($id) {
 }
 $iniciativas = Iniciativa::getAll($pdo);
 $planes = PlanAccion::getAll($pdo);
+$responsables = Responsable::getAll($pdo);
 
 require_once __DIR__ . '/../layout/header.php';
 $esEditar = ($riesgo !== null);
@@ -74,7 +76,15 @@ $esEditar = ($riesgo !== null);
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Responsable</label>
-                    <input type="text" class="form-control" name="responsable" value="<?= sanitize($riesgo['responsable'] ?? '') ?>">
+                    <select class="form-select" name="responsable">
+                        <option value="">-- Seleccionar --</option>
+                        <?php foreach ($responsables as $resp): ?>
+                            <option value="<?= sanitize($resp['nombre']) ?>"
+                                <?= ($riesgo && ($riesgo['responsable'] ?? '') === $resp['nombre']) ? 'selected' : '' ?>>
+                                <?= sanitize($resp['nombre']) ?><?= $resp['cargo'] ? ' (' . sanitize($resp['cargo']) . ')' : '' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
 

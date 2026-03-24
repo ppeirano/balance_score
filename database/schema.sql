@@ -215,6 +215,15 @@ CREATE TABLE seguimientos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Responsables (lista maestra)
+CREATE TABLE responsables (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    cargo VARCHAR(100) DEFAULT NULL,
+    activo TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Evaluaciones IA
 CREATE TABLE evaluaciones_ia (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -233,6 +242,19 @@ CREATE TABLE evaluaciones_ia (
 -- Período estratégico activo
 INSERT INTO periodos_estrategicos (nombre, fecha_inicio, fecha_fin, activo) VALUES
 ('2025-2026', '2025-04-01', '2026-03-31', 1);
+
+-- Responsables
+INSERT INTO responsables (nombre, cargo) VALUES
+('P. Serrago', 'Marketing'),
+('G. Vigetti', 'Comercial'),
+('A. Agliotta', 'Calidad'),
+('N. Braulinese', 'Produccion'),
+('E. Nordi', 'Sistemas'),
+('D. Hernandez', 'Supply Chain'),
+('E. Callisto', 'I+D'),
+('M. Solda', 'Exportaciones'),
+('E. Moyano', 'RRHH'),
+('A. Aliano', 'Finanzas');
 
 -- Perspectivas del BSC
 INSERT INTO perspectivas (nombre, color, icono, orden) VALUES

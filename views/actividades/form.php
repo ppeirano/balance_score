@@ -16,6 +16,10 @@ $esEdicion = ($actividad !== null);
 // Determinar plan_accion_id: desde la actividad si editamos, o desde GET si creamos
 $planAccionId = $esEdicion ? $actividad['plan_accion_id'] : (isset($_GET['plan_id']) ? (int)$_GET['plan_id'] : null);
 
+// Obtener lista de responsables
+require_once __DIR__ . '/../../models/Responsable.php';
+$responsables = Responsable::getAll($pdo);
+
 // Obtener lista de planes para dropdown (en caso de que no venga plan_id)
 $stmtPlanes = $pdo->query("
     SELECT pa.id, pa.codigo, pa.nombre, ie.codigo AS ie_codigo
@@ -95,8 +99,15 @@ require_once __DIR__ . '/../layout/header.php';
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="responsable" class="form-label">Responsable</label>
-                    <input type="text" class="form-control" id="responsable" name="responsable"
-                           value="<?= $esEdicion ? sanitize($actividad['responsable'] ?? '') : '' ?>">
+                    <select class="form-select" id="responsable" name="responsable">
+                        <option value="">-- Seleccionar --</option>
+                        <?php foreach ($responsables as $resp): ?>
+                            <option value="<?= sanitize($resp['nombre']) ?>"
+                                <?= ($esEdicion && ($actividad['responsable'] ?? '') === $resp['nombre']) ? 'selected' : '' ?>>
+                                <?= sanitize($resp['nombre']) ?><?= $resp['cargo'] ? ' (' . sanitize($resp['cargo']) . ')' : '' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="col-md-3">
                     <label for="estado" class="form-label">Estado</label>

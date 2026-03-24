@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../../models/Iniciativa.php';
+require_once __DIR__ . '/../../models/Responsable.php';
 
 // Obtener todas las iniciativas para el dropdown
 $iniciativas = Iniciativa::getAll($pdo);
+$responsables = Responsable::getAll($pdo);
 
 // Si estamos editando, cargar el plan existente
 $plan = null;
@@ -67,9 +69,15 @@ require_once __DIR__ . '/../layout/header.php';
                 </div>
                 <div class="col-md-6">
                     <label for="owner" class="form-label">Owner</label>
-                    <input type="text" class="form-control" id="owner" name="owner"
-                           value="<?= $esEdicion ? sanitize($plan['owner'] ?? '') : '' ?>"
-                           placeholder="Responsable del plan">
+                    <select class="form-select" id="owner" name="owner">
+                        <option value="">-- Seleccionar --</option>
+                        <?php foreach ($responsables as $resp): ?>
+                            <option value="<?= sanitize($resp['nombre']) ?>"
+                                <?= ($esEdicion && ($plan['owner'] ?? '') === $resp['nombre']) ? 'selected' : '' ?>>
+                                <?= sanitize($resp['nombre']) ?><?= $resp['cargo'] ? ' (' . sanitize($resp['cargo']) . ')' : '' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
 

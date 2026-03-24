@@ -95,6 +95,11 @@
                         </li>
                         <hr class="text-muted">
                         <li class="nav-item">
+                            <a class="nav-link <?= activeNav('admin_responsables', $page) ?>" href="<?= BASE_URL ?>index.php?page=admin_responsables">
+                                <i class="bi bi-person-gear me-2"></i>Admin. Responsables
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link <?= activeNav('periodos', $page) ?>" href="<?= BASE_URL ?>index.php?page=periodos">
                                 <i class="bi bi-calendar-range me-2"></i>Períodos
                             </a>

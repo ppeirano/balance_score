@@ -196,6 +196,20 @@ switch ($page) {
     case 'responsables':
         require __DIR__ . '/views/responsables/index.php';
         break;
+    case 'admin_responsables':
+        require __DIR__ . '/models/Responsable.php';
+        switch ($action) {
+            case 'guardar':
+                Responsable::guardar($pdo, $_POST);
+                break;
+            case 'eliminar':
+                if ($id) Responsable::eliminar($pdo, $id);
+                else redirect('index.php?page=admin_responsables');
+                break;
+            default:
+                require __DIR__ . '/views/admin_responsables/index.php';
+        }
+        break;
     case 'reportes':
         require __DIR__ . '/views/reportes/generar.php';
         break;

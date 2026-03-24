@@ -2,11 +2,13 @@
 require_once __DIR__ . '/../../models/Reunion.php';
 require_once __DIR__ . '/../../models/Compromiso.php';
 require_once __DIR__ . '/../../models/PlanAccion.php';
+require_once __DIR__ . '/../../models/Responsable.php';
 
 $reunion = Reunion::getById($pdo, $id);
 if (!$reunion) { flash('error', 'Reunión no encontrada.'); redirect('index.php?page=reuniones'); }
 $compromisos = Compromiso::getByReunion($pdo, $id);
 $planes = PlanAccion::getAll($pdo);
+$responsables = Responsable::getAll($pdo);
 
 require_once __DIR__ . '/../layout/header.php';
 ?>
@@ -65,7 +67,14 @@ require_once __DIR__ . '/../layout/header.php';
                             <input type="text" class="form-control form-control-sm" name="descripcion" placeholder="Descripción del compromiso" required>
                         </div>
                         <div class="col-md-3">
-                            <input type="text" class="form-control form-control-sm" name="responsable" placeholder="Responsable">
+                            <select class="form-select form-select-sm" name="responsable">
+                                <option value="">Responsable...</option>
+                                <?php foreach ($responsables as $resp): ?>
+                                    <option value="<?= sanitize($resp['nombre']) ?>">
+                                        <?= sanitize($resp['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <input type="date" class="form-control form-control-sm" name="fecha_limite">
