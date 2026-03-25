@@ -77,7 +77,10 @@ class Kpi {
             ]);
             flash('success', 'KPI creado correctamente.');
         }
-        redirect('index.php?page=kpis');
+        $filtros = [];
+        if (!empty($data['filtro_ie'])) $filtros[] = 'ie=' . (int)$data['filtro_ie'];
+        if (!empty($data['filtro_tipo'])) $filtros[] = 'tipo=' . urlencode($data['filtro_tipo']);
+        redirect('index.php?page=kpis' . ($filtros ? '&' . implode('&', $filtros) : ''));
     }
 
     static function registrarValor($pdo, $data) {

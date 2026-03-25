@@ -25,6 +25,12 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
             <?php if ($esEditar): ?>
                 <input type="hidden" name="id" value="<?= (int)$kpi['id'] ?>">
             <?php endif; ?>
+            <?php
+                $filtroIE = $_GET['filtro_ie'] ?? '';
+                $filtroTipo = $_GET['filtro_tipo'] ?? '';
+            ?>
+            <?php if ($filtroIE): ?><input type="hidden" name="filtro_ie" value="<?= (int)$filtroIE ?>"><?php endif; ?>
+            <?php if ($filtroTipo): ?><input type="hidden" name="filtro_tipo" value="<?= sanitize($filtroTipo) ?>"><?php endif; ?>
             <?php if ($periodoActivo): ?>
                 <input type="hidden" name="periodo_id" value="<?= (int)$periodoActivo['id'] ?>">
             <?php endif; ?>
