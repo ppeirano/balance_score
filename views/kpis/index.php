@@ -142,6 +142,8 @@ require_once __DIR__ . '/../layout/header.php';
                                 </a>
                                 <form method="POST" action="<?= BASE_URL ?>index.php?page=kpis&action=eliminar&id=<?= (int)$kpi['id'] ?>"
                                       class="d-inline" onsubmit="return confirm('¿Eliminar este KPI?');">
+                                    <?php if ($filtroIE): ?><input type="hidden" name="ie" value="<?= (int)$filtroIE ?>"><?php endif; ?>
+                                    <?php if ($filtroTipo): ?><input type="hidden" name="tipo" value="<?= sanitize($filtroTipo) ?>"><?php endif; ?>
                                     <button type="submit" class="btn btn-outline-danger" title="Eliminar">
                                         <i class="bi bi-trash"></i>
                                     </button>

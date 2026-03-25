@@ -237,7 +237,10 @@ switch ($page) {
                     $pdo->prepare("DELETE FROM kpis WHERE id = ?")->execute([$id]);
                     flash('success', 'KPI eliminado.');
                 }
-                redirect('index.php?page=kpis');
+                $filtros = [];
+                if (!empty($_POST['ie'])) $filtros[] = 'ie=' . (int)$_POST['ie'];
+                if (!empty($_POST['tipo'])) $filtros[] = 'tipo=' . urlencode($_POST['tipo']);
+                redirect('index.php?page=kpis' . ($filtros ? '&' . implode('&', $filtros) : ''));
                 break;
             default:
                 require __DIR__ . '/views/kpis/index.php';
