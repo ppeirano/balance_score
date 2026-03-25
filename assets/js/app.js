@@ -1,4 +1,4 @@
-// BSC Lab Pharma - JavaScript principal
+// BSC Temis Lostalo - JavaScript principal
 
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-dismiss alerts after 5 seconds

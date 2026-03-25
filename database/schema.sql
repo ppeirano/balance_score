@@ -1,6 +1,6 @@
 -- =====================================================
--- BSC Lab Pharma - Schema de Base de Datos
--- Laboratorio Farmacéutico - Gestión Estratégica
+-- BSC Temis Lostalo - Schema de Base de Datos
+-- Temis Lostalo - Gestión Estratégica
 -- =====================================================
 
 CREATE DATABASE IF NOT EXISTS balance_score CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
