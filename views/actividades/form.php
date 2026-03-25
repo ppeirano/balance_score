@@ -161,39 +161,68 @@ require_once __DIR__ . '/../layout/header.php';
     require_once __DIR__ . '/../../models/NotaActividad.php';
     $notas = NotaActividad::getByActividad($pdo, $actividad['id']);
 ?>
+<style>
+    .nota-item:hover .btn-eliminar-nota { opacity: 1; }
+    .btn-eliminar-nota { opacity: 0; transition: opacity 0.2s; }
+    .nota-timeline { position: relative; padding-left: 1.5rem; }
+    .nota-timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.45rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+    .nota-item { position: relative; }
+    .nota-item::before {
+        content: '';
+        position: absolute;
+        left: -1.05rem;
+        top: 0.75rem;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6c757d;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #dee2e6;
+    }
+</style>
 <div class="card mt-4">
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Historial de Notas</h5>
-        <span class="badge bg-light text-dark"><?= count($notas) ?></span>
+        <?php if (!empty($notas)): ?>
+            <span class="badge bg-light text-dark"><?= count($notas) ?></span>
+        <?php endif; ?>
     </div>
     <div class="card-body">
         <!-- Agregar nueva nota -->
-        <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=guardar" class="mb-3">
+        <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=guardar" class="mb-4">
             <input type="hidden" name="actividad_id" value="<?= $actividad['id'] ?>">
-            <div class="input-group">
-                <textarea class="form-control" name="texto" rows="2" placeholder="Escribir una nota..." required></textarea>
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-plus-lg me-1"></i>Agregar
+            <textarea class="form-control mb-2" name="texto" rows="2" placeholder="Escribir una nota..." required></textarea>
+            <div class="text-end">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="bi bi-send me-1"></i>Agregar nota
                 </button>
             </div>
         </form>
 
         <?php if (!empty($notas)): ?>
-            <div class="list-group">
+            <div class="nota-timeline">
                 <?php foreach ($notas as $nota): ?>
-                    <div class="list-group-item">
+                    <div class="nota-item mb-3">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
-                                <p class="mb-1"><?= nl2br(sanitize($nota['texto'])) ?></p>
-                                <small class="text-muted">
+                                <small class="text-muted d-block mb-1">
                                     <i class="bi bi-clock me-1"></i><?= date('d/m/Y H:i', strtotime($nota['created_at'])) ?>
                                 </small>
+                                <p class="mb-0"><?= nl2br(sanitize($nota['texto'])) ?></p>
                             </div>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=eliminar&id=<?= $nota['id'] ?>"
                                   class="ms-2"
                                   onsubmit="return confirm('¿Eliminar esta nota?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar nota">
-                                    <i class="bi bi-trash"></i>
+                                <button type="submit" class="btn btn-sm btn-link text-danger btn-eliminar-nota p-0" title="Eliminar nota">
+                                    <i class="bi bi-x-lg"></i>
                                 </button>
                             </form>
                         </div>
@@ -201,7 +230,10 @@ require_once __DIR__ . '/../layout/header.php';
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>No hay notas registradas aún.</p>
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-chat-left-text d-block mb-2" style="font-size: 1.5rem;"></i>
+                No hay notas registradas aún.
+            </div>
         <?php endif; ?>
     </div>
 </div>
