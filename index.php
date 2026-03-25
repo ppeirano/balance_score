@@ -130,6 +130,23 @@ switch ($page) {
                 redirect('index.php?page=planes');
         }
         break;
+    case 'notas_actividad':
+        require __DIR__ . '/models/NotaActividad.php';
+        switch ($action) {
+            case 'guardar':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    NotaActividad::guardar($pdo, $_POST);
+                }
+                break;
+            case 'eliminar':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    NotaActividad::eliminar($pdo, $id);
+                }
+                break;
+            default:
+                redirect('index.php?page=planes');
+        }
+        break;
     case 'kpis':
         switch ($action) {
             case 'crear':

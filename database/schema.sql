@@ -215,6 +215,15 @@ CREATE TABLE seguimientos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Notas de actividades (historial)
+CREATE TABLE notas_actividad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    actividad_id INT NOT NULL,
+    texto TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (actividad_id) REFERENCES actividades(id) ON DELETE CASCADE
+);
+
 -- Responsables (lista maestra)
 CREATE TABLE responsables (
     id INT AUTO_INCREMENT PRIMARY KEY,

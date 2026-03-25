@@ -156,6 +156,56 @@ require_once __DIR__ . '/../layout/header.php';
 </div>
 
 <?php if ($esEdicion): ?>
+<!-- Historial de Notas -->
+<?php
+    require_once __DIR__ . '/../../models/NotaActividad.php';
+    $notas = NotaActividad::getByActividad($pdo, $actividad['id']);
+?>
+<div class="card mt-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Historial de Notas</h5>
+        <span class="badge bg-light text-dark"><?= count($notas) ?></span>
+    </div>
+    <div class="card-body">
+        <!-- Agregar nueva nota -->
+        <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=guardar" class="mb-3">
+            <input type="hidden" name="actividad_id" value="<?= $actividad['id'] ?>">
+            <div class="input-group">
+                <textarea class="form-control" name="texto" rows="2" placeholder="Escribir una nota..." required></textarea>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Agregar
+                </button>
+            </div>
+        </form>
+
+        <?php if (!empty($notas)): ?>
+            <div class="list-group">
+                <?php foreach ($notas as $nota): ?>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <p class="mb-1"><?= nl2br(sanitize($nota['texto'])) ?></p>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i><?= date('d/m/Y H:i', strtotime($nota['created_at'])) ?>
+                                </small>
+                            </div>
+                            <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=eliminar&id=<?= $nota['id'] ?>"
+                                  class="ms-2"
+                                  onsubmit="return confirm('¿Eliminar esta nota?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar nota">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>No hay notas registradas aún.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
 <!-- Archivos Adjuntos -->
 <?php
     require_once __DIR__ . '/../../models/ArchivoAdjunto.php';
