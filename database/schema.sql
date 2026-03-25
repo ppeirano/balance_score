@@ -233,10 +233,50 @@ CREATE TABLE responsables (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Proyectos
+CREATE TABLE proyectos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(200) NOT NULL,
+    descripcion TEXT,
+    responsable VARCHAR(100) DEFAULT NULL,
+    estado ENUM('pendiente','en_progreso','completado','cancelado','suspendido') DEFAULT 'pendiente',
+    fecha_inicio DATE DEFAULT NULL,
+    fecha_fin DATE DEFAULT NULL,
+    presupuesto DECIMAL(14,2) DEFAULT NULL,
+    prioridad INT DEFAULT 1,
+    avance INT DEFAULT 0,
+    periodo_id INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (periodo_id) REFERENCES periodos_estrategicos(id) ON DELETE SET NULL
+);
+
+-- Vínculos de proyectos con IEs y Planes
+CREATE TABLE proyecto_vinculos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    proyecto_id INT NOT NULL,
+    entidad_tipo ENUM('iniciativa','plan_accion') NOT NULL,
+    entidad_id INT NOT NULL,
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id) ON DELETE CASCADE
+);
+
+-- Entregables de proyectos
+CREATE TABLE proyecto_entregables (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    proyecto_id INT NOT NULL,
+    nombre VARCHAR(200) NOT NULL,
+    descripcion TEXT,
+    responsable VARCHAR(100) DEFAULT NULL,
+    fecha_prevista DATE DEFAULT NULL,
+    fecha_real DATE DEFAULT NULL,
+    estado ENUM('pendiente','en_progreso','completado') DEFAULT 'pendiente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id) ON DELETE CASCADE
+);
+
 -- Evaluaciones IA
 CREATE TABLE evaluaciones_ia (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    tipo ENUM('general','iniciativa','plan_accion','reunion','riesgos') NOT NULL,
+    tipo ENUM('general','iniciativa','plan_accion','reunion','riesgos','proyecto') NOT NULL,
     entidad_id INT DEFAULT NULL,
     prompt_enviado TEXT,
     respuesta TEXT,

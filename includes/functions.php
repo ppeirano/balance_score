@@ -36,7 +36,8 @@ function estadoBadge($estado) {
         'pendiente' => 'bg-secondary',
         'en_progreso' => 'bg-primary',
         'completado' => 'bg-success',
-        'cancelado' => 'bg-danger'
+        'cancelado' => 'bg-danger',
+        'suspendido' => 'bg-warning text-dark'
     ];
     $clase = $clases[$estado] ?? 'bg-secondary';
     $texto = str_replace('_', ' ', ucfirst($estado));

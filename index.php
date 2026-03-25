@@ -147,6 +147,64 @@ switch ($page) {
                 redirect('index.php?page=planes');
         }
         break;
+    case 'proyectos':
+        require __DIR__ . '/models/Proyecto.php';
+        switch ($action) {
+            case 'index':
+                require __DIR__ . '/views/proyectos/index.php';
+                break;
+            case 'crear':
+            case 'editar':
+                require __DIR__ . '/views/proyectos/form.php';
+                break;
+            case 'guardar':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    Proyecto::guardar($pdo, $_POST);
+                }
+                break;
+            case 'detalle':
+                require __DIR__ . '/views/proyectos/detalle.php';
+                break;
+            case 'eliminar':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    $pdo->prepare("DELETE FROM proyectos WHERE id = ?")->execute([$id]);
+                    flash('success', 'Proyecto eliminado.');
+                }
+                redirect('index.php?page=proyectos');
+                break;
+            case 'guardar_vinculo':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    Proyecto::guardarVinculo($pdo, $_POST);
+                }
+                break;
+            case 'eliminar_vinculo':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    Proyecto::eliminarVinculo($pdo, $id);
+                }
+                break;
+            case 'guardar_entregable':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    Proyecto::guardarEntregable($pdo, $_POST);
+                }
+                break;
+            case 'eliminar_entregable':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    Proyecto::eliminarEntregable($pdo, $id);
+                }
+                break;
+            case 'cambiar_estado_entregable':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    $estado = $_POST['estado'] ?? 'pendiente';
+                    $pdo->prepare("UPDATE proyecto_entregables SET estado = ? WHERE id = ?")->execute([$estado, $id]);
+                    flash('success', 'Estado del entregable actualizado.');
+                    $proyectoId = $_POST['proyecto_id'] ?? '';
+                    redirect('index.php?page=proyectos&action=detalle&id=' . $proyectoId);
+                }
+                break;
+            default:
+                redirect('index.php?page=proyectos');
+        }
+        break;
     case 'kpis':
         switch ($action) {
             case 'crear':
