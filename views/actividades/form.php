@@ -197,9 +197,20 @@ require_once __DIR__ . '/../layout/header.php';
     </div>
     <div class="card-body">
         <!-- Agregar nueva nota -->
-        <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=guardar" class="mb-4">
+        <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=guardar" class="mb-4" id="formNota">
             <input type="hidden" name="actividad_id" value="<?= $actividad['id'] ?>">
-            <textarea class="form-control mb-2" name="texto" rows="2" placeholder="Escribir una nota..." required></textarea>
+            <input type="hidden" name="imagen" id="notaImagen" value="">
+            <textarea class="form-control mb-2" name="texto" id="notaTexto" rows="2" placeholder="Escribir una nota... (pod&#233;s pegar im&#225;genes con Ctrl+V)" required></textarea>
+            <!-- Preview de imagen pegada -->
+            <div id="notaImagenPreview" class="mb-2" style="display:none;">
+                <div class="position-relative d-inline-block">
+                    <img id="notaImagenImg" src="" class="img-thumbnail" style="max-height: 150px;">
+                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" onclick="quitarImagenNota()" title="Quitar imagen">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <small class="text-muted d-block mt-1"><i class="bi bi-image me-1"></i>Imagen adjunta</small>
+            </div>
             <div class="text-end">
                 <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-send me-1"></i>Agregar nota
@@ -217,6 +228,13 @@ require_once __DIR__ . '/../layout/header.php';
                                     <i class="bi bi-clock me-1"></i><?= date('d/m/Y H:i', strtotime($nota['created_at'])) ?>
                                 </small>
                                 <p class="mb-0"><?= nl2br(sanitize($nota['texto'])) ?></p>
+                                <?php if ($nota['imagen']): ?>
+                                    <div class="mt-2">
+                                        <a href="<?= BASE_URL ?>uploads/notas/<?= sanitize($nota['imagen']) ?>" target="_blank">
+                                            <img src="<?= BASE_URL ?>uploads/notas/<?= sanitize($nota['imagen']) ?>" class="img-thumbnail" style="max-height: 300px; cursor: pointer;">
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=notas_actividad&action=eliminar&id=<?= $nota['id'] ?>"
                                   class="ms-2"
@@ -237,6 +255,56 @@ require_once __DIR__ . '/../layout/header.php';
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+// Paste de imágenes en el textarea de notas
+document.getElementById('notaTexto').addEventListener('paste', function(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            e.preventDefault();
+            const file = items[i].getAsFile();
+            subirImagenNota(file);
+            return;
+        }
+    }
+});
+
+function subirImagenNota(file) {
+    const formData = new FormData();
+    formData.append('imagen', file, file.name || 'pasted-image.png');
+
+    const preview = document.getElementById('notaImagenPreview');
+    const img = document.getElementById('notaImagenImg');
+    preview.style.display = 'block';
+    img.src = URL.createObjectURL(file);
+
+    fetch('<?= BASE_URL ?>index.php?page=notas_actividad&action=subir_imagen', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) {
+            document.getElementById('notaImagen').value = data.filename;
+        } else {
+            alert('Error al subir imagen: ' + (data.error || 'desconocido'));
+            quitarImagenNota();
+        }
+    })
+    .catch(() => {
+        alert('Error de conexión al subir la imagen.');
+        quitarImagenNota();
+    });
+}
+
+function quitarImagenNota() {
+    document.getElementById('notaImagen').value = '';
+    document.getElementById('notaImagenPreview').style.display = 'none';
+    document.getElementById('notaImagenImg').src = '';
+}
+</script>
 
 <!-- Archivos Adjuntos -->
 <?php

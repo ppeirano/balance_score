@@ -220,6 +220,7 @@ CREATE TABLE notas_actividad (
     id INT AUTO_INCREMENT PRIMARY KEY,
     actividad_id INT NOT NULL,
     texto TEXT NOT NULL,
+    imagen VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (actividad_id) REFERENCES actividades(id) ON DELETE CASCADE
 );

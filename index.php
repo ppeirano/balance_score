@@ -135,9 +135,19 @@ switch ($page) {
         switch ($action) {
             case 'guardar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    NotaActividad::guardar($pdo, $_POST);
+                    NotaActividad::guardar($pdo, $_POST, $_FILES);
                 }
                 break;
+            case 'subir_imagen':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['imagen'])) {
+                    $resultado = NotaActividad::subirImagen($_FILES['imagen']);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
+                    exit;
+                }
+                header('Content-Type: application/json');
+                echo json_encode(['ok' => false, 'error' => 'No se recibió imagen.']);
+                exit;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
                     NotaActividad::eliminar($pdo, $id);
