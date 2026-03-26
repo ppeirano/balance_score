@@ -123,7 +123,7 @@ require_once __DIR__ . '/../layout/header.php';
                         <div class="col-md-1">
                             <input type="hidden" name="act_color" value="#A8D8EA">
                             <div class="d-flex gap-1 flex-wrap" style="padding-top:2px;">
-                                <?php foreach (['#A8D8EA','#5DADE2','#85C1E9','#A3E4D7','#2E86C1','#1B4F72','#76D7C4'] as $c): ?>
+                                <?php foreach (['#A8D8EA','#5DADE2','#85C1E9','#A3E4D7','#2E86C1','#1B4F72','#76D7C4','#F5B7B1','#D7BDE2'] as $c): ?>
                                     <span class="color-swatch" onclick="this.closest('.col-md-1').querySelector('input[name=act_color]').value='<?= $c ?>';this.closest('.col-md-1').querySelectorAll('.color-swatch').forEach(s=>s.style.outline='none');this.style.outline='2px solid #333';" style="display:inline-block;width:16px;height:16px;border-radius:3px;background:<?= $c ?>;cursor:pointer;<?= $c === '#A8D8EA' ? 'outline:2px solid #333;' : '' ?>"></span>
                                 <?php endforeach; ?>
                             </div>
@@ -225,7 +225,7 @@ require_once __DIR__ . '/../layout/header.php';
                                     <label class="form-label small text-muted mb-0">Color</label>
                                     <input type="hidden" name="act_color" value="<?= sanitize($a['color'] ?? '#A8D8EA') ?>">
                                     <div class="d-flex gap-1 flex-wrap" style="padding-top:2px;">
-                                        <?php foreach (['#A8D8EA','#5DADE2','#85C1E9','#A3E4D7','#2E86C1','#1B4F72','#76D7C4'] as $c): ?>
+                                        <?php foreach (['#A8D8EA','#5DADE2','#85C1E9','#A3E4D7','#2E86C1','#1B4F72','#76D7C4','#F5B7B1','#D7BDE2'] as $c): ?>
                                             <span class="color-swatch" onclick="this.closest('.col-md-1').querySelector('input[name=act_color]').value='<?= $c ?>';this.closest('.col-md-1').querySelectorAll('.color-swatch').forEach(s=>s.style.outline='none');this.style.outline='2px solid #333';" style="display:inline-block;width:16px;height:16px;border-radius:3px;background:<?= $c ?>;cursor:pointer;<?= ($a['color'] ?? '#A8D8EA') === $c ? 'outline:2px solid #333;' : '' ?>"></span>
                                         <?php endforeach; ?>
                                     </div>
@@ -310,13 +310,13 @@ require_once __DIR__ . '/../layout/header.php';
         <style>
             .gantt-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
             .gantt-table th, .gantt-table td { padding: 0; vertical-align: middle; }
-            .gantt-table .gt-label { width: 180px; min-width: 180px; padding: 8px 10px 8px 0; font-size: 0.8rem; border-bottom: 1px solid #f0f0f0; }
+            .gantt-table .gt-label { width: 140px; min-width: 140px; max-width: 140px; padding: 8px 8px 8px 0; font-size: 0.78rem; border-bottom: 1px solid #f0f0f0; }
             .gantt-table .gt-label .gt-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
             .gantt-table .gt-label .gt-sub { font-size: 0.72rem; color: #6c757d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
             .gantt-table .gt-chart { position: relative; height: 36px; border-bottom: 1px solid #f0f0f0; }
             .gantt-bar { position: absolute; top: 7px; height: 22px; border-radius: 4px; min-width: 6px; display: flex; align-items: center; padding: 0 6px; font-size: 0.7rem; color: #fff; font-weight: 500; overflow: hidden; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: opacity 0.2s; cursor: default; }
             .gantt-bar:hover { opacity: 0.8; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
-            .gantt-month-hd { font-size: 0.75rem; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 2px 0; text-align: center; border-left: 1px solid #dee2e6; }
+            .gantt-month-hd { font-size: 0.7rem; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 2px 0; text-align: center; border-left: 1px solid #dee2e6; }
             .gantt-month-hd:first-child { border-left: none; }
             .gantt-today { position: absolute; top: 0; bottom: 0; width: 2px; background: #dc3545; z-index: 2; }
             .gantt-today::before { content: 'Hoy'; position: absolute; top: -18px; left: -12px; font-size: 0.65rem; color: #dc3545; font-weight: 600; }
@@ -325,7 +325,7 @@ require_once __DIR__ . '/../layout/header.php';
         <div>
         <table class="gantt-table">
             <colgroup>
-                <col style="width: 180px;">
+                <col style="width: 140px;">
                 <col>
             </colgroup>
             <thead><tr>
