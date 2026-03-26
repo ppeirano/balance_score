@@ -97,11 +97,11 @@ require_once __DIR__ . '/../layout/header.php';
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_actividad">
                     <input type="hidden" name="proyecto_id" value="<?= $id ?>">
                     <div class="row mb-2">
-                        <div class="col-md-3">
-                            <input type="text" class="form-control form-control-sm" name="act_nombre" placeholder="Nombre de la actividad *" required>
-                        </div>
                         <div class="col-md-2">
                             <input type="text" class="form-control form-control-sm" name="act_grupo" placeholder="Grupo..." list="dlGrupos">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" name="act_nombre" placeholder="Nombre de la actividad *" required>
                         </div>
                         <div class="col-md-2">
                             <input type="text" class="form-control form-control-sm" name="act_fase" placeholder="Fase..." list="dlFases">
@@ -195,13 +195,13 @@ require_once __DIR__ . '/../layout/header.php';
                             <input type="hidden" name="proyecto_id" value="<?= $id ?>">
                             <input type="hidden" name="actividad_id" value="<?= $a['id'] ?>">
                             <div class="row mb-2">
-                                <div class="col-md-3">
-                                    <label class="form-label small text-muted mb-0">Nombre</label>
-                                    <input type="text" class="form-control form-control-sm" name="act_nombre" value="<?= sanitize($a['nombre']) ?>" required>
-                                </div>
                                 <div class="col-md-2">
                                     <label class="form-label small text-muted mb-0">Grupo</label>
                                     <input type="text" class="form-control form-control-sm" name="act_grupo" value="<?= sanitize($a['grupo'] ?? '') ?>" list="dlGrupos">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small text-muted mb-0">Nombre</label>
+                                    <input type="text" class="form-control form-control-sm" name="act_nombre" value="<?= sanitize($a['nombre']) ?>" required>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label small text-muted mb-0">Fase</label>
