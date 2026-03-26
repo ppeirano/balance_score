@@ -102,9 +102,14 @@ require_once __DIR__ . '/../layout/header.php';
                         <div class="col-md-2">
                             <input type="date" class="form-control form-control-sm" name="act_fecha_fin" title="Fecha fin">
                         </div>
-                        <div class="col-md-1">
-                            <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-check-lg"></i></button>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <textarea class="form-control form-control-sm" name="act_descripcion" rows="2" placeholder="Descripción / detalle de la actividad (opcional)"></textarea>
                         </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check-lg me-1"></i>Guardar</button>
                     </div>
                 </form>
             </div>
@@ -124,8 +129,13 @@ require_once __DIR__ . '/../layout/header.php';
             </thead>
             <tbody>
                 <?php foreach ($actividades as $a): ?>
-                <tr>
-                    <td class="fw-semibold"><?= sanitize($a['nombre']) ?></td>
+                <tr class="act-row-<?= $a['id'] ?>">
+                    <td>
+                        <span class="fw-semibold"><?= sanitize($a['nombre']) ?></span>
+                        <?php if ($a['descripcion']): ?>
+                            <br><small class="text-muted" style="white-space: pre-wrap;"><?= sanitize($a['descripcion']) ?></small>
+                        <?php endif; ?>
+                    </td>
                     <td><?= sanitize($a['responsable'] ?? '-') ?></td>
                     <td><?= formatDate($a['fecha_inicio']) ?></td>
                     <td><?= formatDate($a['fecha_fin']) ?></td>
@@ -140,8 +150,59 @@ require_once __DIR__ . '/../layout/header.php';
                         </form>
                     </td>
                     <td>
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="toggleEditAct(<?= $a['id'] ?>)" title="Editar"><i class="bi bi-pencil"></i></button>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_actividad&id=<?= $a['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?')">
                             <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <!-- Fila de edición (oculta por defecto) -->
+                <tr class="edit-act-<?= $a['id'] ?>" style="display:none; background: #f8f9fa;">
+                    <td colspan="6">
+                        <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_actividad">
+                            <input type="hidden" name="proyecto_id" value="<?= $id ?>">
+                            <input type="hidden" name="actividad_id" value="<?= $a['id'] ?>">
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted mb-0">Nombre</label>
+                                    <input type="text" class="form-control form-control-sm" name="act_nombre" value="<?= sanitize($a['nombre']) ?>" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small text-muted mb-0">Responsable</label>
+                                    <select class="form-select form-select-sm" name="act_responsable">
+                                        <option value="">Responsable...</option>
+                                        <?php foreach ($responsables as $resp): ?>
+                                            <option value="<?= sanitize($resp['nombre']) ?>" <?= ($a['responsable'] ?? '') == $resp['nombre'] ? 'selected' : '' ?>><?= sanitize($resp['nombre']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted mb-0">Inicio</label>
+                                    <input type="date" class="form-control form-control-sm" name="act_fecha_inicio" value="<?= $a['fecha_inicio'] ?? '' ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted mb-0">Fin</label>
+                                    <input type="date" class="form-control form-control-sm" name="act_fecha_fin" value="<?= $a['fecha_fin'] ?? '' ?>">
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label small text-muted mb-0">Estado</label>
+                                    <select class="form-select form-select-sm" name="act_estado">
+                                        <?php foreach (['pendiente'=>'Pendiente','en_progreso'=>'En progreso','completado'=>'Completado','cancelado'=>'Cancelado'] as $val=>$lab): ?>
+                                            <option value="<?= $val ?>" <?= $a['estado'] == $val ? 'selected' : '' ?>><?= $lab ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <label class="form-label small text-muted mb-0">Descripción</label>
+                                    <textarea class="form-control form-control-sm" name="act_descripcion" rows="3" placeholder="Detalle de la actividad..."><?= sanitize($a['descripcion'] ?? '') ?></textarea>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleEditAct(<?= $a['id'] ?>)">Cancelar</button>
+                                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+                            </div>
                         </form>
                     </td>
                 </tr>
@@ -523,6 +584,18 @@ require_once __DIR__ . '/../layout/header.php';
 </div>
 
 <script>
+function toggleEditAct(id) {
+    const editRow = document.querySelector('.edit-act-' + id);
+    const viewRow = document.querySelector('.act-row-' + id);
+    if (editRow.style.display === 'none') {
+        editRow.style.display = '';
+        viewRow.style.opacity = '0.4';
+    } else {
+        editRow.style.display = 'none';
+        viewRow.style.opacity = '1';
+    }
+}
+
 function toggleVinculoDropdown() {
     const tipo = document.getElementById('vinculoTipo').value;
     const options = document.querySelectorAll('#vinculoEntidad option[data-tipo]');

@@ -279,6 +279,7 @@ CREATE TABLE proyecto_actividades (
     id INT AUTO_INCREMENT PRIMARY KEY,
     proyecto_id INT NOT NULL,
     nombre VARCHAR(200) NOT NULL,
+    descripcion TEXT DEFAULT NULL,
     responsable VARCHAR(100) DEFAULT NULL,
     fecha_inicio DATE DEFAULT NULL,
     fecha_fin DATE DEFAULT NULL,

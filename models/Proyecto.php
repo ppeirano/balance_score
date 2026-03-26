@@ -198,11 +198,12 @@ class Proyecto {
         if (!empty($data['actividad_id'])) {
             $stmt = $pdo->prepare("
                 UPDATE proyecto_actividades
-                SET nombre = ?, responsable = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, orden = ?
+                SET nombre = ?, descripcion = ?, responsable = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, orden = ?
                 WHERE id = ?
             ");
             $stmt->execute([
                 $data['act_nombre'],
+                $data['act_descripcion'] ?: null,
                 $data['act_responsable'] ?: null,
                 $data['act_fecha_inicio'] ?: null,
                 $data['act_fecha_fin'] ?: null,
@@ -213,12 +214,13 @@ class Proyecto {
             flash('success', 'Actividad actualizada.');
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO proyecto_actividades (proyecto_id, nombre, responsable, fecha_inicio, fecha_fin, estado, orden)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO proyecto_actividades (proyecto_id, nombre, descripcion, responsable, fecha_inicio, fecha_fin, estado, orden)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['proyecto_id'],
                 $data['act_nombre'],
+                $data['act_descripcion'] ?: null,
                 $data['act_responsable'] ?: null,
                 $data['act_fecha_inicio'] ?: null,
                 $data['act_fecha_fin'] ?: null,
