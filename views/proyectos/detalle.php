@@ -313,16 +313,16 @@ require_once __DIR__ . '/../layout/header.php';
             .gantt-table .gt-label { width: 140px; min-width: 140px; max-width: 140px; padding: 8px 8px 8px 0; font-size: 0.78rem; border-bottom: 1px solid #f0f0f0; }
             .gantt-table .gt-label .gt-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
             .gantt-table .gt-label .gt-sub { font-size: 0.72rem; color: #6c757d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
-            .gantt-table .gt-chart { position: relative; height: 36px; border-bottom: 1px solid #f0f0f0; overflow: visible; }
+            .gantt-table .gt-chart { position: relative; height: 36px; border-bottom: 1px solid #f0f0f0; }
             .gantt-bar { position: absolute; top: 7px; height: 22px; border-radius: 4px; min-width: 6px; display: flex; align-items: center; padding: 0 6px; font-size: 0.7rem; color: #fff; font-weight: 500; overflow: hidden; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: opacity 0.2s; cursor: default; }
             .gantt-bar:hover { opacity: 0.8; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
             .gantt-month-hd { font-size: 0.7rem; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 2px 0; text-align: center; border-left: 1px solid #dee2e6; }
             .gantt-month-hd:first-child { border-left: none; }
-            .gantt-today { position: absolute; top: 0; width: 2px; background: #dc3545; z-index: 2; height: 500px; }
-            .gantt-today::before { content: 'Hoy'; position: absolute; top: -18px; left: -12px; font-size: 0.65rem; color: #dc3545; font-weight: 600; }
+            .gantt-today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #dc3545; z-index: 2; pointer-events: none; }
+            .gantt-today-label { position: absolute; top: -16px; font-size: 0.65rem; color: #dc3545; font-weight: 600; pointer-events: none; transform: translateX(-50%); }
             .gantt-grid-line { position: absolute; top: 0; bottom: 0; width: 1px; background: #f0f0f0; }
         </style>
-        <div>
+        <div style="position:relative; overflow:hidden;">
         <table class="gantt-table">
             <colgroup>
                 <col style="width: 140px;">
@@ -341,7 +341,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </th>
             </tr></thead>
             <tbody>
-            <?php $primeraFila = true; foreach ($grupos as $grpNombre => $grpActs):
+            <?php foreach ($grupos as $grpNombre => $grpActs):
                 // Subtítulo: primera fase del grupo o responsable
                 $subLabel = '';
                 $fases = array_unique(array_filter(array_column($grpActs, 'fase')));
@@ -365,7 +365,7 @@ require_once __DIR__ . '/../layout/header.php';
                             echo '<div class="gantt-grid-line" style="left:' . round($gPct, 2) . '%"></div>';
                         }
                     }
-                    if ($hoyPct !== null && $primeraFila) echo '<div class="gantt-today" style="left:' . round($hoyPct, 2) . '%"></div>';
+                    // Today line handled by wrapper overlay
 
                     // Barras de cada actividad del grupo
                     foreach ($grpActs as $a):
@@ -388,9 +388,13 @@ require_once __DIR__ . '/../layout/header.php';
                     <?php endforeach; ?>
                 </td>
             </tr>
-            <?php $primeraFila = false; endforeach; ?>
+            <?php endforeach; ?>
             </tbody>
         </table>
+        <?php if ($hoyPct !== null): ?>
+            <div class="gantt-today-line" style="left: calc(140px + (100% - 140px) * <?= round($hoyPct, 4) ?> / 100);"></div>
+            <div class="gantt-today-label" style="left: calc(140px + (100% - 140px) * <?= round($hoyPct, 4) ?> / 100);">Hoy</div>
+        <?php endif; ?>
         </div>
         <?php if (!empty($leyenda)): ?>
         <div class="d-flex flex-wrap gap-3 mt-2" style="font-size: 0.75rem;">
