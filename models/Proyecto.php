@@ -192,7 +192,7 @@ class Proyecto {
         $stmt = $pdo->prepare("
             SELECT * FROM proyecto_actividades
             WHERE proyecto_id = ?
-            ORDER BY orden, fecha_inicio, id
+            ORDER BY grupo, orden, fecha_inicio, id
         ");
         $stmt->execute([$proyectoId]);
         return $stmt->fetchAll();
@@ -202,12 +202,15 @@ class Proyecto {
         if (!empty($data['actividad_id'])) {
             $stmt = $pdo->prepare("
                 UPDATE proyecto_actividades
-                SET nombre = ?, descripcion = ?, responsable = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, orden = ?
+                SET nombre = ?, descripcion = ?, grupo = ?, fase = ?, color = ?, responsable = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, orden = ?
                 WHERE id = ?
             ");
             $stmt->execute([
                 $data['act_nombre'],
                 $data['act_descripcion'] ?: null,
+                $data['act_grupo'] ?: null,
+                $data['act_fase'] ?: null,
+                $data['act_color'] ?: '#5b9bd5',
                 $data['act_responsable'] ?: null,
                 $data['act_fecha_inicio'] ?: null,
                 $data['act_fecha_fin'] ?: null,
@@ -218,13 +221,16 @@ class Proyecto {
             flash('success', 'Actividad actualizada.');
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO proyecto_actividades (proyecto_id, nombre, descripcion, responsable, fecha_inicio, fecha_fin, estado, orden)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO proyecto_actividades (proyecto_id, nombre, descripcion, grupo, fase, color, responsable, fecha_inicio, fecha_fin, estado, orden)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['proyecto_id'],
                 $data['act_nombre'],
                 $data['act_descripcion'] ?: null,
+                $data['act_grupo'] ?: null,
+                $data['act_fase'] ?: null,
+                $data['act_color'] ?: '#5b9bd5',
                 $data['act_responsable'] ?: null,
                 $data['act_fecha_inicio'] ?: null,
                 $data['act_fecha_fin'] ?: null,

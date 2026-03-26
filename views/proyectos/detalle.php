@@ -80,15 +80,33 @@ require_once __DIR__ . '/../layout/header.php';
         </button>
     </div>
     <div class="card-body">
+        <?php
+        // Datalists de grupos y fases existentes
+        $gruposExist = array_unique(array_filter(array_column($actividades, 'grupo')));
+        $fasesExist = array_unique(array_filter(array_column($actividades, 'fase')));
+        ?>
+        <datalist id="dlGrupos">
+            <?php foreach ($gruposExist as $g): ?><option value="<?= sanitize($g) ?>"><?php endforeach; ?>
+        </datalist>
+        <datalist id="dlFases">
+            <?php foreach ($fasesExist as $f): ?><option value="<?= sanitize($f) ?>"><?php endforeach; ?>
+        </datalist>
+
         <div class="collapse mb-3" id="nuevaActividad">
             <div class="card card-body bg-light">
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_actividad">
                     <input type="hidden" name="proyecto_id" value="<?= $id ?>">
                     <div class="row mb-2">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <input type="text" class="form-control form-control-sm" name="act_nombre" placeholder="Nombre de la actividad *" required>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" name="act_grupo" placeholder="Grupo..." list="dlGrupos">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" name="act_fase" placeholder="Fase..." list="dlFases">
+                        </div>
+                        <div class="col-md-2">
                             <select class="form-select form-select-sm" name="act_responsable">
                                 <option value="">Responsable...</option>
                                 <?php foreach ($responsables as $resp): ?>
@@ -96,11 +114,14 @@ require_once __DIR__ . '/../layout/header.php';
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <input type="date" class="form-control form-control-sm" name="act_fecha_inicio" title="Fecha inicio">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <input type="date" class="form-control form-control-sm" name="act_fecha_fin" title="Fecha fin">
+                        </div>
+                        <div class="col-md-1">
+                            <input type="color" class="form-control form-control-sm form-control-color" name="act_color" value="#5b9bd5" title="Color barra Gantt" style="height:31px;">
                         </div>
                     </div>
                     <div class="row mb-2">
@@ -120,6 +141,8 @@ require_once __DIR__ . '/../layout/header.php';
             <thead>
                 <tr>
                     <th>Actividad</th>
+                    <th>Grupo</th>
+                    <th>Fase</th>
                     <th>Responsable</th>
                     <th>Inicio</th>
                     <th>Fin</th>
@@ -134,6 +157,15 @@ require_once __DIR__ . '/../layout/header.php';
                         <span class="fw-semibold"><?= sanitize($a['nombre']) ?></span>
                         <?php if ($a['descripcion']): ?>
                             <br><small class="text-muted" style="white-space: pre-wrap;"><?= sanitize($a['descripcion']) ?></small>
+                        <?php endif; ?>
+                    </td>
+                    <td><small><?= sanitize($a['grupo'] ?? '-') ?></small></td>
+                    <td>
+                        <?php if ($a['fase']): ?>
+                            <span class="d-inline-block rounded-circle me-1" style="width:10px;height:10px;background:<?= sanitize($a['color'] ?? '#5b9bd5') ?>;"></span>
+                            <small><?= sanitize($a['fase']) ?></small>
+                        <?php else: ?>
+                            <small class="text-muted">-</small>
                         <?php endif; ?>
                     </td>
                     <td><?= sanitize($a['responsable'] ?? '-') ?></td>
@@ -158,16 +190,24 @@ require_once __DIR__ . '/../layout/header.php';
                 </tr>
                 <!-- Fila de edición (oculta por defecto) -->
                 <tr class="edit-act-<?= $a['id'] ?>" style="display:none; background: #f8f9fa;">
-                    <td colspan="6">
+                    <td colspan="8">
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_actividad">
                             <input type="hidden" name="proyecto_id" value="<?= $id ?>">
                             <input type="hidden" name="actividad_id" value="<?= $a['id'] ?>">
                             <div class="row mb-2">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label small text-muted mb-0">Nombre</label>
                                     <input type="text" class="form-control form-control-sm" name="act_nombre" value="<?= sanitize($a['nombre']) ?>" required>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted mb-0">Grupo</label>
+                                    <input type="text" class="form-control form-control-sm" name="act_grupo" value="<?= sanitize($a['grupo'] ?? '') ?>" list="dlGrupos">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted mb-0">Fase</label>
+                                    <input type="text" class="form-control form-control-sm" name="act_fase" value="<?= sanitize($a['fase'] ?? '') ?>" list="dlFases">
+                                </div>
+                                <div class="col-md-2">
                                     <label class="form-label small text-muted mb-0">Responsable</label>
                                     <select class="form-select form-select-sm" name="act_responsable">
                                         <option value="">Responsable...</option>
@@ -176,15 +216,21 @@ require_once __DIR__ . '/../layout/header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-1">
+                                    <label class="form-label small text-muted mb-0">Color</label>
+                                    <input type="color" class="form-control form-control-sm form-control-color" name="act_color" value="<?= sanitize($a['color'] ?? '#5b9bd5') ?>" style="height:31px;">
+                                </div>
+                                <div class="col-md-1">
                                     <label class="form-label small text-muted mb-0">Inicio</label>
                                     <input type="date" class="form-control form-control-sm" name="act_fecha_inicio" value="<?= $a['fecha_inicio'] ?? '' ?>">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-1">
                                     <label class="form-label small text-muted mb-0">Fin</label>
                                     <input type="date" class="form-control form-control-sm" name="act_fecha_fin" value="<?= $a['fecha_fin'] ?? '' ?>">
                                 </div>
-                                <div class="col-md-1">
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-2">
                                     <label class="form-label small text-muted mb-0">Estado</label>
                                     <select class="form-select form-select-sm" name="act_estado">
                                         <?php foreach (['pendiente'=>'Pendiente','en_progreso'=>'En progreso','completado'=>'Completado','cancelado'=>'Cancelado'] as $val=>$lab): ?>
@@ -192,11 +238,9 @@ require_once __DIR__ . '/../layout/header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-12">
+                                <div class="col-md-10">
                                     <label class="form-label small text-muted mb-0">Descripción</label>
-                                    <textarea class="form-control form-control-sm" name="act_descripcion" rows="3" placeholder="Detalle de la actividad..."><?= sanitize($a['descripcion'] ?? '') ?></textarea>
+                                    <textarea class="form-control form-control-sm" name="act_descripcion" rows="2" placeholder="Detalle de la actividad..."><?= sanitize($a['descripcion'] ?? '') ?></textarea>
                                 </div>
                             </div>
                             <div class="text-end">
@@ -208,7 +252,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($actividades)): ?>
-                <tr><td colspan="6" class="text-center text-muted">Sin actividades registradas.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted">Sin actividades registradas.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -239,19 +283,29 @@ require_once __DIR__ . '/../layout/header.php';
                 $months[] = ['label' => $label, 'year' => $year, 'width' => $widthPct];
                 $monthStart = strtotime('+1 month', $monthStart);
             }
+
+            // Agrupar actividades por grupo
+            $grupos = [];
+            $leyenda = [];
+            foreach ($actConFechas as $a) {
+                $grp = $a['grupo'] ?: $a['nombre']; // sin grupo = fila individual
+                $grupos[$grp][] = $a;
+                if ($a['fase']) {
+                    $key = $a['fase'] . '|' . ($a['color'] ?? '#5b9bd5');
+                    $leyenda[$key] = ['fase' => $a['fase'], 'color' => $a['color'] ?? '#5b9bd5'];
+                }
+            }
         ?>
         <h6 class="mb-3"><i class="bi bi-bar-chart-steps me-2"></i>Diagrama Gantt</h6>
         <style>
             .gantt-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
             .gantt-table th, .gantt-table td { padding: 0; vertical-align: middle; }
-            .gantt-table .gt-label { width: 220px; min-width: 220px; padding: 6px 12px 6px 0; font-size: 0.83rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid #f0f0f0; }
-            .gantt-table .gt-chart { position: relative; height: 30px; border-bottom: 1px solid #f0f0f0; }
-            .gantt-bar { position: absolute; top: 4px; height: 22px; border-radius: 4px; min-width: 6px; display: flex; align-items: center; padding: 0 6px; font-size: 0.72rem; color: #fff; font-weight: 500; overflow: hidden; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: opacity 0.2s; }
-            .gantt-bar:hover { opacity: 0.85; }
-            .gantt-bar.st-pendiente { background: linear-gradient(135deg, #6c757d, #868e96); }
-            .gantt-bar.st-en_progreso { background: linear-gradient(135deg, #0d6efd, #4d94ff); }
-            .gantt-bar.st-completado { background: linear-gradient(135deg, #198754, #28a76d); }
-            .gantt-bar.st-cancelado { background: linear-gradient(135deg, #dc3545, #e06570); opacity: 0.6; }
+            .gantt-table .gt-label { width: 220px; min-width: 220px; padding: 8px 12px 8px 0; font-size: 0.83rem; border-bottom: 1px solid #f0f0f0; }
+            .gantt-table .gt-label .gt-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
+            .gantt-table .gt-label .gt-sub { font-size: 0.72rem; color: #6c757d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
+            .gantt-table .gt-chart { position: relative; height: 36px; border-bottom: 1px solid #f0f0f0; }
+            .gantt-bar { position: absolute; top: 7px; height: 22px; border-radius: 4px; min-width: 6px; display: flex; align-items: center; padding: 0 6px; font-size: 0.7rem; color: #fff; font-weight: 500; overflow: hidden; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: opacity 0.2s; cursor: default; }
+            .gantt-bar:hover { opacity: 0.8; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
             .gantt-month-hd { font-size: 0.75rem; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 2px 0; text-align: center; border-left: 1px solid #dee2e6; }
             .gantt-month-hd:first-child { border-left: none; }
             .gantt-today { position: absolute; top: 0; bottom: 0; width: 2px; background: #dc3545; z-index: 2; }
@@ -264,7 +318,6 @@ require_once __DIR__ . '/../layout/header.php';
                 <col style="width: 220px;">
                 <col>
             </colgroup>
-            <!-- Month headers -->
             <thead><tr>
                 <th></th>
                 <th style="padding:0;">
@@ -278,17 +331,22 @@ require_once __DIR__ . '/../layout/header.php';
                 </th>
             </tr></thead>
             <tbody>
-            <?php foreach ($actConFechas as $a):
-                $aStart = strtotime($a['fecha_inicio']);
-                $aEnd = strtotime($a['fecha_fin']);
-                $left = ($aStart - $ganttStart) / 86400 / $totalDays * 100;
-                $width = max(($aEnd - $aStart) / 86400 + 1, 1) / $totalDays * 100;
-                $duracion = max(round(($aEnd - $aStart) / 86400) + 1, 1);
+            <?php foreach ($grupos as $grpNombre => $grpActs):
+                // Subtítulo: primera fase del grupo o responsable
+                $subLabel = '';
+                $fases = array_unique(array_filter(array_column($grpActs, 'fase')));
+                if ($fases) $subLabel = implode(', ', $fases);
+                elseif ($grpActs[0]['responsable']) $subLabel = $grpActs[0]['responsable'];
             ?>
             <tr>
-                <td class="gt-label" title="<?= sanitize($a['nombre']) ?>"><?= sanitize($a['nombre']) ?></td>
+                <td class="gt-label" title="<?= sanitize($grpNombre) ?>">
+                    <span class="gt-name"><?= sanitize($grpNombre) ?></span>
+                    <?php if ($subLabel): ?>
+                        <span class="gt-sub"><?= sanitize($subLabel) ?></span>
+                    <?php endif; ?>
+                </td>
                 <td class="gt-chart">
-                    <?php // Grid lines por mes
+                    <?php // Grid lines
                     $gridMonth = strtotime(date('Y-m-01', $ganttStart));
                     while ($gridMonth <= $ganttEnd) {
                         $gridMonth = strtotime('+1 month', $gridMonth);
@@ -297,27 +355,43 @@ require_once __DIR__ . '/../layout/header.php';
                             echo '<div class="gantt-grid-line" style="left:' . round($gPct, 2) . '%"></div>';
                         }
                     }
+                    if ($hoyPct !== null) echo '<div class="gantt-today" style="left:' . round($hoyPct, 2) . '%"></div>';
+
+                    // Barras de cada actividad del grupo
+                    foreach ($grpActs as $a):
+                        $aStart = strtotime($a['fecha_inicio']);
+                        $aEnd = strtotime($a['fecha_fin']);
+                        $left = ($aStart - $ganttStart) / 86400 / $totalDays * 100;
+                        $width = max(($aEnd - $aStart) / 86400 + 1, 1) / $totalDays * 100;
+                        $duracion = max(round(($aEnd - $aStart) / 86400) + 1, 1);
+                        $barColor = $a['color'] ?? '#5b9bd5';
+                        $tooltip = sanitize($a['nombre']);
+                        if ($a['fase']) $tooltip .= '&#10;' . sanitize($a['fase']);
+                        $tooltip .= '&#10;' . formatDate($a['fecha_inicio']) . ' - ' . formatDate($a['fecha_fin']) . ' (' . $duracion . ' d&iacute;as)';
+                        if ($a['responsable']) $tooltip .= '&#10;' . sanitize($a['responsable']);
                     ?>
-                    <?php if ($hoyPct !== null): ?>
-                        <div class="gantt-today" style="left: <?= round($hoyPct, 2) ?>%"></div>
-                    <?php endif; ?>
-                    <div class="gantt-bar st-<?= $a['estado'] ?>"
-                         style="left: <?= round($left, 2) ?>%; width: <?= round($width, 2) ?>%"
-                         title="<?= sanitize($a['nombre']) ?>&#10;<?= formatDate($a['fecha_inicio']) ?> - <?= formatDate($a['fecha_fin']) ?> (<?= $duracion ?> d&iacute;as)&#10;<?= sanitize($a['responsable'] ?? '') ?>">
-                        <?= $width > 10 ? sanitize($a['responsable'] ?? '') : '' ?>
-                    </div>
+                        <div class="gantt-bar"
+                             style="left: <?= round($left, 2) ?>%; width: <?= round($width, 2) ?>%; background-color: <?= sanitize($barColor) ?>;"
+                             title="<?= $tooltip ?>">
+                            <?= $width > 12 ? sanitize($a['fase'] ?? '') : '' ?>
+                        </div>
+                    <?php endforeach; ?>
                 </td>
             </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
         </div>
-        <div class="d-flex gap-3 mt-2" style="font-size: 0.75rem;">
-            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#6c757d;"></span> Pendiente</span>
-            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#0d6efd;"></span> En progreso</span>
-            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#198754;"></span> Completado</span>
-            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#dc3545;opacity:0.6;"></span> Cancelado</span>
+        <?php if (!empty($leyenda)): ?>
+        <div class="d-flex flex-wrap gap-3 mt-2" style="font-size: 0.75rem;">
+            <?php foreach ($leyenda as $item): ?>
+                <span>
+                    <span class="d-inline-block rounded" style="width:12px;height:12px;background:<?= sanitize($item['color']) ?>;"></span>
+                    <?= sanitize($item['fase']) ?>
+                </span>
+            <?php endforeach; ?>
         </div>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
