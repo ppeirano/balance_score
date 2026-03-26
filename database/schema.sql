@@ -193,7 +193,7 @@ CREATE TABLE relaciones_causa_efecto (
 -- Archivos adjuntos
 CREATE TABLE archivos_adjuntos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    entidad_tipo ENUM('plan_accion','actividad','reunion','riesgo') NOT NULL,
+    entidad_tipo ENUM('plan_accion','actividad','reunion','riesgo','proyecto') NOT NULL,
     entidad_id INT NOT NULL,
     nombre_original VARCHAR(255) NOT NULL,
     nombre_archivo VARCHAR(255) NOT NULL,
@@ -270,6 +270,30 @@ CREATE TABLE proyecto_entregables (
     fecha_prevista DATE DEFAULT NULL,
     fecha_real DATE DEFAULT NULL,
     estado ENUM('pendiente','en_progreso','completado') DEFAULT 'pendiente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id) ON DELETE CASCADE
+);
+
+-- Actividades de proyectos
+CREATE TABLE proyecto_actividades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    proyecto_id INT NOT NULL,
+    nombre VARCHAR(200) NOT NULL,
+    responsable VARCHAR(100) DEFAULT NULL,
+    fecha_inicio DATE DEFAULT NULL,
+    fecha_fin DATE DEFAULT NULL,
+    estado ENUM('pendiente','en_progreso','completado','cancelado') DEFAULT 'pendiente',
+    orden INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id) ON DELETE CASCADE
+);
+
+-- Notas de proyectos (historial)
+CREATE TABLE notas_proyecto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    proyecto_id INT NOT NULL,
+    texto TEXT NOT NULL,
+    imagen VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (proyecto_id) REFERENCES proyectos(id) ON DELETE CASCADE
 );

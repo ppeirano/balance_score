@@ -211,6 +211,45 @@ switch ($page) {
                     redirect('index.php?page=proyectos&action=detalle&id=' . $proyectoId);
                 }
                 break;
+            case 'guardar_actividad':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    Proyecto::guardarActividad($pdo, $_POST);
+                }
+                break;
+            case 'eliminar_actividad':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    Proyecto::eliminarActividad($pdo, $id);
+                }
+                break;
+            case 'cambiar_estado_actividad':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    $estado = $_POST['estado'] ?? 'pendiente';
+                    $pdo->prepare("UPDATE proyecto_actividades SET estado = ? WHERE id = ?")->execute([$estado, $id]);
+                    flash('success', 'Estado actualizado.');
+                    $proyectoId = $_POST['proyecto_id'] ?? '';
+                    redirect('index.php?page=proyectos&action=detalle&id=' . $proyectoId);
+                }
+                break;
+            case 'guardar_nota':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    Proyecto::guardarNota($pdo, $_POST, $_FILES);
+                }
+                break;
+            case 'eliminar_nota':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    Proyecto::eliminarNota($pdo, $id);
+                }
+                break;
+            case 'subir_imagen_nota':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['imagen'])) {
+                    $resultado = Proyecto::subirImagenNota($_FILES['imagen']);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
+                    exit;
+                }
+                header('Content-Type: application/json');
+                echo json_encode(['ok' => false, 'error' => 'No se recibió imagen.']);
+                exit;
             default:
                 redirect('index.php?page=proyectos');
         }

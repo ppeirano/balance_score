@@ -181,4 +181,123 @@ class Proyecto {
             redirect('index.php?page=proyectos');
         }
     }
+
+    // --- Actividades de proyecto ---
+
+    static function getActividades($pdo, $proyectoId) {
+        $stmt = $pdo->prepare("
+            SELECT * FROM proyecto_actividades
+            WHERE proyecto_id = ?
+            ORDER BY orden, fecha_inicio, id
+        ");
+        $stmt->execute([$proyectoId]);
+        return $stmt->fetchAll();
+    }
+
+    static function guardarActividad($pdo, $data) {
+        if (!empty($data['actividad_id'])) {
+            $stmt = $pdo->prepare("
+                UPDATE proyecto_actividades
+                SET nombre = ?, responsable = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, orden = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([
+                $data['act_nombre'],
+                $data['act_responsable'] ?: null,
+                $data['act_fecha_inicio'] ?: null,
+                $data['act_fecha_fin'] ?: null,
+                $data['act_estado'] ?? 'pendiente',
+                $data['act_orden'] ?? 0,
+                $data['actividad_id']
+            ]);
+            flash('success', 'Actividad actualizada.');
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO proyecto_actividades (proyecto_id, nombre, responsable, fecha_inicio, fecha_fin, estado, orden)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $data['proyecto_id'],
+                $data['act_nombre'],
+                $data['act_responsable'] ?: null,
+                $data['act_fecha_inicio'] ?: null,
+                $data['act_fecha_fin'] ?: null,
+                $data['act_estado'] ?? 'pendiente',
+                $data['act_orden'] ?? 0
+            ]);
+            flash('success', 'Actividad agregada.');
+        }
+        redirect('index.php?page=proyectos&action=detalle&id=' . $data['proyecto_id']);
+    }
+
+    static function eliminarActividad($pdo, $id) {
+        $stmt = $pdo->prepare("SELECT proyecto_id FROM proyecto_actividades WHERE id = ?");
+        $stmt->execute([$id]);
+        $act = $stmt->fetch();
+        $pdo->prepare("DELETE FROM proyecto_actividades WHERE id = ?")->execute([$id]);
+        flash('success', 'Actividad eliminada.');
+        if ($act) {
+            redirect('index.php?page=proyectos&action=detalle&id=' . $act['proyecto_id']);
+        } else {
+            redirect('index.php?page=proyectos');
+        }
+    }
+
+    // --- Notas de proyecto ---
+
+    static function getNotas($pdo, $proyectoId) {
+        $stmt = $pdo->prepare("
+            SELECT * FROM notas_proyecto
+            WHERE proyecto_id = ?
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([$proyectoId]);
+        return $stmt->fetchAll();
+    }
+
+    static function subirImagenNota($file) {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            return ['ok' => false, 'error' => 'Tipo de archivo no permitido.'];
+        }
+        $uploadDir = __DIR__ . '/../uploads/notas/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION) ?: 'png';
+        $nombreArchivo = uniqid('pnota_') . '.' . $extension;
+        if (!move_uploaded_file($file['tmp_name'], $uploadDir . $nombreArchivo)) {
+            return ['ok' => false, 'error' => 'Error al guardar la imagen.'];
+        }
+        return ['ok' => true, 'filename' => $nombreArchivo];
+    }
+
+    static function guardarNota($pdo, $data, $files = []) {
+        $imagen = $data['imagen'] ?? null;
+        if (!$imagen && !empty($files['imagen']['name'])) {
+            $result = self::subirImagenNota($files['imagen']);
+            if ($result['ok']) $imagen = $result['filename'];
+        }
+        $stmt = $pdo->prepare("INSERT INTO notas_proyecto (proyecto_id, texto, imagen) VALUES (?, ?, ?)");
+        $stmt->execute([$data['proyecto_id'], $data['texto'], $imagen]);
+        flash('success', 'Nota agregada.');
+        redirect('index.php?page=proyectos&action=detalle&id=' . $data['proyecto_id']);
+    }
+
+    static function eliminarNota($pdo, $id) {
+        $stmt = $pdo->prepare("SELECT proyecto_id, imagen FROM notas_proyecto WHERE id = ?");
+        $stmt->execute([$id]);
+        $nota = $stmt->fetch();
+        if ($nota && $nota['imagen']) {
+            $ruta = __DIR__ . '/../uploads/notas/' . $nota['imagen'];
+            if (file_exists($ruta)) unlink($ruta);
+        }
+        $pdo->prepare("DELETE FROM notas_proyecto WHERE id = ?")->execute([$id]);
+        flash('success', 'Nota eliminada.');
+        if ($nota) {
+            redirect('index.php?page=proyectos&action=detalle&id=' . $nota['proyecto_id']);
+        } else {
+            redirect('index.php?page=proyectos');
+        }
+    }
 }
