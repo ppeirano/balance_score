@@ -160,62 +160,102 @@ require_once __DIR__ . '/../layout/header.php';
             $allEnds = array_map(fn($a) => strtotime($a['fecha_fin']), $actConFechas);
             $ganttStart = min($allStarts);
             $ganttEnd = max($allEnds);
-            $totalDays = max(($ganttEnd - $ganttStart) / 86400, 1);
-        ?>
-        <h6 class="mb-3"><i class="bi bi-bar-chart-steps me-2"></i>Diagrama Gantt</h6>
-        <style>
-            .gantt-container { overflow-x: auto; }
-            .gantt-row { display: flex; align-items: center; margin-bottom: 4px; min-height: 32px; }
-            .gantt-label { width: 180px; min-width: 180px; font-size: 0.82rem; padding-right: 10px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .gantt-track { flex: 1; position: relative; height: 24px; background: #f8f9fa; border-radius: 4px; }
-            .gantt-bar { position: absolute; height: 100%; border-radius: 4px; min-width: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #fff; font-weight: 600; }
-            .gantt-bar.estado-pendiente { background: #6c757d; }
-            .gantt-bar.estado-en_progreso { background: #0d6efd; }
-            .gantt-bar.estado-completado { background: #198754; }
-            .gantt-bar.estado-cancelado { background: #dc3545; opacity: 0.6; }
-            .gantt-header { display: flex; margin-bottom: 6px; }
-            .gantt-header-label { width: 180px; min-width: 180px; }
-            .gantt-header-months { flex: 1; display: flex; font-size: 0.75rem; color: #6c757d; }
-            .gantt-month { border-left: 1px solid #dee2e6; padding-left: 4px; }
-        </style>
-        <div class="gantt-container">
-            <?php
-            // Month headers
+            $totalDays = max(($ganttEnd - $ganttStart) / 86400 + 1, 1);
+
+            // Línea de hoy
+            $hoy = strtotime(date('Y-m-d'));
+            $hoyPct = ($hoy >= $ganttStart && $hoy <= $ganttEnd) ? (($hoy - $ganttStart) / 86400) / $totalDays * 100 : null;
+
+            // Meses
             $monthStart = strtotime(date('Y-m-01', $ganttStart));
             $months = [];
             while ($monthStart <= $ganttEnd) {
-                $monthEnd = strtotime('+1 month', $monthStart) - 86400;
                 $mStart = max($monthStart, $ganttStart);
-                $mEnd = min($monthEnd, $ganttEnd);
+                $mEnd = min(strtotime('+1 month', $monthStart) - 86400, $ganttEnd);
                 $widthPct = (($mEnd - $mStart) / 86400 + 1) / $totalDays * 100;
-                $months[] = ['label' => strftime('%b %Y', $monthStart) ?: date('M Y', $monthStart), 'width' => $widthPct];
+                $label = date('M', $monthStart);
+                $year = date('Y', $monthStart);
+                $months[] = ['label' => $label, 'year' => $year, 'width' => $widthPct];
                 $monthStart = strtotime('+1 month', $monthStart);
             }
-            ?>
-            <div class="gantt-header">
-                <div class="gantt-header-label"></div>
-                <div class="gantt-header-months">
-                    <?php foreach ($months as $m): ?>
-                        <div class="gantt-month" style="width: <?= round($m['width'], 2) ?>%"><?= $m['label'] ?></div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
+        ?>
+        <h6 class="mb-3"><i class="bi bi-bar-chart-steps me-2"></i>Diagrama Gantt</h6>
+        <style>
+            .gantt-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+            .gantt-table th, .gantt-table td { padding: 0; vertical-align: middle; }
+            .gantt-table .gt-label { width: 220px; min-width: 220px; padding: 6px 12px 6px 0; font-size: 0.83rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid #f0f0f0; }
+            .gantt-table .gt-chart { position: relative; height: 30px; border-bottom: 1px solid #f0f0f0; }
+            .gantt-bar { position: absolute; top: 4px; height: 22px; border-radius: 4px; min-width: 6px; display: flex; align-items: center; padding: 0 6px; font-size: 0.72rem; color: #fff; font-weight: 500; overflow: hidden; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: opacity 0.2s; }
+            .gantt-bar:hover { opacity: 0.85; }
+            .gantt-bar.st-pendiente { background: linear-gradient(135deg, #6c757d, #868e96); }
+            .gantt-bar.st-en_progreso { background: linear-gradient(135deg, #0d6efd, #4d94ff); }
+            .gantt-bar.st-completado { background: linear-gradient(135deg, #198754, #28a76d); }
+            .gantt-bar.st-cancelado { background: linear-gradient(135deg, #dc3545, #e06570); opacity: 0.6; }
+            .gantt-month-hd { font-size: 0.75rem; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 2px 0; text-align: center; border-left: 1px solid #dee2e6; }
+            .gantt-month-hd:first-child { border-left: none; }
+            .gantt-today { position: absolute; top: 0; bottom: 0; width: 2px; background: #dc3545; z-index: 2; }
+            .gantt-today::before { content: 'Hoy'; position: absolute; top: -18px; left: -12px; font-size: 0.65rem; color: #dc3545; font-weight: 600; }
+            .gantt-grid-line { position: absolute; top: 0; bottom: 0; width: 1px; background: #f0f0f0; }
+        </style>
+        <div style="overflow-x: auto;">
+        <table class="gantt-table" style="min-width: 600px;">
+            <colgroup>
+                <col style="width: 220px;">
+                <col>
+            </colgroup>
+            <!-- Month headers -->
+            <thead><tr>
+                <th></th>
+                <th style="padding:0;">
+                    <div style="display:flex; width:100%;">
+                        <?php foreach ($months as $m): ?>
+                            <div class="gantt-month-hd" style="width: <?= round($m['width'], 2) ?>%; min-width:0;">
+                                <?= $m['label'] ?><br><small style="font-size:0.65rem;opacity:0.7"><?= $m['year'] ?></small>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </th>
+            </tr></thead>
+            <tbody>
             <?php foreach ($actConFechas as $a):
                 $aStart = strtotime($a['fecha_inicio']);
                 $aEnd = strtotime($a['fecha_fin']);
                 $left = ($aStart - $ganttStart) / 86400 / $totalDays * 100;
                 $width = max(($aEnd - $aStart) / 86400 + 1, 1) / $totalDays * 100;
+                $duracion = max(round(($aEnd - $aStart) / 86400) + 1, 1);
             ?>
-            <div class="gantt-row">
-                <div class="gantt-label" title="<?= sanitize($a['nombre']) ?>"><?= sanitize($a['nombre']) ?></div>
-                <div class="gantt-track">
-                    <div class="gantt-bar estado-<?= $a['estado'] ?>" style="left: <?= round($left, 2) ?>%; width: <?= round($width, 2) ?>%"
-                         title="<?= sanitize($a['nombre']) ?>: <?= formatDate($a['fecha_inicio']) ?> - <?= formatDate($a['fecha_fin']) ?>">
-                        <?php if ($width > 8): ?><?= sanitize($a['responsable'] ?? '') ?><?php endif; ?>
+            <tr>
+                <td class="gt-label" title="<?= sanitize($a['nombre']) ?>"><?= sanitize($a['nombre']) ?></td>
+                <td class="gt-chart">
+                    <?php // Grid lines por mes
+                    $gridMonth = strtotime(date('Y-m-01', $ganttStart));
+                    while ($gridMonth <= $ganttEnd) {
+                        $gridMonth = strtotime('+1 month', $gridMonth);
+                        if ($gridMonth <= $ganttEnd) {
+                            $gPct = ($gridMonth - $ganttStart) / 86400 / $totalDays * 100;
+                            echo '<div class="gantt-grid-line" style="left:' . round($gPct, 2) . '%"></div>';
+                        }
+                    }
+                    ?>
+                    <?php if ($hoyPct !== null): ?>
+                        <div class="gantt-today" style="left: <?= round($hoyPct, 2) ?>%"></div>
+                    <?php endif; ?>
+                    <div class="gantt-bar st-<?= $a['estado'] ?>"
+                         style="left: <?= round($left, 2) ?>%; width: <?= round($width, 2) ?>%"
+                         title="<?= sanitize($a['nombre']) ?>&#10;<?= formatDate($a['fecha_inicio']) ?> - <?= formatDate($a['fecha_fin']) ?> (<?= $duracion ?> d&iacute;as)&#10;<?= sanitize($a['responsable'] ?? '') ?>">
+                        <?= $width > 10 ? sanitize($a['responsable'] ?? '') : '' ?>
                     </div>
-                </div>
-            </div>
+                </td>
+            </tr>
             <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
+        <div class="d-flex gap-3 mt-2" style="font-size: 0.75rem;">
+            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#6c757d;"></span> Pendiente</span>
+            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#0d6efd;"></span> En progreso</span>
+            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#198754;"></span> Completado</span>
+            <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#dc3545;opacity:0.6;"></span> Cancelado</span>
         </div>
         <?php endif; ?>
     </div>
