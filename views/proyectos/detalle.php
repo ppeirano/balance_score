@@ -140,8 +140,8 @@ require_once __DIR__ . '/../layout/header.php';
         <table class="table table-sm mb-4">
             <thead>
                 <tr>
-                    <th>Actividad</th>
                     <th>Grupo</th>
+                    <th>Actividad</th>
                     <th>Fase</th>
                     <th>Responsable</th>
                     <th>Inicio</th>
@@ -153,13 +153,13 @@ require_once __DIR__ . '/../layout/header.php';
             <tbody>
                 <?php foreach ($actividades as $a): ?>
                 <tr class="act-row-<?= $a['id'] ?>">
+                    <td><small><?= sanitize($a['grupo'] ?? '-') ?></small></td>
                     <td>
                         <span class="fw-semibold"><?= sanitize($a['nombre']) ?></span>
                         <?php if ($a['descripcion']): ?>
                             <br><small class="text-muted" style="white-space: pre-wrap;"><?= sanitize($a['descripcion']) ?></small>
                         <?php endif; ?>
                     </td>
-                    <td><small><?= sanitize($a['grupo'] ?? '-') ?></small></td>
                     <td>
                         <?php if ($a['fase']): ?>
                             <span class="d-inline-block rounded-circle me-1" style="width:10px;height:10px;background:<?= sanitize($a['color'] ?? '#5b9bd5') ?>;"></span>
