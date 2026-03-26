@@ -40,44 +40,33 @@ require_once __DIR__ . '/../layout/header.php';
 </div>
 
 <!-- Info general -->
-<div class="row mb-4">
-    <div class="col-md-8">
+<div class="card mb-4">
+    <div class="card-body">
         <?php if ($proyecto['descripcion']): ?>
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div style="white-space: pre-wrap;"><?= sanitize($proyecto['descripcion']) ?></div>
-                </div>
-            </div>
+            <p class="mb-3" style="white-space: pre-wrap;"><?= sanitize($proyecto['descripcion']) ?></p>
         <?php endif; ?>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label text-muted mb-1">Avance</label>
-                    <div class="progress" style="height: 24px;">
-                        <div class="progress-bar <?= $proyecto['avance'] >= 75 ? 'bg-success' : ($proyecto['avance'] >= 40 ? 'bg-primary' : 'bg-warning') ?>"
-                             style="width: <?= $proyecto['avance'] ?>%"><?= $proyecto['avance'] ?>%</div>
-                    </div>
+        <div class="row align-items-center">
+            <div class="col-md-<?= $proyecto['presupuesto'] ? '4' : '6' ?>">
+                <label class="form-label text-muted mb-1 small">Avance</label>
+                <div class="progress" style="height: 22px;">
+                    <div class="progress-bar <?= $proyecto['avance'] >= 75 ? 'bg-success' : ($proyecto['avance'] >= 40 ? 'bg-primary' : 'bg-warning') ?>"
+                         style="width: <?= $proyecto['avance'] ?>%"><?= $proyecto['avance'] ?>%</div>
                 </div>
-                <div class="row text-center">
-                    <div class="col-6">
-                        <small class="text-muted d-block">Inicio</small>
-                        <strong><?= formatDate($proyecto['fecha_inicio']) ?></strong>
-                    </div>
-                    <div class="col-6">
-                        <small class="text-muted d-block">Fin</small>
-                        <strong><?= formatDate($proyecto['fecha_fin']) ?></strong>
-                    </div>
-                </div>
-                <?php if ($proyecto['presupuesto']): ?>
-                    <hr>
-                    <div class="text-center">
-                        <small class="text-muted d-block">Presupuesto</small>
-                        <strong class="fs-5">$ <?= number_format($proyecto['presupuesto'], 2, ',', '.') ?></strong>
-                    </div>
-                <?php endif; ?>
             </div>
+            <div class="col-md-<?= $proyecto['presupuesto'] ? '2' : '3' ?> text-center">
+                <small class="text-muted d-block">Inicio</small>
+                <strong><?= formatDate($proyecto['fecha_inicio']) ?></strong>
+            </div>
+            <div class="col-md-<?= $proyecto['presupuesto'] ? '2' : '3' ?> text-center">
+                <small class="text-muted d-block">Fin</small>
+                <strong><?= formatDate($proyecto['fecha_fin']) ?></strong>
+            </div>
+            <?php if ($proyecto['presupuesto']): ?>
+            <div class="col-md-4 text-center">
+                <small class="text-muted d-block">Presupuesto</small>
+                <strong class="fs-5">$ <?= number_format($proyecto['presupuesto'], 2, ',', '.') ?></strong>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
