@@ -121,7 +121,12 @@ require_once __DIR__ . '/../layout/header.php';
                             <input type="date" class="form-control form-control-sm" name="act_fecha_fin" title="Fecha fin">
                         </div>
                         <div class="col-md-1">
-                            <input type="color" class="form-control form-control-sm form-control-color" name="act_color" value="#5b9bd5" title="Color barra Gantt" style="height:31px;">
+                            <input type="hidden" name="act_color" value="#A8D8EA">
+                            <div class="d-flex gap-1 flex-wrap" style="padding-top:2px;">
+                                <?php foreach (['#A8D8EA','#5DADE2','#85C1E9','#A3E4D7','#2E86C1','#1B4F72','#76D7C4'] as $c): ?>
+                                    <span class="color-swatch" onclick="this.closest('.col-md-1').querySelector('input[name=act_color]').value='<?= $c ?>';this.closest('.col-md-1').querySelectorAll('.color-swatch').forEach(s=>s.style.outline='none');this.style.outline='2px solid #333';" style="display:inline-block;width:16px;height:16px;border-radius:3px;background:<?= $c ?>;cursor:pointer;<?= $c === '#A8D8EA' ? 'outline:2px solid #333;' : '' ?>"></span>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     </div>
                     <div class="row mb-2">
@@ -218,7 +223,12 @@ require_once __DIR__ . '/../layout/header.php';
                                 </div>
                                 <div class="col-md-1">
                                     <label class="form-label small text-muted mb-0">Color</label>
-                                    <input type="color" class="form-control form-control-sm form-control-color" name="act_color" value="<?= sanitize($a['color'] ?? '#5b9bd5') ?>" style="height:31px;">
+                                    <input type="hidden" name="act_color" value="<?= sanitize($a['color'] ?? '#A8D8EA') ?>">
+                                    <div class="d-flex gap-1 flex-wrap" style="padding-top:2px;">
+                                        <?php foreach (['#A8D8EA','#5DADE2','#85C1E9','#A3E4D7','#2E86C1','#1B4F72','#76D7C4'] as $c): ?>
+                                            <span class="color-swatch" onclick="this.closest('.col-md-1').querySelector('input[name=act_color]').value='<?= $c ?>';this.closest('.col-md-1').querySelectorAll('.color-swatch').forEach(s=>s.style.outline='none');this.style.outline='2px solid #333';" style="display:inline-block;width:16px;height:16px;border-radius:3px;background:<?= $c ?>;cursor:pointer;<?= ($a['color'] ?? '#A8D8EA') === $c ? 'outline:2px solid #333;' : '' ?>"></span>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="form-label small text-muted mb-0">Inicio</label>
