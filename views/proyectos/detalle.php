@@ -310,7 +310,7 @@ require_once __DIR__ . '/../layout/header.php';
         <style>
             .gantt-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
             .gantt-table th, .gantt-table td { padding: 0; vertical-align: middle; }
-            .gantt-table .gt-label { width: 220px; min-width: 220px; padding: 8px 12px 8px 0; font-size: 0.83rem; border-bottom: 1px solid #f0f0f0; }
+            .gantt-table .gt-label { width: 180px; min-width: 180px; padding: 8px 10px 8px 0; font-size: 0.8rem; border-bottom: 1px solid #f0f0f0; }
             .gantt-table .gt-label .gt-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
             .gantt-table .gt-label .gt-sub { font-size: 0.72rem; color: #6c757d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2; }
             .gantt-table .gt-chart { position: relative; height: 36px; border-bottom: 1px solid #f0f0f0; }
@@ -322,10 +322,10 @@ require_once __DIR__ . '/../layout/header.php';
             .gantt-today::before { content: 'Hoy'; position: absolute; top: -18px; left: -12px; font-size: 0.65rem; color: #dc3545; font-weight: 600; }
             .gantt-grid-line { position: absolute; top: 0; bottom: 0; width: 1px; background: #f0f0f0; }
         </style>
-        <div style="overflow-x: auto;">
-        <table class="gantt-table" style="min-width: 600px;">
+        <div>
+        <table class="gantt-table">
             <colgroup>
-                <col style="width: 220px;">
+                <col style="width: 180px;">
                 <col>
             </colgroup>
             <thead><tr>
