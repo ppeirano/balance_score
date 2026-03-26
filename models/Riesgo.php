@@ -53,6 +53,8 @@ class Riesgo {
                 $data['id']
             ]);
             flash('success', 'Riesgo actualizado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'riesgo', $data['id'], $data['descripcion'], 'editado');
         } else {
             $stmt = $pdo->prepare("
                 INSERT INTO riesgos (iniciativa_id, plan_accion_id, descripcion, probabilidad, impacto, nivel, plan_mitigacion, responsable, estado)
@@ -70,6 +72,8 @@ class Riesgo {
                 $data['estado'] ?? 'abierto'
             ]);
             flash('success', 'Riesgo creado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'riesgo', $pdo->lastInsertId(), $data['descripcion'], 'creado');
         }
         redirect('index.php?page=riesgos');
     }

@@ -86,6 +86,8 @@ class Iniciativa {
                 $data['id']
             ]);
             flash('success', 'Iniciativa actualizada.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'iniciativa', $data['id'], trim($data['nombre']), 'editado');
         } else {
             $stmt = $pdo->prepare("INSERT INTO iniciativas_estrategicas
                 (perspectiva_id, periodo_id, codigo, nombre, descripcion, orden)
@@ -98,14 +100,20 @@ class Iniciativa {
                 trim($data['descripcion'] ?? ''),
                 (int)($data['orden'] ?? 0)
             ]);
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'iniciativa', $pdo->lastInsertId(), trim($data['nombre']), 'creado');
             flash('success', 'Iniciativa creada.');
         }
         redirect('index.php?page=iniciativas');
     }
 
     static function eliminar($pdo, $id) {
-        $stmt = $pdo->prepare("DELETE FROM iniciativas_estrategicas WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT nombre FROM iniciativas_estrategicas WHERE id = ?");
         $stmt->execute([$id]);
+        $ie = $stmt->fetch();
+        $pdo->prepare("DELETE FROM iniciativas_estrategicas WHERE id = ?")->execute([$id]);
+        require_once __DIR__ . '/Bitacora.php';
+        Bitacora::registrar($pdo, 'iniciativa', $id, $ie['nombre'] ?? 'Desconocida', 'eliminado');
         flash('success', 'Iniciativa eliminada.');
         redirect('index.php?page=iniciativas');
     }

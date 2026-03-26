@@ -54,6 +54,8 @@ class Actividad {
                 $data['id']
             ]);
             flash('success', 'Actividad actualizada correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'actividad', $data['id'], $data['descripcion'], 'editado');
         } else {
             $stmt = $pdo->prepare("
                 INSERT INTO actividades (plan_accion_id, codigo, descripcion, responsable, estado, fecha_limite, observaciones)
@@ -69,6 +71,8 @@ class Actividad {
                 $data['observaciones'] ?: null
             ]);
             flash('success', 'Actividad creada correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'actividad', $pdo->lastInsertId(), $data['descripcion'], 'creado');
         }
 
         // Recalculate PDA avance

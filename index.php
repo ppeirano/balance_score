@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/models/Bitacora.php';
 
 $pdo = getDB();
 $page = $_GET['page'] ?? 'dashboard';
@@ -70,8 +71,11 @@ switch ($page) {
                 break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
-                    $stmt = $pdo->prepare("DELETE FROM planes_accion WHERE id = ?");
-                    $stmt->execute([$id]);
+                    $stmtNombre = $pdo->prepare("SELECT nombre FROM planes_accion WHERE id = ?");
+                    $stmtNombre->execute([$id]);
+                    $planNombre = $stmtNombre->fetchColumn() ?: 'Desconocido';
+                    $pdo->prepare("DELETE FROM planes_accion WHERE id = ?")->execute([$id]);
+                    Bitacora::registrar($pdo, 'plan_accion', $id, $planNombre, 'eliminado');
                     flash('success', 'Plan de acción eliminado.');
                 }
                 $filterParams = [];
@@ -97,15 +101,15 @@ switch ($page) {
             case 'cambiar_estado':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
                     $estado = $_POST['estado'] ?? 'pendiente';
-                    $stmt = $pdo->prepare("UPDATE actividades SET estado = ? WHERE id = ?");
-                    $stmt->execute([$estado, $id]);
+                    $stmtAct = $pdo->prepare("SELECT descripcion, plan_accion_id FROM actividades WHERE id = ?");
+                    $stmtAct->execute([$id]);
+                    $actInfo = $stmtAct->fetch();
+                    $pdo->prepare("UPDATE actividades SET estado = ? WHERE id = ?")->execute([$estado, $id]);
+                    Bitacora::registrar($pdo, 'actividad', $id, $actInfo['descripcion'] ?? '', 'estado_cambiado', "Estado → $estado");
                     // Recalcular avance del PDA
-                    $stmt2 = $pdo->prepare("SELECT plan_accion_id FROM actividades WHERE id = ?");
-                    $stmt2->execute([$id]);
-                    $act = $stmt2->fetch();
-                    if ($act) {
-                        $avance = calcularAvancePDA($pdo, $act['plan_accion_id']);
-                        $pdo->prepare("UPDATE planes_accion SET avance = ? WHERE id = ?")->execute([$avance, $act['plan_accion_id']]);
+                    if ($actInfo) {
+                        $avance = calcularAvancePDA($pdo, $actInfo['plan_accion_id']);
+                        $pdo->prepare("UPDATE planes_accion SET avance = ? WHERE id = ?")->execute([$avance, $actInfo['plan_accion_id']]);
                     }
                     flash('success', 'Estado actualizado.');
                 }
@@ -114,10 +118,11 @@ switch ($page) {
                 break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
-                    $stmt = $pdo->prepare("SELECT plan_accion_id FROM actividades WHERE id = ?");
+                    $stmt = $pdo->prepare("SELECT descripcion, plan_accion_id FROM actividades WHERE id = ?");
                     $stmt->execute([$id]);
                     $act = $stmt->fetch();
                     $pdo->prepare("DELETE FROM actividades WHERE id = ?")->execute([$id]);
+                    Bitacora::registrar($pdo, 'actividad', $id, $act['descripcion'] ?? '', 'eliminado');
                     if ($act) {
                         $avance = calcularAvancePDA($pdo, $act['plan_accion_id']);
                         $pdo->prepare("UPDATE planes_accion SET avance = ? WHERE id = ?")->execute([$avance, $act['plan_accion_id']]);
@@ -177,7 +182,11 @@ switch ($page) {
                 break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    $stmtN = $pdo->prepare("SELECT nombre FROM proyectos WHERE id = ?");
+                    $stmtN->execute([$id]);
+                    $proyNombre = $stmtN->fetchColumn() ?: 'Desconocido';
                     $pdo->prepare("DELETE FROM proyectos WHERE id = ?")->execute([$id]);
+                    Bitacora::registrar($pdo, 'proyecto', $id, $proyNombre, 'eliminado');
                     flash('success', 'Proyecto eliminado.');
                 }
                 redirect('index.php?page=proyectos');
@@ -273,7 +282,11 @@ switch ($page) {
                 break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    $stmtN = $pdo->prepare("SELECT nombre FROM kpis WHERE id = ?");
+                    $stmtN->execute([$id]);
+                    $kpiNombre = $stmtN->fetchColumn() ?: 'Desconocido';
                     $pdo->prepare("DELETE FROM kpis WHERE id = ?")->execute([$id]);
+                    Bitacora::registrar($pdo, 'kpi', $id, $kpiNombre, 'eliminado');
                     flash('success', 'KPI eliminado.');
                 }
                 $filtros = [];
@@ -300,7 +313,11 @@ switch ($page) {
                 break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    $stmtN = $pdo->prepare("SELECT titulo FROM reuniones WHERE id = ?");
+                    $stmtN->execute([$id]);
+                    $reuNombre = $stmtN->fetchColumn() ?: 'Desconocida';
                     $pdo->prepare("DELETE FROM reuniones WHERE id = ?")->execute([$id]);
+                    Bitacora::registrar($pdo, 'reunion', $id, $reuNombre, 'eliminado');
                     flash('success', 'Reunión eliminada.');
                 }
                 redirect('index.php?page=reuniones');
@@ -318,7 +335,11 @@ switch ($page) {
             case 'cambiar_estado':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
                     $estado = $_POST['estado'] ?? 'pendiente';
+                    $stmtC = $pdo->prepare("SELECT descripcion FROM compromisos WHERE id = ?");
+                    $stmtC->execute([$id]);
+                    $compDesc = $stmtC->fetchColumn() ?: '';
                     $pdo->prepare("UPDATE compromisos SET estado = ? WHERE id = ?")->execute([$estado, $id]);
+                    Bitacora::registrar($pdo, 'compromiso', $id, $compDesc, 'estado_cambiado', "Estado → $estado");
                     flash('success', 'Compromiso actualizado.');
                 }
                 $reunionId = $_POST['reunion_id'] ?? '';
@@ -340,7 +361,11 @@ switch ($page) {
                 break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    $stmtN = $pdo->prepare("SELECT descripcion FROM riesgos WHERE id = ?");
+                    $stmtN->execute([$id]);
+                    $riesgoDesc = $stmtN->fetchColumn() ?: 'Desconocido';
                     $pdo->prepare("DELETE FROM riesgos WHERE id = ?")->execute([$id]);
+                    Bitacora::registrar($pdo, 'riesgo', $id, $riesgoDesc, 'eliminado');
                     flash('success', 'Riesgo eliminado.');
                 }
                 redirect('index.php?page=riesgos');
@@ -348,6 +373,9 @@ switch ($page) {
             default:
                 require __DIR__ . '/views/riesgos/index.php';
         }
+        break;
+    case 'bitacora':
+        require __DIR__ . '/views/bitacora/index.php';
         break;
     case 'responsables':
         require __DIR__ . '/views/responsables/index.php';

@@ -48,6 +48,8 @@ class Proyecto {
                 $data['id']
             ]);
             flash('success', 'Proyecto actualizado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'proyecto', $data['id'], $data['nombre'], 'editado');
             redirect('index.php?page=proyectos&action=detalle&id=' . $data['id']);
         } else {
             $stmt = $pdo->prepare("
@@ -68,6 +70,8 @@ class Proyecto {
             ]);
             $newId = $pdo->lastInsertId();
             flash('success', 'Proyecto creado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'proyecto', $newId, $data['nombre'], 'creado');
             redirect('index.php?page=proyectos&action=detalle&id=' . $newId);
         }
     }

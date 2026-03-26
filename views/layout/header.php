@@ -79,6 +79,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link <?= activeNav('bitacora', $page) ?>" href="<?= BASE_URL ?>index.php?page=bitacora">
+                                <i class="bi bi-clock-history me-2"></i>Bitácora
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link <?= activeNav('calendario', $page) ?>" href="<?= BASE_URL ?>index.php?page=calendario">
                                 <i class="bi bi-calendar-event me-2"></i>Calendario
                             </a>

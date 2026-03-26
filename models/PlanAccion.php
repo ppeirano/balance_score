@@ -60,6 +60,8 @@ class PlanAccion {
                 $data['id']
             ]);
             flash('success', 'Plan de accion actualizado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'plan_accion', $data['id'], $data['nombre'], 'editado');
         } else {
             $stmt = $pdo->prepare("
                 INSERT INTO planes_accion (iniciativa_id, periodo_id, codigo, nombre, owner, fecha_inicio, fecha_fin, prioridad, peso, estado)
@@ -78,6 +80,8 @@ class PlanAccion {
                 $data['estado'] ?? 'pendiente'
             ]);
             flash('success', 'Plan de accion creado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'plan_accion', $pdo->lastInsertId(), $data['nombre'], 'creado');
         }
         redirect('index.php?page=planes');
     }

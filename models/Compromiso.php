@@ -47,6 +47,8 @@ class Compromiso {
                 $data['id']
             ]);
             flash('success', 'Compromiso actualizado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'compromiso', $data['id'], $data['descripcion'], 'editado');
         } else {
             $stmt = $pdo->prepare("
                 INSERT INTO compromisos (reunion_id, actividad_id, plan_accion_id, descripcion, responsable, fecha_limite, estado)
@@ -62,6 +64,8 @@ class Compromiso {
                 $data['estado'] ?? 'pendiente'
             ]);
             flash('success', 'Compromiso creado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'compromiso', $pdo->lastInsertId(), $data['descripcion'], 'creado');
         }
         redirect('index.php?page=reuniones&action=detalle&id=' . $data['reunion_id']);
     }

@@ -54,6 +54,8 @@ class Kpi {
                 $data['id']
             ]);
             flash('success', 'KPI actualizado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'kpi', $data['id'], $data['nombre'], 'editado');
         } else {
             $stmt = $pdo->prepare("
                 INSERT INTO kpis (iniciativa_id, plan_accion_id, periodo_id, nombre, tipo, unidad, meta, umbral_verde, umbral_amarillo, direccion, escala_cualitativa, opciones_cualitativas, frecuencia, activo)
@@ -76,6 +78,8 @@ class Kpi {
                 $data['activo'] ?? 1
             ]);
             flash('success', 'KPI creado correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'kpi', $pdo->lastInsertId(), $data['nombre'], 'creado');
         }
         $filtros = [];
         if (!empty($data['filtro_ie'])) $filtros[] = 'ie=' . (int)$data['filtro_ie'];

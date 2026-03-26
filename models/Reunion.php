@@ -41,6 +41,8 @@ class Reunion {
                 $data['id']
             ]);
             flash('success', 'Reunion actualizada correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'reunion', $data['id'], $data['titulo'], 'editado');
         } else {
             $stmt = $pdo->prepare("
                 INSERT INTO reuniones (iniciativa_id, titulo, fecha, participantes, minuta)
@@ -54,6 +56,8 @@ class Reunion {
                 $data['minuta'] ?: null
             ]);
             flash('success', 'Reunion creada correctamente.');
+            require_once __DIR__ . '/Bitacora.php';
+            Bitacora::registrar($pdo, 'reunion', $pdo->lastInsertId(), $data['titulo'], 'creado');
         }
         redirect('index.php?page=reuniones');
     }

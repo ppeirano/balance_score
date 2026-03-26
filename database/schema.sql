@@ -310,6 +310,18 @@ CREATE TABLE evaluaciones_ia (
 );
 
 
+-- Bitácora de cambios
+CREATE TABLE bitacora (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entidad_tipo ENUM('iniciativa','plan_accion','actividad','kpi','proyecto','riesgo','reunion','compromiso') NOT NULL,
+    entidad_id INT NOT NULL,
+    entidad_nombre VARCHAR(255) NOT NULL,
+    accion ENUM('creado','editado','eliminado','estado_cambiado') NOT NULL,
+    descripcion TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 -- =====================================================
 -- DATOS SEMILLA
 -- =====================================================
