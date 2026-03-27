@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../models/Iniciativa.php';
 require_once __DIR__ . '/../../models/PlanAccion.php';
 require_once __DIR__ . '/../../models/Kpi.php';
 require_once __DIR__ . '/../../models/Riesgo.php';
+require_once __DIR__ . '/../../models/Proyecto.php';
 
 if (!$id) {
     flash('error', 'Iniciativa no especificada.');
@@ -53,6 +54,17 @@ $stmtRiesgos = $pdo->prepare("
 ");
 $stmtRiesgos->execute([$id]);
 $riesgos = $stmtRiesgos->fetchAll();
+
+// Obtener proyectos vinculados a esta iniciativa
+$stmtProy = $pdo->prepare("
+    SELECT p.*
+    FROM proyectos p
+    INNER JOIN proyecto_vinculos pv ON p.id = pv.proyecto_id
+    WHERE pv.entidad_tipo = 'iniciativa' AND pv.entidad_id = ?
+    ORDER BY p.nombre
+");
+$stmtProy->execute([$id]);
+$proyectos = $stmtProy->fetchAll();
 
 // Calcular avance general de la IE
 $totalPeso = 0;
@@ -339,6 +351,80 @@ require_once __DIR__ . '/../layout/header.php';
             <div class="p-4 text-center text-muted">
                 <i class="bi bi-shield-check fs-1 d-block mb-2"></i>
                 No hay riesgos registrados para esta iniciativa.
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Proyectos Vinculados -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-kanban me-2"></i>Proyectos Vinculados (<?= count($proyectos) ?>)</h5>
+    </div>
+    <div class="card-body p-0">
+        <?php if (!empty($proyectos)): ?>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Responsable</th>
+                            <th class="text-center">Avance</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Prioridad</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($proyectos as $proy):
+                            $estadoProyClases = [
+                                'pendiente' => 'bg-secondary',
+                                'en_progreso' => 'bg-primary',
+                                'completado' => 'bg-success',
+                                'cancelado' => 'bg-danger',
+                                'suspendido' => 'bg-warning text-dark'
+                            ];
+                            $claseProy = $estadoProyClases[$proy['estado']] ?? 'bg-secondary';
+                            $prioridadLabels = [1 => 'Baja', 2 => 'Media', 3 => 'Alta', 4 => 'Muy Alta', 5 => 'Cr&iacute;tica'];
+                            $prioridadClases = [1 => 'bg-secondary', 2 => 'bg-info text-dark', 3 => 'bg-warning text-dark', 4 => 'bg-danger', 5 => 'bg-dark'];
+                        ?>
+                            <tr>
+                                <td>
+                                    <a href="<?= BASE_URL ?>index.php?page=proyectos&action=detalle&id=<?= $proy['id'] ?>" class="text-decoration-none fw-semibold">
+                                        <?= sanitize($proy['nombre']) ?>
+                                    </a>
+                                </td>
+                                <td><?= $proy['responsable'] ? sanitize($proy['responsable']) : '<span class="text-muted">-</span>' ?></td>
+                                <td class="text-center" style="min-width:120px;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <?php
+                                            $avProy = intval($proy['avance']);
+                                            $barColor = $avProy >= 75 ? 'bg-success' : ($avProy >= 40 ? 'bg-warning' : 'bg-danger');
+                                            ?>
+                                            <div class="progress-bar <?= $barColor ?>" style="width: <?= $avProy ?>%"></div>
+                                        </div>
+                                        <small class="text-muted"><?= $avProy ?>%</small>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge <?= $claseProy ?>"><?= ucfirst(str_replace('_', ' ', sanitize($proy['estado']))) ?></span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge <?= $prioridadClases[$proy['prioridad']] ?? 'bg-secondary' ?>"><?= $prioridadLabels[$proy['prioridad']] ?? '-' ?></span>
+                                </td>
+                                <td><?= $proy['fecha_inicio'] ? formatDate($proy['fecha_inicio']) : '<span class="text-muted">-</span>' ?></td>
+                                <td><?= $proy['fecha_fin'] ? formatDate($proy['fecha_fin']) : '<span class="text-muted">-</span>' ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="p-4 text-center text-muted">
+                <i class="bi bi-kanban fs-1 d-block mb-2"></i>
+                No hay proyectos vinculados a esta iniciativa.
             </div>
         <?php endif; ?>
     </div>
