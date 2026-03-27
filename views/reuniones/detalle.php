@@ -18,7 +18,7 @@ require_once __DIR__ . '/../layout/header.php';
         <h4><i class="bi bi-people me-2"></i><?= sanitize($reunion['titulo']) ?></h4>
         <p class="text-muted mb-0">
             <i class="bi bi-calendar me-1"></i><?= formatDate($reunion['fecha']) ?>
-            <?php if ($reunion['ie_codigo']): ?>
+            <?php if (!empty($reunion['ie_codigo'])): ?>
                 <span class="badge bg-primary ms-2"><?= sanitize($reunion['ie_codigo']) ?></span>
             <?php endif; ?>
         </p>
