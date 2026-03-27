@@ -308,6 +308,21 @@ switch ($page) {
                 require __DIR__ . '/models/Reunion.php';
                 Reunion::guardar($pdo, $_POST);
                 break;
+            case 'generar_agenda':
+                header('Content-Type: application/json');
+                require __DIR__ . '/models/ClaudeApi.php';
+                $responsable = $_POST['responsable'] ?? '';
+                if (empty($responsable)) {
+                    echo json_encode(['error' => 'Seleccione un responsable.']);
+                    exit;
+                }
+                $agenda = ClaudeApi::generarAgenda($pdo, $responsable);
+                if ($agenda === false) {
+                    echo json_encode(['error' => 'Error al comunicarse con la API. Verifique que la API key este configurada.']);
+                } else {
+                    echo json_encode(['agenda' => $agenda]);
+                }
+                exit;
             case 'detalle':
                 require __DIR__ . '/views/reuniones/detalle.php';
                 break;

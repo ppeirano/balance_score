@@ -263,4 +263,140 @@ class ClaudeApi {
         ");
         return $stmt->fetchAll();
     }
+
+    static function generarAgenda($pdo, $responsable) {
+        $datos = "=== DATOS DE: " . $responsable . " ===\n";
+        $datos .= "Fecha de hoy: " . date('d/m/Y') . "\n\n";
+
+        // Planes de acción donde es owner
+        $stmt = $pdo->prepare("
+            SELECT pa.codigo, pa.nombre, pa.estado, pa.avance, pa.peso, pa.fecha_inicio, pa.fecha_fin,
+                   ie.codigo AS ie_codigo, ie.nombre AS ie_nombre
+            FROM planes_accion pa
+            JOIN iniciativas_estrategicas ie ON ie.id = pa.iniciativa_id
+            WHERE pa.owner = ?
+            ORDER BY pa.prioridad DESC
+        ");
+        $stmt->execute([$responsable]);
+        $planes = $stmt->fetchAll();
+
+        $datos .= "## Planes de Accion a cargo (" . count($planes) . ")\n";
+        foreach ($planes as $p) {
+            $datos .= "- " . $p['ie_codigo'] . " > " . $p['codigo'] . ": " . $p['nombre']
+                . " | Estado: " . $p['estado'] . " | Avance: " . $p['avance'] . "%"
+                . " | Peso: " . $p['peso'] . "%"
+                . " | Periodo: " . ($p['fecha_inicio'] ?: '?') . " a " . ($p['fecha_fin'] ?: '?') . "\n";
+        }
+
+        // Actividades pendientes de planes
+        $stmt = $pdo->prepare("
+            SELECT a.codigo, a.descripcion, a.estado, a.fecha_limite,
+                   pa.codigo AS pa_codigo, pa.nombre AS pa_nombre
+            FROM actividades a
+            JOIN planes_accion pa ON pa.id = a.plan_accion_id
+            WHERE a.responsable = ? AND a.estado != 'completado'
+            ORDER BY a.fecha_limite ASC
+        ");
+        $stmt->execute([$responsable]);
+        $actividades = $stmt->fetchAll();
+
+        $datos .= "\n## Actividades pendientes (" . count($actividades) . ")\n";
+        foreach ($actividades as $a) {
+            $datos .= "- [" . $a['pa_codigo'] . "] " . $a['codigo'] . ": " . $a['descripcion']
+                . " | Estado: " . $a['estado']
+                . " | Fecha limite: " . ($a['fecha_limite'] ?: 'Sin definir') . "\n";
+        }
+
+        // Compromisos pendientes
+        $stmt = $pdo->prepare("
+            SELECT c.descripcion, c.estado, c.fecha_limite,
+                   r.titulo AS reunion_titulo, r.fecha AS reunion_fecha
+            FROM compromisos c
+            JOIN reuniones r ON r.id = c.reunion_id
+            WHERE c.responsable = ? AND c.estado != 'completado'
+            ORDER BY c.fecha_limite ASC
+        ");
+        $stmt->execute([$responsable]);
+        $compromisos = $stmt->fetchAll();
+
+        $datos .= "\n## Compromisos pendientes (" . count($compromisos) . ")\n";
+        foreach ($compromisos as $c) {
+            $datos .= "- " . $c['descripcion']
+                . " | Estado: " . $c['estado']
+                . " | Fecha limite: " . ($c['fecha_limite'] ?: 'Sin definir')
+                . " | Reunion origen: " . $c['reunion_titulo'] . " (" . date('d/m/Y', strtotime($c['reunion_fecha'])) . ")\n";
+        }
+
+        // Riesgos abiertos
+        $stmt = $pdo->prepare("
+            SELECT r.descripcion, r.nivel, r.probabilidad, r.impacto, r.plan_mitigacion,
+                   ie.codigo AS ie_codigo
+            FROM riesgos r
+            LEFT JOIN iniciativas_estrategicas ie ON ie.id = r.iniciativa_id
+            WHERE r.responsable = ? AND r.estado = 'abierto'
+            ORDER BY FIELD(r.nivel, 'critico', 'alto', 'medio', 'bajo')
+        ");
+        $stmt->execute([$responsable]);
+        $riesgos = $stmt->fetchAll();
+
+        $datos .= "\n## Riesgos abiertos (" . count($riesgos) . ")\n";
+        foreach ($riesgos as $r) {
+            $datos .= "- " . ($r['ie_codigo'] ? "[" . $r['ie_codigo'] . "] " : "") . $r['descripcion']
+                . " | Nivel: " . $r['nivel']
+                . " | Prob: " . $r['probabilidad'] . " | Impacto: " . $r['impacto']
+                . ($r['plan_mitigacion'] ? " | Mitigacion: " . mb_substr($r['plan_mitigacion'], 0, 80) : "") . "\n";
+        }
+
+        // Proyectos
+        $stmt = $pdo->prepare("
+            SELECT p.nombre, p.estado, p.avance, p.fecha_inicio, p.fecha_fin
+            FROM proyectos p
+            WHERE p.responsable = ?
+            ORDER BY p.prioridad DESC
+        ");
+        $stmt->execute([$responsable]);
+        $proyectos = $stmt->fetchAll();
+
+        $datos .= "\n## Proyectos a cargo (" . count($proyectos) . ")\n";
+        foreach ($proyectos as $p) {
+            $datos .= "- " . $p['nombre']
+                . " | Estado: " . $p['estado'] . " | Avance: " . $p['avance'] . "%"
+                . " | Periodo: " . ($p['fecha_inicio'] ?: '?') . " a " . ($p['fecha_fin'] ?: '?') . "\n";
+        }
+
+        // Actividades de proyectos pendientes
+        $stmt = $pdo->prepare("
+            SELECT pa.nombre, pa.estado, pa.fecha_inicio, pa.fecha_fin, pa.grupo, pa.fase,
+                   p.nombre AS proyecto_nombre
+            FROM proyecto_actividades pa
+            JOIN proyectos p ON p.id = pa.proyecto_id
+            WHERE pa.responsable = ? AND pa.estado != 'completado'
+            ORDER BY pa.fecha_inicio ASC
+        ");
+        $stmt->execute([$responsable]);
+        $proyActiv = $stmt->fetchAll();
+
+        $datos .= "\n## Actividades de proyectos pendientes (" . count($proyActiv) . ")\n";
+        foreach ($proyActiv as $pa) {
+            $datos .= "- [" . $pa['proyecto_nombre'] . "] " . $pa['nombre']
+                . ($pa['grupo'] ? " (Grupo: " . $pa['grupo'] . ")" : "")
+                . ($pa['fase'] ? " | Fase: " . $pa['fase'] : "")
+                . " | Estado: " . $pa['estado']
+                . " | " . ($pa['fecha_inicio'] ?: '?') . " a " . ($pa['fecha_fin'] ?: '?') . "\n";
+        }
+
+        $prompt = "Eres un consultor experto en Balanced Scorecard y gestion estrategica para el laboratorio farmaceutico Temis Lostalo. "
+            . "A partir de los siguientes datos, genera una AGENDA DE REUNION estructurada para revisar con " . $responsable . ".\n\n"
+            . "La agenda debe:\n"
+            . "- Estar organizada por temas prioritarios\n"
+            . "- Incluir puntos de seguimiento de compromisos anteriores\n"
+            . "- Destacar items vencidos o en riesgo\n"
+            . "- Sugerir preguntas clave para cada tema\n"
+            . "- Ser concisa y actionable\n"
+            . "- Estar en espanol\n"
+            . "- Usar formato de texto plano (no markdown)\n\n"
+            . $datos;
+
+        return self::llamarApi($prompt);
+    }
 }
