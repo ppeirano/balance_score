@@ -85,7 +85,7 @@ require_once __DIR__ . '/../layout/header.php';
                             <select class="form-select form-select-sm" name="plan_accion_id">
                                 <option value="">Vincular a PDA (opcional)</option>
                                 <?php foreach ($planes as $p): ?>
-                                    <option value="<?= $p['id'] ?>"><?= sanitize($p['ie_codigo'] . ' - ' . $p['codigo'] . ': ' . $p['nombre']) ?></option>
+                                    <option value="<?= $p['id'] ?>"><?= sanitize(($p['iniciativa_codigo'] ?? '') . ' - ' . $p['codigo'] . ': ' . $p['nombre']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
