@@ -28,7 +28,7 @@ require_once __DIR__ . '/../layout/header.php';
             <tr>
                 <td><?= formatDate($r['fecha']) ?></td>
                 <td><a href="<?= BASE_URL ?>index.php?page=reuniones&action=detalle&id=<?= $r['id'] ?>"><?= sanitize($r['titulo']) ?></a></td>
-                <td><?= $r['ie_codigo'] ? '<span class="badge bg-primary">' . sanitize($r['ie_codigo']) . '</span>' : '-' ?></td>
+                <td><?= !empty($r['ie_codigo']) ? '<span class="badge bg-primary">' . sanitize($r['ie_codigo']) . '</span>' : '-' ?></td>
                 <td><small><?= sanitize($r['participantes'] ?? '') ?></small></td>
                 <td>
                     <?php
