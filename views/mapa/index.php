@@ -36,68 +36,143 @@ $relaciones = $pdo->query("
     ORDER BY io.orden ASC
 ")->fetchAll();
 
+// Calcular avance por IE
+$avanceByIE = [];
+foreach ($iniciativas as $ie) {
+    $stmt = $pdo->prepare("SELECT avance, peso FROM planes_accion WHERE iniciativa_id = ?");
+    $stmt->execute([$ie['id']]);
+    $pdas = $stmt->fetchAll();
+    $pesoTotal = array_sum(array_column($pdas, 'peso'));
+    $avance = 0;
+    if ($pesoTotal > 0) {
+        foreach ($pdas as $pda) {
+            $avance += ($pda['avance'] * $pda['peso'] / $pesoTotal);
+        }
+    }
+    $avanceByIE[$ie['id']] = round($avance);
+}
+
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-diagram-3 me-2"></i>Mapa Estrat&eacute;gico</h2>
-</div>
+<style>
+.mapa-banda {
+    border-radius: 14px;
+    padding: 20px 24px 16px;
+    position: relative;
+    margin-bottom: 0;
+}
+.mapa-banda-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 14px;
+}
+.mapa-ie-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 14px 12px;
+    text-align: center;
+    min-width: 160px;
+    max-width: 220px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-top: 3px solid transparent;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.mapa-ie-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    color: inherit;
+}
+.mapa-ie-card .ie-code {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+}
+.mapa-ie-card .ie-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #1b2333;
+    line-height: 1.3;
+    margin-bottom: 8px;
+}
+.mapa-ie-card .ie-avance {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+.mapa-ie-card .ie-avance .progress {
+    flex-grow: 1;
+    height: 4px;
+    max-width: 80px;
+}
+.mapa-ie-card .ie-avance small {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+}
+.mapa-conector {
+    text-align: center;
+    padding: 6px 0;
+    color: #d1d5db;
+    font-size: 1.2rem;
+}
+</style>
 
-<p class="text-muted mb-4">
-    Visualizaci&oacute;n de las perspectivas del Balanced Scorecard y sus iniciativas estrat&eacute;gicas.
-    Las flechas representan relaciones causa-efecto entre iniciativas.
-</p>
-
-<!-- Mapa Estrategico: piramide BSC de base a resultado (Aprendizaje -> Financiera) -->
+<!-- Mapa Estratégico -->
 <div class="card mb-4">
-    <div class="card-body p-3">
-        <?php foreach ($perspectivas as $persp): ?>
+    <div class="card-body p-4">
+        <?php foreach ($perspectivas as $idx => $persp): ?>
             <?php $iesPersp = $ieByPerspectiva[$persp['id']] ?? []; ?>
-            <div class="mb-3 p-3 rounded position-relative"
-                 style="background-color: <?= sanitize($persp['color']) ?>15; border: 2px solid <?= sanitize($persp['color']) ?>40; min-height: 100px;">
+            <div class="mapa-banda" style="background-color: <?= sanitize($persp['color']) ?>0D; border: 1px solid <?= sanitize($persp['color']) ?>25;">
 
-                <!-- Etiqueta de perspectiva -->
-                <div class="mb-2">
-                    <span class="badge" style="background-color: <?= sanitize($persp['color']) ?>;">
-                        <i class="bi <?= sanitize($persp['icono'] ?? 'bi-circle') ?> me-1"></i>
-                        <?= sanitize($persp['nombre']) ?>
-                    </span>
+                <div class="mapa-banda-label" style="background-color: <?= sanitize($persp['color']) ?>;">
+                    <i class="bi <?= sanitize($persp['icono'] ?? 'bi-circle') ?>"></i>
+                    <?= sanitize($persp['nombre']) ?>
                 </div>
 
-                <!-- Iniciativas como tarjetas dentro de la banda -->
-                <div class="row g-2 justify-content-center">
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
                     <?php if (!empty($iesPersp)): ?>
-                        <?php foreach ($iesPersp as $ie): ?>
-                            <div class="col-auto">
-                                <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>"
-                                   class="text-decoration-none">
-                                    <div class="card border-0 shadow-sm rounded-3 h-100"
-                                         style="border-left: 4px solid <?= sanitize($ie['perspectiva_color']) ?> !important; min-width: 160px; max-width: 220px;">
-                                        <div class="card-body p-2 text-center">
-                                            <span class="badge mb-1" style="background-color: <?= sanitize($ie['perspectiva_color']) ?>;">
-                                                <?= sanitize($ie['codigo']) ?>
-                                            </span>
-                                            <div class="small fw-semibold text-dark"><?= sanitize($ie['nombre']) ?></div>
-                                        </div>
+                        <?php foreach ($iesPersp as $ie):
+                            $avance = $avanceByIE[$ie['id']] ?? 0;
+                            $barColor = $avance >= 70 ? '#22c55e' : ($avance >= 40 ? '#f59e0b' : '#ef4444');
+                        ?>
+                            <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>"
+                               class="mapa-ie-card" style="border-top-color: <?= sanitize($ie['perspectiva_color']) ?>;">
+                                <span class="ie-code" style="background-color: <?= sanitize($ie['perspectiva_color']) ?>;">
+                                    <?= sanitize($ie['codigo']) ?>
+                                </span>
+                                <div class="ie-name"><?= sanitize($ie['nombre']) ?></div>
+                                <div class="ie-avance">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: <?= $avance ?>%; background-color: <?= $barColor ?>;"></div>
                                     </div>
-                                </a>
-                            </div>
+                                    <small><?= $avance ?>%</small>
+                                </div>
+                            </a>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <div class="col-12 text-center text-muted small py-2">
-                            Sin iniciativas en esta perspectiva
-                        </div>
+                        <div class="text-muted small py-2">Sin iniciativas en esta perspectiva</div>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <?php
-            // Mostrar flecha visual entre bandas (excepto despues de la ultima)
-            $lastPersp = end($perspectivas);
-            if ($persp['id'] !== $lastPersp['id']):
-            ?>
-                <div class="text-center my-1">
-                    <i class="bi bi-arrow-down fs-4 text-muted"></i>
+            <?php if ($idx < count($perspectivas) - 1): ?>
+                <div class="mapa-conector">
+                    <i class="bi bi-chevron-down"></i>
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
@@ -183,25 +258,6 @@ require_once __DIR__ . '/../layout/header.php';
                 No hay relaciones causa-efecto registradas.
             </div>
         <?php endif; ?>
-    </div>
-</div>
-
-<!-- Leyenda -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h6 class="mb-0"><i class="bi bi-palette me-2"></i>Leyenda de Perspectivas</h6>
-    </div>
-    <div class="card-body">
-        <div class="row g-2">
-            <?php foreach ($perspectivas as $persp): ?>
-                <div class="col-md-3 col-6">
-                    <span class="badge me-1" style="background-color: <?= sanitize($persp['color']) ?>;">
-                        <i class="bi <?= sanitize($persp['icono'] ?? 'bi-circle') ?> me-1"></i>
-                        <?= sanitize($persp['nombre']) ?>
-                    </span>
-                </div>
-            <?php endforeach; ?>
-        </div>
     </div>
 </div>
 
