@@ -33,28 +33,28 @@ function semaforoBadge($estado) {
 // Badge de estado de proyecto/PDA
 function estadoBadge($estado) {
     $clases = [
-        'pendiente' => 'bg-secondary',
-        'en_progreso' => 'bg-primary',
-        'completado' => 'bg-success',
-        'cancelado' => 'bg-danger',
-        'suspendido' => 'bg-warning text-dark'
+        'pendiente' => 'badge-neutral',
+        'en_progreso' => 'badge-info',
+        'completado' => 'badge-ok',
+        'cancelado' => 'badge-bad',
+        'suspendido' => 'badge-warn'
     ];
-    $clase = $clases[$estado] ?? 'bg-secondary';
+    $clase = $clases[$estado] ?? 'badge-neutral';
     $texto = str_replace('_', ' ', ucfirst($estado));
-    return '<span class="badge ' . $clase . '">' . $texto . '</span>';
+    return '<span class="' . $clase . '">' . $texto . '</span>';
 }
 
 // Badge de prioridad
 function prioridadBadge($prioridad) {
     $map = [
-        1 => ['texto' => 'Muy Alta', 'badge' => 'bg-danger'],
-        2 => ['texto' => 'Alta', 'badge' => 'bg-danger'],
-        3 => ['texto' => 'Media', 'badge' => 'bg-warning text-dark'],
-        4 => ['texto' => 'Baja', 'badge' => 'bg-info text-dark'],
-        5 => ['texto' => 'Muy Baja', 'badge' => 'bg-secondary'],
+        1 => ['texto' => 'Muy Alta', 'badge' => 'badge-bad'],
+        2 => ['texto' => 'Alta', 'badge' => 'badge-bad'],
+        3 => ['texto' => 'Media', 'badge' => 'badge-warn'],
+        4 => ['texto' => 'Baja', 'badge' => 'badge-info'],
+        5 => ['texto' => 'Muy Baja', 'badge' => 'badge-neutral'],
     ];
     $prio = $map[(int)$prioridad] ?? $map[3];
-    return '<span class="badge ' . $prio['badge'] . '">' . $prio['texto'] . '</span>';
+    return '<span class="' . $prio['badge'] . '">' . $prio['texto'] . '</span>';
 }
 
 // Flash messages
@@ -126,13 +126,13 @@ function calcularNivelRiesgo($probabilidad, $impacto) {
 
 function nivelRiesgoBadge($nivel) {
     $clases = [
-        'critico' => 'bg-danger',
-        'alto' => 'bg-warning text-dark',
-        'medio' => 'bg-info text-dark',
-        'bajo' => 'bg-success'
+        'critico' => 'badge-bad',
+        'alto' => 'badge-warn',
+        'medio' => 'badge-info',
+        'bajo' => 'badge-ok'
     ];
-    $clase = $clases[$nivel] ?? 'bg-secondary';
-    return '<span class="badge ' . $clase . '">' . ucfirst($nivel) . '</span>';
+    $clase = $clases[$nivel] ?? 'badge-neutral';
+    return '<span class="' . $clase . '">' . ucfirst($nivel) . '</span>';
 }
 
 // Calcular avance de PDA basado en actividades

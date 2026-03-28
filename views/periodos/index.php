@@ -43,9 +43,9 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= formatDate($p['fecha_fin']) ?></td>
                     <td>
                         <?php if ($p['activo']): ?>
-                            <span class="badge bg-success">Activo</span>
+                            <span class="badge-ok">Activo</span>
                         <?php else: ?>
-                            <span class="badge bg-secondary">Inactivo</span>
+                            <span class="badge-neutral">Inactivo</span>
                         <?php endif; ?>
                     </td>
                     <td>

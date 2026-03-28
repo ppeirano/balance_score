@@ -550,7 +550,7 @@ require_once __DIR__ . '/../layout/header.php';
             <tbody>
                 <?php foreach ($vinculos as $v): ?>
                 <tr>
-                    <td><?= $v['entidad_tipo'] === 'iniciativa' ? '<span class="badge bg-primary">IE</span>' : '<span class="badge bg-info text-dark">PDA</span>' ?></td>
+                    <td><?= $v['entidad_tipo'] === 'iniciativa' ? '<span class="badge-info">IE</span>' : '<span class="badge-info">PDA</span>' ?></td>
                     <td><?= sanitize($v['entidad_codigo'] ?? '-') ?></td>
                     <td><?= sanitize($v['entidad_nombre'] ?? '-') ?></td>
                     <td>
@@ -581,7 +581,7 @@ require_once __DIR__ . '/../layout/header.php';
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Historial de Notas</h5>
         <?php if (!empty($notas)): ?>
-            <span class="badge bg-light text-dark"><?= count($notas) ?></span>
+            <span class="badge-neutral"><?= count($notas) ?></span>
         <?php endif; ?>
     </div>
     <div class="card-body">

@@ -56,7 +56,7 @@ require_once __DIR__ . '/../layout/header.php';
     <span><span class="badge" style="background-color:#0d6efd">&nbsp;&nbsp;</span> Plan de Acción</span>
     <span><span class="badge" style="background-color:#198754">&nbsp;&nbsp;</span> Actividad</span>
     <span><span class="badge" style="background-color:#fd7e14">&nbsp;&nbsp;</span> Hito</span>
-    <span><span class="badge bg-secondary">&nbsp;&nbsp;</span> Completado</span>
+    <span><span class="badge-neutral">&nbsp;&nbsp;</span> Completado</span>
 </div>
 
 <div class="card">
@@ -69,7 +69,7 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mt-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-clock me-2"></i>Próximos Eventos</h5>
-        <span class="badge bg-light text-dark"><?= count($proximosSeguimientos) ?> pendiente(s)</span>
+        <span class="badge-neutral"><?= count($proximosSeguimientos) ?> pendiente(s)</span>
     </div>
     <div class="card-body p-0">
         <?php if (empty($proximosSeguimientos)): ?>
@@ -91,7 +91,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <tbody>
                         <?php
                         $hoy = date('Y-m-d');
-                        $tipoColores = ['plan' => 'primary', 'actividad' => 'success', 'hito' => 'warning'];
+                        $tipoClases = ['plan' => 'badge-info', 'actividad' => 'badge-ok', 'hito' => 'badge-warn'];
                         $tipoLabels = ['plan' => 'Plan', 'actividad' => 'Actividad', 'hito' => 'Hito'];
                         foreach ($proximosSeguimientos as $seg):
                             $esHoy = ($seg['fecha'] === $hoy);
@@ -100,9 +100,9 @@ require_once __DIR__ . '/../layout/header.php';
                             <tr class="<?= $esHoy ? 'table-warning' : '' ?>">
                                 <td>
                                     <?php if ($esHoy): ?>
-                                        <span class="badge bg-warning text-dark">Hoy</span>
+                                        <span class="badge-warn">Hoy</span>
                                     <?php elseif ($esMañana): ?>
-                                        <span class="badge bg-info text-dark">Mañana</span>
+                                        <span class="badge-info">Mañana</span>
                                     <?php else: ?>
                                         <?= date('d/m/Y', strtotime($seg['fecha'])) ?>
                                     <?php endif; ?>
@@ -110,7 +110,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td><?= $seg['hora'] ? date('H:i', strtotime($seg['hora'])) : '<span class="text-muted">-</span>' ?></td>
                                 <td><strong><?= sanitize($seg['titulo']) ?></strong></td>
                                 <td>
-                                    <span class="badge bg-<?= $tipoColores[$seg['entidad_tipo']] ?? 'secondary' ?>">
+                                    <span class="<?= $tipoClases[$seg['entidad_tipo']] ?? 'badge-neutral' ?>">
                                         <?= $tipoLabels[$seg['entidad_tipo']] ?? $seg['entidad_tipo'] ?>
                                     </span>
                                 </td>
@@ -345,8 +345,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('detalleHora').textContent = props.hora || 'Sin hora';
             document.getElementById('detalleDescripcion').textContent = props.descripcion || 'Sin descripción';
             document.getElementById('detalleEstado').innerHTML = props.completado
-                ? '<span class="badge bg-success">Completado</span>'
-                : '<span class="badge bg-warning text-dark">Pendiente</span>';
+                ? '<span class="badge-ok">Completado</span>'
+                : '<span class="badge-warn">Pendiente</span>';
 
             document.getElementById('formEliminar').action =
                 '<?= BASE_URL ?>index.php?page=calendario&action=eliminar&id=' + ev.id;

@@ -77,7 +77,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= nivelRiesgoBadge($r['nivel']) ?></td>
                     <td><?= sanitize(mb_substr($r['descripcion'], 0, 80)) ?><?= mb_strlen($r['descripcion']) > 80 ? '...' : '' ?></td>
                     <td>
-                        <?= $r['iniciativa_codigo'] ? '<span class="badge bg-primary">' . sanitize($r['iniciativa_codigo']) . '</span>' : '' ?>
+                        <?= $r['iniciativa_codigo'] ? '<span class="badge-info">' . sanitize($r['iniciativa_codigo']) . '</span>' : '' ?>
                         <?= $r['plan_nombre'] ? '<small class="text-muted">' . sanitize($r['plan_nombre']) . '</small>' : '' ?>
                     </td>
                     <td><?= ucfirst($r['probabilidad']) ?></td>

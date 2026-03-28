@@ -63,11 +63,11 @@ require_once __DIR__ . '/../layout/header.php';
                 </p>
                 <div class="d-flex gap-2">
                     <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
-                        <span class="badge bg-info text-dark">Cuantitativo</span>
+                        <span class="badge-info">Cuantitativo</span>
                     <?php else: ?>
                         <span class="badge text-white" style="background-color: #6f42c1;">Cualitativo</span>
                     <?php endif; ?>
-                    <span class="badge bg-secondary"><?= sanitize(ucfirst($kpi['frecuencia'] ?? '-')) ?></span>
+                    <span class="badge-neutral"><?= sanitize(ucfirst($kpi['frecuencia'] ?? '-')) ?></span>
                 </div>
             </div>
             <div class="col-md-3 text-center">

@@ -172,18 +172,18 @@ require_once __DIR__ . '/../layout/header.php';
                             elseif ($avancePda >= 20) $barClassPda = 'bg-info';
 
                             $prioridadMap = [
-                                1 => ['texto' => 'Muy Alta', 'badge' => 'bg-danger'],
-                                2 => ['texto' => 'Alta', 'badge' => 'bg-danger'],
-                                3 => ['texto' => 'Media', 'badge' => 'bg-warning text-dark'],
-                                4 => ['texto' => 'Baja', 'badge' => 'bg-info text-dark'],
-                                5 => ['texto' => 'Muy Baja', 'badge' => 'bg-secondary'],
+                                1 => ['texto' => 'Muy Alta', 'badge' => 'badge-bad'],
+                                2 => ['texto' => 'Alta', 'badge' => 'badge-bad'],
+                                3 => ['texto' => 'Media', 'badge' => 'badge-warn'],
+                                4 => ['texto' => 'Baja', 'badge' => 'badge-info'],
+                                5 => ['texto' => 'Muy Baja', 'badge' => 'badge-neutral'],
                             ];
                             $prio = $prioridadMap[(int)$pda['prioridad']] ?? $prioridadMap[3];
                             $prioridadTexto = $prio['texto'];
                             $prioridadBadge = $prio['badge'];
                             ?>
                             <tr>
-                                <td><span class="badge bg-secondary"><?= sanitize($pda['codigo']) ?></span></td>
+                                <td><span class="badge-neutral"><?= sanitize($pda['codigo']) ?></span></td>
                                 <td>
                                     <a href="<?= BASE_URL ?>index.php?page=planes&action=detalle&id=<?= (int)$pda['id'] ?>" class="text-decoration-none fw-semibold">
                                         <?= sanitize($pda['nombre']) ?>
@@ -203,7 +203,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 </td>
                                 <td class="text-center"><?= estadoBadge($pda['estado']) ?></td>
                                 <td class="text-center">
-                                    <span class="badge <?= $prioridadBadge ?>"><?= $prioridadTexto ?></span>
+                                    <span class="<?= $prioridadBadge ?>"><?= $prioridadTexto ?></span>
                                 </td>
                                 <td class="text-center"><?= number_format($pda['peso'], 1) ?>%</td>
                                 <td class="text-end">
@@ -264,7 +264,7 @@ require_once __DIR__ . '/../layout/header.php';
                             <tr>
                                 <td class="fw-semibold"><?= sanitize($kpi['nombre']) ?></td>
                                 <td class="text-center">
-                                    <span class="badge <?= $kpi['tipo'] === 'cuantitativo' ? 'bg-primary' : 'bg-info text-dark' ?>">
+                                    <span class="<?= $kpi['tipo'] === 'cuantitativo' ? 'badge-info' : 'badge-info' ?>">
                                         <?= ucfirst(sanitize($kpi['tipo'])) ?>
                                     </span>
                                 </td>
@@ -332,14 +332,14 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td class="text-center">
                                     <?php
                                     $estadoRiesgoClases = [
-                                        'abierto' => 'bg-danger',
-                                        'mitigado' => 'bg-warning text-dark',
-                                        'cerrado' => 'bg-success',
-                                        'materializado' => 'bg-dark'
+                                        'abierto' => 'badge-bad',
+                                        'mitigado' => 'badge-warn',
+                                        'cerrado' => 'badge-ok',
+                                        'materializado' => 'badge-neutral'
                                     ];
-                                    $claseEstado = $estadoRiesgoClases[$riesgo['estado']] ?? 'bg-secondary';
+                                    $claseEstado = $estadoRiesgoClases[$riesgo['estado']] ?? 'badge-neutral';
                                     ?>
-                                    <span class="badge <?= $claseEstado ?>"><?= ucfirst(sanitize($riesgo['estado'])) ?></span>
+                                    <span class="<?= $claseEstado ?>"><?= ucfirst(sanitize($riesgo['estado'])) ?></span>
                                 </td>
                                 <td><?= $riesgo['responsable'] ? sanitize($riesgo['responsable']) : '<span class="text-muted">-</span>' ?></td>
                             </tr>
@@ -379,13 +379,13 @@ require_once __DIR__ . '/../layout/header.php';
                     <tbody>
                         <?php foreach ($proyectos as $proy):
                             $estadoProyClases = [
-                                'pendiente' => 'bg-secondary',
-                                'en_progreso' => 'bg-primary',
-                                'completado' => 'bg-success',
-                                'cancelado' => 'bg-danger',
-                                'suspendido' => 'bg-warning text-dark'
+                                'pendiente' => 'badge-neutral',
+                                'en_progreso' => 'badge-info',
+                                'completado' => 'badge-ok',
+                                'cancelado' => 'badge-bad',
+                                'suspendido' => 'badge-warn'
                             ];
-                            $claseProy = $estadoProyClases[$proy['estado']] ?? 'bg-secondary';
+                            $claseProy = $estadoProyClases[$proy['estado']] ?? 'badge-neutral';
                         ?>
                             <tr>
                                 <td>
@@ -407,7 +407,7 @@ require_once __DIR__ . '/../layout/header.php';
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge <?= $claseProy ?>"><?= ucfirst(str_replace('_', ' ', sanitize($proy['estado']))) ?></span>
+                                    <span class="<?= $claseProy ?>"><?= ucfirst(str_replace('_', ' ', sanitize($proy['estado']))) ?></span>
                                 </td>
                                 <td class="text-center">
                                     <?= prioridadBadge($proy['prioridad']) ?>

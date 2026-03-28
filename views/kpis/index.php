@@ -109,7 +109,7 @@ require_once __DIR__ . '/../layout/header.php';
                         </td>
                         <td>
                             <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
-                                <span class="badge bg-info text-dark">Cuantitativo</span>
+                                <span class="badge-info">Cuantitativo</span>
                             <?php else: ?>
                                 <span class="badge bg-purple text-white" style="background-color: #6f42c1;">Cualitativo</span>
                             <?php endif; ?>
@@ -129,7 +129,7 @@ require_once __DIR__ . '/../layout/header.php';
                             <?php endif; ?>
                         </td>
                         <td><?= sanitize($kpi['unidad'] ?? '-') ?></td>
-                        <td><span class="badge bg-secondary"><?= sanitize(ucfirst($kpi['frecuencia'] ?? '-')) ?></span></td>
+                        <td><span class="badge-neutral"><?= sanitize(ucfirst($kpi['frecuencia'] ?? '-')) ?></span></td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= (int)$kpi['id'] ?>"

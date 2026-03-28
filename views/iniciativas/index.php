@@ -115,7 +115,7 @@ require_once __DIR__ . '/../layout/header.php';
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-secondary rounded-pill"><?= $stats['total_pdas'] ?></span>
+                                            <span class="badge-neutral rounded-pill"><?= $stats['total_pdas'] ?></span>
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">

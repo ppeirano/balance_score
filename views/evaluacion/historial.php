@@ -15,7 +15,7 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-3">
     <div class="card-header d-flex justify-content-between">
         <span>
-            <span class="badge bg-primary"><?= ucfirst(sanitize($e['tipo'])) ?></span>
+            <span class="badge-info"><?= ucfirst(sanitize($e['tipo'])) ?></span>
             <?= date('d/m/Y H:i', strtotime($e['created_at'])) ?>
         </span>
     </div>

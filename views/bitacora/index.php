@@ -39,10 +39,10 @@ $nombresEntidad = [
 ];
 
 $coloresAccion = [
-    'creado' => 'bg-success',
-    'editado' => 'bg-primary',
-    'eliminado' => 'bg-danger',
-    'estado_cambiado' => 'bg-warning text-dark',
+    'creado' => 'badge-ok',
+    'editado' => 'badge-info',
+    'eliminado' => 'badge-bad',
+    'estado_cambiado' => 'badge-warn',
 ];
 
 $nombresAccion = [
@@ -156,7 +156,7 @@ function urlDetalle($tipo, $id) {
                 <div class="flex-grow-1">
                     <div class="d-flex align-items-center gap-2 mb-1">
                         <i class="bi <?= $iconosEntidad[$r['entidad_tipo']] ?? 'bi-record' ?> text-muted"></i>
-                        <span class="badge <?= $coloresAccion[$r['accion']] ?? 'bg-secondary' ?>" style="font-size: 0.7rem;">
+                        <span class="<?= $coloresAccion[$r['accion']] ?? 'badge-neutral' ?>" style="font-size: 0.7rem;">
                             <?= $nombresAccion[$r['accion']] ?? $r['accion'] ?>
                         </span>
                         <small class="text-muted"><?= $nombresEntidad[$r['entidad_tipo']] ?? $r['entidad_tipo'] ?></small>

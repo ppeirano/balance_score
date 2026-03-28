@@ -38,9 +38,9 @@ require_once __DIR__ . '/../layout/header.php';
                     if ($totalC === 0): ?>
                         <span class="text-muted">-</span>
                     <?php elseif ($pendC > 0): ?>
-                        <span class="badge bg-warning text-dark"><?= $pendC ?> pendiente<?= $pendC > 1 ? 's' : '' ?></span>
+                        <span class="badge-warn"><?= $pendC ?> pendiente<?= $pendC > 1 ? 's' : '' ?></span>
                     <?php else: ?>
-                        <span class="badge bg-success">Todos cumplidos</span>
+                        <span class="badge-ok">Todos cumplidos</span>
                     <?php endif; ?>
                 </td>
                 <td>

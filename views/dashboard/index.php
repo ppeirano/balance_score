@@ -171,7 +171,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <tbody>
                         <?php foreach ($kpisRojos as $k): ?>
                         <tr>
-                            <td><span class="badge bg-primary"><?= sanitize($k['ie_codigo'] ?? '-') ?></span></td>
+                            <td><span class="badge-info"><?= sanitize($k['ie_codigo'] ?? '-') ?></span></td>
                             <td><a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= $k['id'] ?>"><?= sanitize($k['nombre']) ?></a></td>
                             <td class="text-danger fw-bold"><?= $k['valor_actual'] ?> <?= sanitize($k['unidad'] ?? '') ?></td>
                             <td><?= $k['meta'] ?> <?= sanitize($k['unidad'] ?? '') ?></td>
@@ -230,7 +230,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <td>
                         <?= formatDate($c['fecha_limite']) ?>
                         <?php if ($c['fecha_limite'] && strtotime($c['fecha_limite']) < time()): ?>
-                            <span class="badge bg-danger">Vencido</span>
+                            <span class="badge-bad">Vencido</span>
                         <?php endif; ?>
                     </td>
                     <td><?= estadoBadge($c['estado']) ?></td>

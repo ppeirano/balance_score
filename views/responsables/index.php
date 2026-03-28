@@ -129,7 +129,7 @@ require_once __DIR__ . '/../layout/header.php';
             <tbody>
                 <?php foreach ($datosPorOwner['planes'] as $p): ?>
                 <tr>
-                    <td><span class="badge bg-primary"><?= sanitize($p['ie_codigo']) ?></span></td>
+                    <td><span class="badge-info"><?= sanitize($p['ie_codigo']) ?></span></td>
                     <td><?= sanitize($p['codigo']) ?></td>
                     <td><a href="<?= BASE_URL ?>index.php?page=planes&action=detalle&id=<?= $p['id'] ?>"><?= sanitize($p['nombre']) ?></a></td>
                     <td>
@@ -154,7 +154,7 @@ require_once __DIR__ . '/../layout/header.php';
             <tbody>
                 <?php foreach ($datosPorOwner['actividades'] as $a): ?>
                 <tr>
-                    <td><span class="badge bg-primary"><?= sanitize($a['ie_codigo']) ?></span></td>
+                    <td><span class="badge-info"><?= sanitize($a['ie_codigo']) ?></span></td>
                     <td><small><?= sanitize($a['plan_codigo']) ?></small></td>
                     <td><?= sanitize($a['codigo']) ?></td>
                     <td><?= sanitize(mb_substr($a['descripcion'], 0, 60)) ?></td>

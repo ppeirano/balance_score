@@ -73,7 +73,7 @@ require_once __DIR__ . '/../layout/header.php';
             <small class="text-muted">(<?= sanitize($plan['codigo']) ?>)</small>
         </h2>
         <div class="d-flex gap-2 flex-wrap mt-2">
-            <span class="badge bg-info text-dark fs-6"><?= sanitize($plan['ie_codigo']) ?> - <?= sanitize($plan['ie_nombre']) ?></span>
+            <span class="badge-info fs-6"><?= sanitize($plan['ie_codigo']) ?> - <?= sanitize($plan['ie_nombre']) ?></span>
             <?= estadoBadge($plan['estado']) ?>
         </div>
     </div>
@@ -176,7 +176,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td>
                                     <?= sanitize($act['observaciones'] ?? '-') ?>
                                     <?php if (!empty($adjuntosAct[$act['id']])): ?>
-                                        <span class="badge bg-secondary ms-1" title="<?= count($adjuntosAct[$act['id']]) ?> archivo(s) adjunto(s)">
+                                        <span class="badge-neutral ms-1" title="<?= count($adjuntosAct[$act['id']]) ?> archivo(s) adjunto(s)">
                                             <i class="bi bi-paperclip"></i> <?= count($adjuntosAct[$act['id']]) ?>
                                         </span>
                                     <?php endif; ?>
@@ -221,7 +221,7 @@ require_once __DIR__ . '/../layout/header.php';
                                             <tbody>
                                                 <?php foreach ($recursos[$act['id']] as $rec): ?>
                                                     <tr>
-                                                        <td><span class="badge bg-secondary"><?= sanitize(ucfirst($rec['tipo'])) ?></span></td>
+                                                        <td><span class="badge-neutral"><?= sanitize(ucfirst($rec['tipo'])) ?></span></td>
                                                         <td><?= sanitize($rec['descripcion']) ?></td>
                                                         <td><?= $rec['cantidad'] !== null ? sanitize($rec['cantidad']) : '-' ?></td>
                                                         <td><?= sanitize($rec['unidad'] ?? '-') ?></td>
@@ -283,13 +283,13 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td>
                                     <?php
                                     $hitoBadges = [
-                                        'pendiente' => 'bg-secondary',
-                                        'alcanzado' => 'bg-success',
-                                        'retrasado' => 'bg-danger'
+                                        'pendiente' => 'badge-neutral',
+                                        'alcanzado' => 'badge-ok',
+                                        'retrasado' => 'badge-bad'
                                     ];
-                                    $hitoBadge = $hitoBadges[$hito['estado']] ?? 'bg-secondary';
+                                    $hitoBadge = $hitoBadges[$hito['estado']] ?? 'badge-neutral';
                                     ?>
-                                    <span class="badge <?= $hitoBadge ?>"><?= ucfirst(sanitize($hito['estado'])) ?></span>
+                                    <span class="<?= $hitoBadge ?>"><?= ucfirst(sanitize($hito['estado'])) ?></span>
                                 </td>
                                 <td>
                                     <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=hito&entidad_id=<?= $hito['id'] ?>&nombre=<?= urlencode($hito['nombre']) ?>"

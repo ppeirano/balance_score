@@ -192,7 +192,7 @@ require_once __DIR__ . '/../layout/header.php';
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Historial de Notas</h5>
         <?php if (!empty($notas)): ?>
-            <span class="badge bg-light text-dark"><?= count($notas) ?></span>
+            <span class="badge-neutral"><?= count($notas) ?></span>
         <?php endif; ?>
     </div>
     <div class="card-body">

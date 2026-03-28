@@ -106,7 +106,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td><strong><?= sanitize($plan['codigo']) ?></strong></td>
                                 <td><?= sanitize($plan['nombre']) ?></td>
                                 <td>
-                                    <span class="badge bg-info text-dark">
+                                    <span class="badge-info">
                                         <?= sanitize($plan['ie_codigo']) ?>
                                     </span>
                                 </td>
