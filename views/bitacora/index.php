@@ -64,8 +64,7 @@ function urlDetalle($tipo, $id) {
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4><i class="bi bi-clock-history me-2"></i>Bitácora de Cambios</h4>
+<div class="d-flex justify-content-end align-items-center mb-4">
     <span class="text-muted"><?= $total ?> registro<?= $total !== 1 ? 's' : '' ?></span>
 </div>
 

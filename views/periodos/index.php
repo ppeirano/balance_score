@@ -4,8 +4,6 @@ $periodos = Periodo::getAll($pdo);
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<h4 class="mb-4"><i class="bi bi-calendar-range me-2"></i>Períodos Estratégicos</h4>
-
 <!-- Formulario nuevo período -->
 <div class="card mb-4">
     <div class="card-header"><h6 class="mb-0">Nuevo Período</h6></div>

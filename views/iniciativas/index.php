@@ -48,8 +48,7 @@ foreach ($iniciativas as $ie) {
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-bullseye me-2"></i>Iniciativas Estrat&eacute;gicas</h2>
+<div class="d-flex justify-content-end align-items-center mb-4">
     <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=crear" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nueva IE
     </a>

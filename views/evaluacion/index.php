@@ -8,8 +8,6 @@ $apiKeyConfigurada = !empty(CLAUDE_API_KEY);
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<h4 class="mb-4"><i class="bi bi-robot me-2"></i>Evaluación Estratégica con IA</h4>
-
 <?php if (!$apiKeyConfigurada): ?>
 <div class="alert alert-warning">
     <i class="bi bi-key me-2"></i>

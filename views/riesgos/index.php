@@ -5,8 +5,7 @@ $matriz = Riesgo::getMatriz($pdo);
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4><i class="bi bi-exclamation-triangle me-2"></i>Gestión de Riesgos</h4>
+<div class="d-flex justify-content-end align-items-center mb-4">
     <a href="<?= BASE_URL ?>index.php?page=riesgos&action=crear" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Riesgo
     </a>

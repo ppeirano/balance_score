@@ -44,8 +44,7 @@ $pageTitle = 'Calendario de Seguimientos';
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-calendar-event me-2"></i>Calendario de Seguimientos</h2>
+<div class="d-flex justify-content-end align-items-center mb-4">
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSeguimiento" onclick="nuevoSeguimiento()">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Seguimiento
     </button>

@@ -68,8 +68,6 @@ $actividadesCompletadas = $pdo->query("SELECT COUNT(*) FROM actividades WHERE es
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<h4 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Dashboard Estratégico</h4>
-
 <!-- Tarjetas por Perspectiva -->
 <div class="row mb-4">
     <?php foreach ($datosPersp as $dp): ?>

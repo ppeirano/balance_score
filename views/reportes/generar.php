@@ -69,8 +69,6 @@ if ($tipoReporte === 'csv_actividades') {
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<h4 class="mb-4"><i class="bi bi-file-earmark-pdf me-2"></i>Reportes y Exportación</h4>
-
 <div class="row">
     <!-- Exportar CSV -->
     <div class="col-md-4 mb-4">

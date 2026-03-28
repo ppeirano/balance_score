@@ -19,8 +19,7 @@ if ($filtroTipo) {
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-graph-up me-2"></i>Indicadores (KPIs)</h2>
+<div class="d-flex justify-content-end align-items-center mb-4">
     <a href="<?= BASE_URL ?>index.php?page=kpis&action=crear<?= $filtroIE ? '&filtro_ie=' . (int)$filtroIE : '' ?><?= $filtroTipo ? '&filtro_tipo=' . urlencode($filtroTipo) : '' ?>" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo KPI
     </a>
