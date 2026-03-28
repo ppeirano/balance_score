@@ -128,18 +128,18 @@ require_once __DIR__ . '/../layout/header.php';
                                             </div>
                                         </td>
                                         <td class="text-end">
-                                            <div class="btn-group btn-group-sm">
+                                            <div class="d-flex gap-1 justify-content-end">
                                                 <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>"
-                                                   class="btn btn-outline-primary" title="Ver detalle">
+                                                   class="btn-action btn-action-primary" title="Ver detalle">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
                                                 <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=editar&id=<?= (int)$ie['id'] ?>"
-                                                   class="btn btn-outline-secondary" title="Editar">
+                                                   class="btn-action btn-action-secondary" title="Editar">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <form method="POST" action="<?= BASE_URL ?>index.php?page=iniciativas&action=eliminar&id=<?= (int)$ie['id'] ?>"
                                                       class="d-inline" onsubmit="return confirm('¿Eliminar esta IE y todos sus planes/actividades?');">
-                                                    <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                                                    <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>

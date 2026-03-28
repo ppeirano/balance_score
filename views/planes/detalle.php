@@ -182,19 +182,19 @@ require_once __DIR__ . '/../layout/header.php';
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <div class="btn-group btn-group-sm">
+                                    <div class="d-flex gap-1 justify-content-end">
                                         <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=actividad&entidad_id=<?= $act['id'] ?>&nombre=<?= urlencode($act['codigo'] . ' - ' . $act['descripcion']) ?>"
-                                           class="btn btn-outline-info" title="Agendar seguimiento">
+                                           class="btn-action btn-action-info" title="Agendar seguimiento">
                                             <i class="bi bi-calendar-event"></i>
                                         </a>
                                         <a href="<?= BASE_URL ?>index.php?page=actividades&action=editar&id=<?= $act['id'] ?>"
-                                           class="btn btn-outline-warning" title="Editar">
+                                           class="btn-action btn-action-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <form method="POST" action="<?= BASE_URL ?>index.php?page=actividades&action=eliminar&id=<?= $act['id'] ?>"
                                               class="d-inline"
                                               onsubmit="return confirm('¿Está seguro de que desea eliminar esta actividad?');">
-                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                                            <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -231,7 +231,7 @@ require_once __DIR__ . '/../layout/header.php';
                                                             <form method="POST" action="<?= BASE_URL ?>index.php?page=recursos&action=eliminar&id=<?= $rec['id'] ?>"
                                                                   class="d-inline"
                                                                   onsubmit="return confirm('¿Está seguro de que desea eliminar este recurso?');">
-                                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                                                                <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                                                     <i class="bi bi-trash"></i>
                                                                 </button>
                                                             </form>

@@ -125,13 +125,13 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td><?= estadoBadge($plan['estado']) ?></td>
                                 <td><?= (int)$plan['prioridad'] ?></td>
                                 <td>
-                                    <div class="btn-group btn-group-sm">
+                                    <div class="d-flex gap-1 justify-content-end">
                                         <a href="<?= BASE_URL ?>index.php?page=planes&action=detalle&id=<?= $plan['id'] ?>"
-                                           class="btn btn-outline-primary" title="Ver detalle">
+                                           class="btn-action btn-action-primary" title="Ver detalle">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         <a href="<?= BASE_URL ?>index.php?page=planes&action=editar&id=<?= $plan['id'] ?>"
-                                           class="btn btn-outline-warning" title="Editar">
+                                           class="btn-action btn-action-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <form method="POST" action="<?= BASE_URL ?>index.php?page=planes&action=eliminar&id=<?= $plan['id'] ?>"
@@ -143,7 +143,7 @@ require_once __DIR__ . '/../layout/header.php';
                                             <?php if ($filtroEstado !== ''): ?>
                                                 <input type="hidden" name="estado" value="<?= sanitize($filtroEstado) ?>">
                                             <?php endif; ?>
-                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                                            <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>

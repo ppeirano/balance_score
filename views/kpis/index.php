@@ -130,20 +130,20 @@ require_once __DIR__ . '/../layout/header.php';
                         <td><?= sanitize($kpi['unidad'] ?? '-') ?></td>
                         <td><span class="badge-neutral"><?= sanitize(ucfirst($kpi['frecuencia'] ?? '-')) ?></span></td>
                         <td>
-                            <div class="btn-group btn-group-sm">
+                            <div class="d-flex gap-1 justify-content-end">
                                 <a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= (int)$kpi['id'] ?>"
-                                   class="btn btn-outline-info" title="Historial">
+                                   class="btn-action btn-action-info" title="Historial">
                                     <i class="bi bi-clock-history"></i>
                                 </a>
                                 <a href="<?= BASE_URL ?>index.php?page=kpis&action=editar&id=<?= (int)$kpi['id'] ?><?= $filtroIE ? '&filtro_ie=' . (int)$filtroIE : '' ?><?= $filtroTipo ? '&filtro_tipo=' . urlencode($filtroTipo) : '' ?>"
-                                   class="btn btn-outline-primary" title="Editar">
+                                   class="btn-action btn-action-primary" title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </a>
                                 <form method="POST" action="<?= BASE_URL ?>index.php?page=kpis&action=eliminar&id=<?= (int)$kpi['id'] ?>"
                                       class="d-inline" onsubmit="return confirm('¿Eliminar este KPI?');">
                                     <?php if ($filtroIE): ?><input type="hidden" name="ie" value="<?= (int)$filtroIE ?>"><?php endif; ?>
                                     <?php if ($filtroTipo): ?><input type="hidden" name="tipo" value="<?= sanitize($filtroTipo) ?>"><?php endif; ?>
-                                    <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                                    <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>

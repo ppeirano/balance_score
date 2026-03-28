@@ -356,6 +356,44 @@ body {
     background: #f8fafc;
 }
 
+/* ── BOTONES DE ACCIÓN ────────────────────────────────────────── */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+    text-decoration: none;
+}
+.btn-action:hover {
+    background: #f1f5f9;
+    color: #6b7280;
+}
+.btn-action-primary:hover {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+.btn-action-secondary:hover {
+    background: #f1f5f9;
+    color: #6b7280;
+}
+.btn-action-danger:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+.btn-action-info:hover {
+    background: #ecfeff;
+    color: #06b6d4;
+}
+
 /* ── BARRAS DE PROGRESO ───────────────────────────────────────── */
 .progress {
     height: 4px;
