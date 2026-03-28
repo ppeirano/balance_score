@@ -102,6 +102,18 @@ function activeNav($page, $current) {
     return ($page === $current) ? 'active' : '';
 }
 
+// Formatear valor de KPI según si es entero o decimal
+function formatKpiValor($valor, $esEntero = false) {
+    if ($valor === null || $valor === '') return '-';
+    if ($esEntero) {
+        return number_format((float)$valor, 0, ',', '.');
+    }
+    // Decimal: quitar ceros trailing innecesarios
+    $v = (float)$valor;
+    if ($v == (int)$v) return number_format($v, 0, ',', '.');
+    return rtrim(rtrim(number_format($v, 2, ',', '.'), '0'), ',');
+}
+
 // Formatear fecha
 function formatDate($date) {
     if (!$date) return '-';

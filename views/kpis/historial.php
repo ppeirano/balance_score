@@ -72,8 +72,8 @@ require_once __DIR__ . '/../layout/header.php';
             </div>
             <div class="col-md-3 text-center">
                 <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
-                    <div class="fs-2 fw-bold"><?= $kpi['valor_actual'] !== null ? sanitize($kpi['valor_actual']) : '-' ?></div>
-                    <small class="text-muted">de <?= sanitize($kpi['meta'] ?? '-') ?> <?= sanitize($kpi['unidad'] ?? '') ?></small>
+                    <div class="fs-2 fw-bold"><?= $kpi['valor_actual'] !== null ? formatKpiValor($kpi['valor_actual'], $kpi['es_entero'] ?? 0) : '-' ?></div>
+                    <small class="text-muted">de <?= formatKpiValor($kpi['meta'], $kpi['es_entero'] ?? 0) ?> <?= sanitize($kpi['unidad'] ?? '') ?></small>
                 <?php else: ?>
                     <div class="fs-4 fw-bold"><?= $kpi['valor_cualitativo'] ? sanitize($kpi['valor_cualitativo']) : '-' ?></div>
                     <small class="text-muted">Escala: <?= sanitize(str_replace('_', ' ', ucfirst($kpi['escala_cualitativa'] ?? '-'))) ?></small>
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../layout/header.php';
                 <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
                     <div class="col-md-3">
                         <label class="form-label">Valor *</label>
-                        <input type="number" class="form-control" name="valor" step="any" required>
+                        <input type="number" class="form-control" name="valor" step="<?= ($kpi['es_entero'] ?? 0) ? '1' : 'any' ?>" required>
                     </div>
                 <?php else: ?>
                     <div class="col-md-3">
@@ -172,7 +172,7 @@ require_once __DIR__ . '/../layout/header.php';
                         <td><?= formatDate($reg['periodo']) ?></td>
                         <td>
                             <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
-                                <?= sanitize($reg['valor'] ?? '-') ?> <?= sanitize($kpi['unidad'] ?? '') ?>
+                                <?= formatKpiValor($reg['valor'], $kpi['es_entero'] ?? 0) ?> <?= sanitize($kpi['unidad'] ?? '') ?>
                             <?php else: ?>
                                 <?= sanitize($reg['valor_cualitativo'] ?? '-') ?>
                             <?php endif; ?>

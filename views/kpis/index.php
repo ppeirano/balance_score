@@ -115,14 +115,14 @@ require_once __DIR__ . '/../layout/header.php';
                         </td>
                         <td>
                             <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
-                                <?= sanitize($kpi['meta'] ?? '-') ?>
+                                <?= formatKpiValor($kpi['meta'], $kpi['es_entero'] ?? 0) ?>
                             <?php else: ?>
                                 <?= sanitize($kpi['escala_cualitativa'] ?? '-') ?>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
-                                <?= $kpi['valor_actual'] !== null ? sanitize($kpi['valor_actual']) : '<span class="text-muted">-</span>' ?>
+                                <?= $kpi['valor_actual'] !== null ? formatKpiValor($kpi['valor_actual'], $kpi['es_entero'] ?? 0) : '<span class="text-muted">-</span>' ?>
                             <?php else: ?>
                                 <?= $kpi['valor_cualitativo'] ? sanitize($kpi['valor_cualitativo']) : '<span class="text-muted">-</span>' ?>
                             <?php endif; ?>

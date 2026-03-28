@@ -171,8 +171,8 @@ require_once __DIR__ . '/../layout/header.php';
                         <tr>
                             <td><span class="badge-info"><?= sanitize($k['ie_codigo'] ?? '-') ?></span></td>
                             <td><a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= $k['id'] ?>"><?= sanitize($k['nombre']) ?></a></td>
-                            <td class="text-danger fw-bold"><?= $k['valor_actual'] ?> <?= sanitize($k['unidad'] ?? '') ?></td>
-                            <td><?= $k['meta'] ?> <?= sanitize($k['unidad'] ?? '') ?></td>
+                            <td class="text-danger fw-bold"><?= formatKpiValor($k['valor_actual'], $k['es_entero'] ?? 0) ?> <?= sanitize($k['unidad'] ?? '') ?></td>
+                            <td><?= formatKpiValor($k['meta'], $k['es_entero'] ?? 0) ?> <?= sanitize($k['unidad'] ?? '') ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

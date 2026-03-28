@@ -270,14 +270,14 @@ require_once __DIR__ . '/../layout/header.php';
                                 </td>
                                 <td class="text-center">
                                     <?php if ($kpi['tipo'] === 'cuantitativo' && $kpi['meta'] !== null): ?>
-                                        <?= number_format($kpi['meta'], 2) ?> <?= sanitize($kpi['unidad'] ?? '') ?>
+                                        <?= formatKpiValor($kpi['meta'], $kpi['es_entero'] ?? 0) ?> <?= sanitize($kpi['unidad'] ?? '') ?>
                                     <?php else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <?php if ($kpi['tipo'] === 'cuantitativo' && $kpi['valor_actual'] !== null): ?>
-                                        <?= number_format($kpi['valor_actual'], 2) ?> <?= sanitize($kpi['unidad'] ?? '') ?>
+                                        <?= formatKpiValor($kpi['valor_actual'], $kpi['es_entero'] ?? 0) ?> <?= sanitize($kpi['unidad'] ?? '') ?>
                                     <?php elseif ($kpi['tipo'] === 'cualitativo' && $kpi['valor_cualitativo']): ?>
                                         <?= sanitize($kpi['valor_cualitativo']) ?>
                                     <?php else: ?>

@@ -32,6 +32,7 @@ class Kpi {
                 SET iniciativa_id = ?, plan_accion_id = ?, periodo_id = ?,
                     nombre = ?, tipo = ?, unidad = ?, meta = ?,
                     umbral_verde = ?, umbral_amarillo = ?, direccion = ?,
+                    es_entero = ?,
                     escala_cualitativa = ?, opciones_cualitativas = ?,
                     frecuencia = ?, activo = ?
                 WHERE id = ?
@@ -47,6 +48,7 @@ class Kpi {
                 $data['umbral_verde'] ?? 90,
                 $data['umbral_amarillo'] ?? 70,
                 $data['direccion'] ?? 'mayor_mejor',
+                $data['es_entero'] ?? 0,
                 $data['escala_cualitativa'] ?: null,
                 $data['opciones_cualitativas'] ?: null,
                 $data['frecuencia'] ?? 'mensual',
@@ -58,8 +60,8 @@ class Kpi {
             Bitacora::registrar($pdo, 'kpi', $data['id'], $data['nombre'], 'editado');
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO kpis (iniciativa_id, plan_accion_id, periodo_id, nombre, tipo, unidad, meta, umbral_verde, umbral_amarillo, direccion, escala_cualitativa, opciones_cualitativas, frecuencia, activo)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO kpis (iniciativa_id, plan_accion_id, periodo_id, nombre, tipo, unidad, meta, umbral_verde, umbral_amarillo, direccion, es_entero, escala_cualitativa, opciones_cualitativas, frecuencia, activo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['iniciativa_id'] ?: null,
@@ -72,6 +74,7 @@ class Kpi {
                 $data['umbral_verde'] ?? 90,
                 $data['umbral_amarillo'] ?? 70,
                 $data['direccion'] ?? 'mayor_mejor',
+                $data['es_entero'] ?? 0,
                 $data['escala_cualitativa'] ?: null,
                 $data['opciones_cualitativas'] ?: null,
                 $data['frecuencia'] ?? 'mensual',

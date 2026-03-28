@@ -131,6 +131,14 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
                             <option value="menor_mejor" <?= ($kpi['direccion'] ?? '') === 'menor_mejor' ? 'selected' : '' ?>>Menor es mejor</option>
                         </select>
                     </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="es_entero" id="esEntero" value="1"
+                                   <?= ($kpi['es_entero'] ?? 0) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="esEntero">Valor entero</label>
+                            <div class="form-text">Sin decimales (ej: unidades, cantidad)</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -185,6 +193,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     tipoCuantitativo.addEventListener('change', toggleTipo);
     tipoCualitativo.addEventListener('change', toggleTipo);
+
+    // Toggle meta step based on es_entero checkbox
+    const esEntero = document.getElementById('esEntero');
+    const metaInput = document.querySelector('input[name="meta"]');
+    function toggleMetaStep() {
+        metaInput.step = esEntero.checked ? '1' : 'any';
+    }
+    esEntero.addEventListener('change', toggleMetaStep);
+    toggleMetaStep();
 
     // Filter planes by selected iniciativa
     const iniciativaSelect = document.getElementById('iniciativa_id');
