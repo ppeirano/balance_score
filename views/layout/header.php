@@ -40,105 +40,121 @@
                     <?php endif; ?>
 
                     <!-- Principal -->
-                    <div class="sidebar-section-label">Principal</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('dashboard', $page) ?>" href="<?= BASE_URL ?>index.php?page=dashboard">
-                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('mapa', $page) ?>" href="<?= BASE_URL ?>index.php?page=mapa">
-                                <i class="bi bi-diagram-3 me-2"></i>Mapa Estratégico
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('iniciativas', $page) ?>" href="<?= BASE_URL ?>index.php?page=iniciativas">
-                                <i class="bi bi-bullseye me-2"></i>Iniciativas (IE)
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('planes', $page) ?>" href="<?= BASE_URL ?>index.php?page=planes">
-                                <i class="bi bi-list-check me-2"></i>Planes de Acción
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('kpis', $page) ?>" href="<?= BASE_URL ?>index.php?page=kpis">
-                                <i class="bi bi-graph-up me-2"></i>KPIs
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="sidebar-section-label" data-bs-toggle="collapse" data-bs-target="#navPrincipal">
+                        Principal <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="collapse show" id="navPrincipal">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('dashboard', $page) ?>" href="<?= BASE_URL ?>index.php?page=dashboard">
+                                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('mapa', $page) ?>" href="<?= BASE_URL ?>index.php?page=mapa">
+                                    <i class="bi bi-diagram-3 me-2"></i>Mapa Estratégico
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('iniciativas', $page) ?>" href="<?= BASE_URL ?>index.php?page=iniciativas">
+                                    <i class="bi bi-bullseye me-2"></i>Iniciativas (IE)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('planes', $page) ?>" href="<?= BASE_URL ?>index.php?page=planes">
+                                    <i class="bi bi-list-check me-2"></i>Planes de Acción
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('kpis', $page) ?>" href="<?= BASE_URL ?>index.php?page=kpis">
+                                    <i class="bi bi-graph-up me-2"></i>KPIs
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
                     <hr>
 
                     <!-- Gestión -->
-                    <div class="sidebar-section-label">Gestión</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('reuniones', $page) ?>" href="<?= BASE_URL ?>index.php?page=reuniones">
-                                <i class="bi bi-people me-2"></i>Reuniones
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('riesgos', $page) ?>" href="<?= BASE_URL ?>index.php?page=riesgos">
-                                <i class="bi bi-exclamation-triangle me-2"></i>Riesgos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('proyectos', $page) ?>" href="<?= BASE_URL ?>index.php?page=proyectos">
-                                <i class="bi bi-kanban me-2"></i>Proyectos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('bitacora', $page) ?>" href="<?= BASE_URL ?>index.php?page=bitacora">
-                                <i class="bi bi-clock-history me-2"></i>Bitácora
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('calendario', $page) ?>" href="<?= BASE_URL ?>index.php?page=calendario">
-                                <i class="bi bi-calendar-event me-2"></i>Calendario
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('responsables', $page) ?>" href="<?= BASE_URL ?>index.php?page=responsables">
-                                <i class="bi bi-person-badge me-2"></i>Responsables
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="sidebar-section-label" data-bs-toggle="collapse" data-bs-target="#navGestion">
+                        Gestión <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="collapse show" id="navGestion">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('reuniones', $page) ?>" href="<?= BASE_URL ?>index.php?page=reuniones">
+                                    <i class="bi bi-people me-2"></i>Reuniones
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('riesgos', $page) ?>" href="<?= BASE_URL ?>index.php?page=riesgos">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Riesgos
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('proyectos', $page) ?>" href="<?= BASE_URL ?>index.php?page=proyectos">
+                                    <i class="bi bi-kanban me-2"></i>Proyectos
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('bitacora', $page) ?>" href="<?= BASE_URL ?>index.php?page=bitacora">
+                                    <i class="bi bi-clock-history me-2"></i>Bitácora
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('calendario', $page) ?>" href="<?= BASE_URL ?>index.php?page=calendario">
+                                    <i class="bi bi-calendar-event me-2"></i>Calendario
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('responsables', $page) ?>" href="<?= BASE_URL ?>index.php?page=responsables">
+                                    <i class="bi bi-person-badge me-2"></i>Responsables
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
                     <hr>
 
                     <!-- Reportes -->
-                    <div class="sidebar-section-label">Reportes</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('reportes', $page) ?>" href="<?= BASE_URL ?>index.php?page=reportes">
-                                <i class="bi bi-file-earmark-pdf me-2"></i>Reportes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('evaluacion', $page) ?>" href="<?= BASE_URL ?>index.php?page=evaluacion">
-                                <i class="bi bi-robot me-2"></i>Evaluación IA
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="sidebar-section-label" data-bs-toggle="collapse" data-bs-target="#navReportes">
+                        Reportes <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="collapse show" id="navReportes">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('reportes', $page) ?>" href="<?= BASE_URL ?>index.php?page=reportes">
+                                    <i class="bi bi-file-earmark-pdf me-2"></i>Reportes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('evaluacion', $page) ?>" href="<?= BASE_URL ?>index.php?page=evaluacion">
+                                    <i class="bi bi-robot me-2"></i>Evaluación IA
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
                     <hr>
 
                     <!-- Admin -->
-                    <div class="sidebar-section-label">Admin</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('admin_responsables', $page) ?>" href="<?= BASE_URL ?>index.php?page=admin_responsables">
-                                <i class="bi bi-person-gear me-2"></i>Admin. Responsables
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= activeNav('periodos', $page) ?>" href="<?= BASE_URL ?>index.php?page=periodos">
-                                <i class="bi bi-calendar-range me-2"></i>Períodos
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="sidebar-section-label" data-bs-toggle="collapse" data-bs-target="#navAdmin">
+                        Admin <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="collapse show" id="navAdmin">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('admin_responsables', $page) ?>" href="<?= BASE_URL ?>index.php?page=admin_responsables">
+                                    <i class="bi bi-person-gear me-2"></i>Admin. Responsables
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('periodos', $page) ?>" href="<?= BASE_URL ?>index.php?page=periodos">
+                                    <i class="bi bi-calendar-range me-2"></i>Períodos
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
 

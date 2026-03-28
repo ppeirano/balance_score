@@ -44,7 +44,7 @@ body {
     }
 }
 .sidebar-brand {
-    padding: 18px 20px 14px;
+    padding: 12px 16px 10px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .sidebar-logo {
@@ -76,11 +76,11 @@ body {
     letter-spacing: 0.5px;
 }
 .sidebar-period {
-    margin: 12px 14px;
+    margin: 8px 12px;
     background: rgba(59,130,246,0.1);
     border: 1px solid rgba(59,130,246,0.2);
     border-radius: 8px;
-    padding: 7px 10px;
+    padding: 5px 10px;
     display: flex;
     align-items: center;
     gap: 7px;
@@ -102,19 +102,34 @@ body {
     color: #93c5fd;
 }
 .sidebar-section-label {
-    padding: 10px 22px 4px;
+    padding: 6px 14px 2px;
     font-size: 9px;
     font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: rgba(255,255,255,0.22);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+.sidebar-section-label:hover {
+    color: rgba(255,255,255,0.4);
+}
+.sidebar-section-label .bi-chevron-down {
+    font-size: 8px;
+    transition: transform 0.2s;
+}
+.sidebar-section-label.collapsed .bi-chevron-down {
+    transform: rotate(-90deg);
 }
 .sidebar .nav-link {
     color: rgba(255,255,255,0.5);
-    padding: 8px 14px;
+    padding: 5px 14px;
     border-radius: 7px;
-    margin: 1px 8px;
-    font-size: 12.5px;
+    margin: 0 8px;
+    font-size: 12px;
     font-weight: 400;
     transition: all 0.15s;
 }
@@ -136,7 +151,7 @@ body {
 }
 .sidebar hr {
     border-color: rgba(255,255,255,0.06);
-    margin: 8px 14px;
+    margin: 4px 14px;
 }
 
 /* ── TOPBAR ───────────────────────────────────────────────────── */
