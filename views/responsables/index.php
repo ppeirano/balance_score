@@ -18,10 +18,12 @@ if ($ownerSeleccionado) {
     $datosPorOwner['planes'] = $stmt->fetchAll();
 
     // Actividades asignadas
-    $stmt = $pdo->prepare("SELECT a.*, pa.codigo as plan_codigo, pa.nombre as plan_nombre
+    $stmt = $pdo->prepare("SELECT a.*, pa.codigo as plan_codigo, pa.nombre as plan_nombre,
+                                  ie.codigo as ie_codigo
                            FROM actividades a
                            JOIN planes_accion pa ON a.plan_accion_id = pa.id
-                           WHERE a.responsable = ? ORDER BY a.estado, a.fecha_limite");
+                           JOIN iniciativas_estrategicas ie ON pa.iniciativa_id = ie.id
+                           WHERE a.responsable = ? ORDER BY ie.codigo, pa.codigo, a.codigo");
     $stmt->execute([$ownerSeleccionado]);
     $datosPorOwner['actividades'] = $stmt->fetchAll();
 
@@ -148,10 +150,11 @@ require_once __DIR__ . '/../layout/header.php';
     <div class="card-header"><h6 class="mb-0"><i class="bi bi-activity me-2"></i>Actividades</h6></div>
     <div class="card-body">
         <table class="table table-sm">
-            <thead><tr><th>PDA</th><th>Código</th><th>Descripción</th><th>Estado</th><th>Fecha Límite</th></tr></thead>
+            <thead><tr><th>IE</th><th>PDA</th><th>Código</th><th>Descripción</th><th>Estado</th><th>Fecha Límite</th></tr></thead>
             <tbody>
                 <?php foreach ($datosPorOwner['actividades'] as $a): ?>
                 <tr>
+                    <td><span class="badge bg-primary"><?= sanitize($a['ie_codigo']) ?></span></td>
                     <td><small><?= sanitize($a['plan_codigo']) ?></small></td>
                     <td><?= sanitize($a['codigo']) ?></td>
                     <td><?= sanitize(mb_substr($a['descripcion'], 0, 60)) ?></td>
