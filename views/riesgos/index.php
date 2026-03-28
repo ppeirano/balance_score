@@ -13,35 +13,45 @@ require_once __DIR__ . '/../layout/header.php';
 
 <!-- Matriz de Riesgos Visual -->
 <div class="card mb-4">
-    <div class="card-header"><h6 class="mb-0">Matriz de Riesgos</h6></div>
+    <div class="card-header"><h6 class="mb-0"><i class="bi bi-grid-3x3 me-2"></i>Matriz de Riesgos</h6></div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="risk-matrix" style="table-layout:fixed; width:100%">
+            <table class="risk-matrix">
                 <thead>
                     <tr>
-                        <th class="text-center" style="width:25%">Probabilidad \ Impacto</th>
-                        <th class="text-center" style="width:25%">Bajo</th>
-                        <th class="text-center" style="width:25%">Medio</th>
-                        <th class="text-center" style="width:25%">Alto</th>
+                        <th></th>
+                        <th></th>
+                        <th colspan="3" class="risk-axis-label pb-2"><i class="bi bi-arrow-right me-1"></i>Impacto</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th style="width:28%">Bajo</th>
+                        <th style="width:28%">Medio</th>
+                        <th style="width:28%">Alto</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                     $probs = ['alta', 'media', 'baja'];
                     $impacts = ['bajo', 'medio', 'alto'];
-                    foreach ($probs as $prob):
+                    foreach ($probs as $i => $prob):
                     ?>
                     <tr>
-                        <td class="fw-bold text-center"><?= ucfirst($prob) ?></td>
+                        <?php if ($i === 0): ?>
+                            <th class="risk-prob-header" rowspan="3"><i class="bi bi-arrow-up me-1"></i>Probabilidad</th>
+                        <?php endif; ?>
+                        <td class="risk-prob-label"><?= ucfirst($prob) ?></td>
                         <?php foreach ($impacts as $imp):
                             $nivel = calcularNivelRiesgo($prob, $imp);
                             $count = $matriz[$prob][$imp]['total'] ?? 0;
                         ?>
-                        <td class="risk-cell-<?= $nivel ?>">
+                        <td class="<?= $count > 0 ? 'risk-cell-' . $nivel : 'risk-cell-empty' ?>">
                             <?php if ($count > 0): ?>
-                                <strong><?= $count ?></strong> riesgo<?= $count > 1 ? 's' : '' ?>
+                                <span class="risk-count"><?= $count ?></span>
+                                <span class="risk-count-label">riesgo<?= $count > 1 ? 's' : '' ?></span>
                             <?php else: ?>
-                                <span class="text-muted">-</span>
+                                &mdash;
                             <?php endif; ?>
                         </td>
                         <?php endforeach; ?>
