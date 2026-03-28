@@ -218,10 +218,7 @@ require_once __DIR__ . '/../layout/header.php';
         <table class="table table-sm">
             <thead><tr><th>Nombre</th><th>Avance</th><th>Estado</th><th>Prioridad</th><th>Inicio</th><th>Fin</th></tr></thead>
             <tbody>
-                <?php
-                $prioridadLabels = [1 => 'Baja', 2 => 'Media', 3 => 'Alta', 4 => 'Muy Alta', 5 => 'Crítica'];
-                $prioridadClases = [1 => 'bg-secondary', 2 => 'bg-info text-dark', 3 => 'bg-warning text-dark', 4 => 'bg-danger', 5 => 'bg-dark'];
-                foreach ($datosPorOwner['proyectos'] as $proy):
+                <?php foreach ($datosPorOwner['proyectos'] as $proy):
                     $avProy = intval($proy['avance']);
                     $barColor = $avProy >= 75 ? 'bg-success' : ($avProy >= 40 ? 'bg-warning' : 'bg-danger');
                 ?>
@@ -236,7 +233,7 @@ require_once __DIR__ . '/../layout/header.php';
                         </div>
                     </td>
                     <td><?= estadoBadge($proy['estado']) ?></td>
-                    <td><span class="badge <?= $prioridadClases[$proy['prioridad']] ?? 'bg-secondary' ?>"><?= $prioridadLabels[$proy['prioridad']] ?? '-' ?></span></td>
+                    <td><?= prioridadBadge($proy['prioridad']) ?></td>
                     <td><?= $proy['fecha_inicio'] ? formatDate($proy['fecha_inicio']) : '-' ?></td>
                     <td><?= $proy['fecha_fin'] ? formatDate($proy['fecha_fin']) : '-' ?></td>
                 </tr>

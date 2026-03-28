@@ -386,8 +386,6 @@ require_once __DIR__ . '/../layout/header.php';
                                 'suspendido' => 'bg-warning text-dark'
                             ];
                             $claseProy = $estadoProyClases[$proy['estado']] ?? 'bg-secondary';
-                            $prioridadLabels = [1 => 'Baja', 2 => 'Media', 3 => 'Alta', 4 => 'Muy Alta', 5 => 'Cr&iacute;tica'];
-                            $prioridadClases = [1 => 'bg-secondary', 2 => 'bg-info text-dark', 3 => 'bg-warning text-dark', 4 => 'bg-danger', 5 => 'bg-dark'];
                         ?>
                             <tr>
                                 <td>
@@ -412,7 +410,7 @@ require_once __DIR__ . '/../layout/header.php';
                                     <span class="badge <?= $claseProy ?>"><?= ucfirst(str_replace('_', ' ', sanitize($proy['estado']))) ?></span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge <?= $prioridadClases[$proy['prioridad']] ?? 'bg-secondary' ?>"><?= $prioridadLabels[$proy['prioridad']] ?? '-' ?></span>
+                                    <?= prioridadBadge($proy['prioridad']) ?>
                                 </td>
                                 <td><?= $proy['fecha_inicio'] ? formatDate($proy['fecha_inicio']) : '<span class="text-muted">-</span>' ?></td>
                                 <td><?= $proy['fecha_fin'] ? formatDate($proy['fecha_fin']) : '<span class="text-muted">-</span>' ?></td>
