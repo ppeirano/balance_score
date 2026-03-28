@@ -264,7 +264,7 @@ require_once __DIR__ . '/../layout/header.php';
                             <tr>
                                 <td class="fw-semibold"><?= sanitize($kpi['nombre']) ?></td>
                                 <td class="text-center">
-                                    <span class="<?= $kpi['tipo'] === 'cuantitativo' ? 'badge-info' : 'badge-info' ?>">
+                                    <span class="badge-info">
                                         <?= ucfirst(sanitize($kpi['tipo'])) ?>
                                     </span>
                                 </td>
