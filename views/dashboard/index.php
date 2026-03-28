@@ -269,16 +269,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Gráfico de IEs (Barras horizontales)
     const ctxIEs = document.getElementById('chartIEs').getContext('2d');
     <?php
-    $ieLabels = [];
-    $ieData = [];
-    $ieColors = [];
+    $ieItems = [];
     foreach ($datosPersp as $dp) {
         foreach ($dp['iniciativas'] as $ie) {
-            $ieLabels[] = $ie['codigo'];
-            $ieData[] = $ie['avance'];
-            $ieColors[] = $dp['perspectiva']['color'];
+            $ieItems[] = ['codigo' => $ie['codigo'], 'avance' => $ie['avance'], 'color' => $dp['perspectiva']['color']];
         }
     }
+    usort($ieItems, function($a, $b) { return strnatcmp($a['codigo'], $b['codigo']); });
+    $ieLabels = array_column($ieItems, 'codigo');
+    $ieData = array_column($ieItems, 'avance');
+    $ieColors = array_column($ieItems, 'color');
     ?>
     new Chart(ctxIEs, {
         type: 'bar',
