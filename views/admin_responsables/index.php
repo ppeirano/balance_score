@@ -20,20 +20,35 @@ require_once __DIR__ . '/../layout/header.php';
             <?php if ($editando): ?>
                 <input type="hidden" name="id" value="<?= $editando['id'] ?>">
             <?php endif; ?>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label">Nombre <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="nombre"
                        value="<?= $editando ? sanitize($editando['nombre']) : '' ?>" required
                        placeholder="Ej: G. Vigetti">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label">Cargo</label>
                 <input type="text" class="form-control" name="cargo"
                        value="<?= $editando ? sanitize($editando['cargo'] ?? '') : '' ?>"
                        placeholder="Ej: Gerente Comercial">
             </div>
+            <div class="col-md-3">
+                <label class="form-label">Reporta a</label>
+                <select class="form-select" name="reporta_a_id">
+                    <option value="">-- Ninguno (raíz) --</option>
+                    <?php foreach ($responsables as $r):
+                        if ($editando && $r['id'] == $editando['id']) continue;
+                        if (!$r['activo']) continue;
+                    ?>
+                        <option value="<?= $r['id'] ?>"
+                            <?= ($editando && ($editando['reporta_a_id'] ?? null) == $r['id']) ? 'selected' : '' ?>>
+                            <?= sanitize($r['nombre']) ?> <?= $r['cargo'] ? '(' . sanitize($r['cargo']) . ')' : '' ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <?php if ($editando): ?>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <div class="form-check mt-2">
                     <input class="form-check-input" type="checkbox" name="activo" id="activo"
                            <?= $editando['activo'] ? 'checked' : '' ?>>
@@ -63,15 +78,28 @@ require_once __DIR__ . '/../layout/header.php';
                 <tr>
                     <th>Nombre</th>
                     <th>Cargo</th>
+                    <th>Reporta a</th>
                     <th>Estado</th>
                     <th style="width:150px">Acciones</th>
                 </tr>
             </thead>
             <tbody>
+                <?php
+                // Index para buscar nombres por id
+                $respById = [];
+                foreach ($responsables as $r) $respById[$r['id']] = $r;
+                ?>
                 <?php foreach ($responsables as $r): ?>
                 <tr class="<?= !$r['activo'] ? 'text-muted' : '' ?>">
                     <td><?= sanitize($r['nombre']) ?></td>
                     <td><?= sanitize($r['cargo'] ?? '-') ?></td>
+                    <td>
+                        <?php if (!empty($r['reporta_a_id']) && isset($respById[$r['reporta_a_id']])): ?>
+                            <?= sanitize($respById[$r['reporta_a_id']]['nombre']) ?>
+                        <?php else: ?>
+                            <span class="text-muted">-</span>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <?php if ($r['activo']): ?>
                             <span class="badge-ok">Activo</span>
@@ -94,7 +122,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($responsables)): ?>
-                <tr><td colspan="4" class="text-center text-muted">No hay responsables registrados.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted">No hay responsables registrados.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

@@ -56,6 +56,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link <?= activeNav('organigrama', $page) ?>" href="<?= BASE_URL ?>index.php?page=organigrama">
+                                    <i class="bi bi-diagram-2 me-2"></i>Organigrama
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= activeNav('iniciativas', $page) ?>" href="<?= BASE_URL ?>index.php?page=iniciativas">
                                     <i class="bi bi-bullseye me-2"></i>Iniciativas (IE)
                                 </a>
@@ -164,6 +169,7 @@
                 $pageTitles = [
                     'dashboard' => 'Dashboard Estratégico',
                     'mapa' => 'Mapa Estratégico',
+                    'organigrama' => 'Organigrama CODI',
                     'iniciativas' => 'Iniciativas Estratégicas',
                     'planes' => 'Planes de Acción',
                     'kpis' => 'Indicadores (KPIs)',

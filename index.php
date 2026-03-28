@@ -392,6 +392,9 @@ switch ($page) {
     case 'bitacora':
         require __DIR__ . '/views/bitacora/index.php';
         break;
+    case 'organigrama':
+        require __DIR__ . '/views/organigrama/index.php';
+        break;
     case 'responsables':
         require __DIR__ . '/views/responsables/index.php';
         break;
