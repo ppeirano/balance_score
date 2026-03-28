@@ -243,15 +243,7 @@ function renderNodo($nodo, $depth = 0) {
     position: relative;
     justify-content: center;
 }
-.org-children::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 1px;
-    height: 20px;
-    background: #d1d5db;
-}
+/* Vertical line: parent down to children level */
 .org-children > .org-node::before {
     content: '';
     position: absolute;
@@ -261,32 +253,9 @@ function renderNodo($nodo, $depth = 0) {
     height: 20px;
     background: #d1d5db;
 }
-.org-children > .org-node:not(:only-child):first-child::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    right: -4px;
-    height: 1px;
-    background: #d1d5db;
-}
-.org-children > .org-node:not(:only-child):last-child::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 50%;
-    left: -4px;
-    height: 1px;
-    background: #d1d5db;
-}
-.org-children > .org-node:not(:first-child):not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -4px;
-    right: -4px;
-    height: 1px;
-    background: #d1d5db;
+/* Only child: no horizontal rail needed, just the vertical */
+.org-children > .org-node:only-child::after {
+    display: none;
 }
 
 /* Responsive */
@@ -339,5 +308,42 @@ function renderNodo($nodo, $depth = 0) {
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+// Draw horizontal connector rails between sibling nodes
+function drawOrgRails() {
+    document.querySelectorAll('.org-children').forEach(function(container) {
+        // Remove old rails
+        container.querySelectorAll('.org-rail').forEach(function(r) { r.remove(); });
+
+        var nodes = Array.from(container.children).filter(function(el) {
+            return el.classList.contains('org-node');
+        });
+        if (nodes.length < 2) return;
+
+        var first = nodes[0];
+        var last = nodes[nodes.length - 1];
+        var containerRect = container.getBoundingClientRect();
+        var firstRect = first.getBoundingClientRect();
+        var lastRect = last.getBoundingClientRect();
+
+        var left = firstRect.left + firstRect.width / 2 - containerRect.left;
+        var right = lastRect.left + lastRect.width / 2 - containerRect.left;
+
+        var rail = document.createElement('div');
+        rail.className = 'org-rail';
+        rail.style.cssText = 'position:absolute;top:0;height:1px;background:#d1d5db;left:' + left + 'px;width:' + (right - left) + 'px;';
+        container.appendChild(rail);
+    });
+}
+// Run on load and on collapse toggle
+drawOrgRails();
+document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(el) {
+    var target = document.querySelector(el.getAttribute('data-bs-target'));
+    if (target) {
+        target.addEventListener('shown.bs.collapse', function() { setTimeout(drawOrgRails, 50); });
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
