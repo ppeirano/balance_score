@@ -154,6 +154,83 @@ body {
     margin: 4px 14px;
 }
 
+/* Toggle button */
+.sidebar-toggle-wrap {
+    margin-top: auto;
+    padding: 8px 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-toggle-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.4);
+    width: 100%;
+    padding: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+}
+.sidebar-toggle-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+}
+
+/* ── SIDEBAR COLLAPSED STATE ──────────────────────────────────── */
+@media (min-width: 768px) {
+    .sidebar, .main-content {
+        transition: all 0.2s ease;
+    }
+    body.sidebar-collapsed .sidebar {
+        max-width: 60px !important;
+        min-width: 60px !important;
+        flex: 0 0 60px !important;
+    }
+    body.sidebar-collapsed .main-content {
+        flex: 1 1 auto !important;
+        max-width: calc(100% - 60px) !important;
+    }
+    body.sidebar-collapsed .sidebar-brand {
+        padding: 12px 8px 10px;
+        text-align: center;
+    }
+    body.sidebar-collapsed .sidebar-logo {
+        justify-content: center;
+    }
+    body.sidebar-collapsed .sidebar-app-name,
+    body.sidebar-collapsed .sidebar-app-sub,
+    body.sidebar-collapsed .sidebar-period,
+    body.sidebar-collapsed .sidebar-section-label,
+    body.sidebar-collapsed .sidebar hr,
+    body.sidebar-collapsed .nav-text {
+        display: none !important;
+    }
+    body.sidebar-collapsed .sidebar .nav-link {
+        text-align: center;
+        padding: 8px 4px;
+        margin: 1px 6px;
+        border-radius: 8px;
+    }
+    body.sidebar-collapsed .sidebar .nav-link i {
+        margin: 0 !important;
+        font-size: 16px;
+    }
+    body.sidebar-collapsed .sidebar .collapse,
+    body.sidebar-collapsed .sidebar .collapsing {
+        display: block !important;
+        height: auto !important;
+    }
+    body.sidebar-collapsed .sidebar .collapse .nav {
+        display: flex !important;
+    }
+    body.sidebar-collapsed .sidebar-toggle-wrap {
+        padding: 8px 6px;
+    }
+    body.sidebar-collapsed .sidebar-toggle-btn i {
+        transform: rotate(180deg);
+    }
+}
+
 /* ── TOPBAR ───────────────────────────────────────────────────── */
 .view-topbar {
     height: 52px;
