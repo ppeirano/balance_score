@@ -43,11 +43,13 @@ require_once __DIR__ . '/../layout/header.php';
                     <?php endif; ?>
                 </td>
                 <td>
-                    <a href="<?= BASE_URL ?>index.php?page=reuniones&action=detalle&id=<?= $r['id'] ?>" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i></a>
-                    <a href="<?= BASE_URL ?>index.php?page=reuniones&action=editar&id=<?= $r['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
-                    <form method="POST" action="<?= BASE_URL ?>index.php?page=reuniones&action=eliminar&id=<?= $r['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar esta reunión?')">
-                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
-                    </form>
+                    <div class="d-flex gap-1 justify-content-end">
+                        <a href="<?= BASE_URL ?>index.php?page=reuniones&action=detalle&id=<?= $r['id'] ?>" class="btn-action btn-action-primary" title="Ver"><i class="bi bi-eye"></i></a>
+                        <a href="<?= BASE_URL ?>index.php?page=reuniones&action=editar&id=<?= $r['id'] ?>" class="btn-action btn-action-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
+                        <form method="POST" action="<?= BASE_URL ?>index.php?page=reuniones&action=eliminar&id=<?= $r['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar esta reunión?')">
+                            <button type="submit" class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>

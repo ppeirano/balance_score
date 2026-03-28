@@ -327,14 +327,14 @@ function quitarImagenNota() {
                         </div>
                         <div class="d-flex gap-2">
                             <a href="<?= BASE_URL ?>index.php?page=adjuntos&action=descargar&id=<?= $adj['id'] ?>"
-                               class="btn btn-sm btn-outline-primary" title="Descargar">
+                               class="btn-action btn-action-primary" title="Descargar">
                                 <i class="bi bi-download"></i>
                             </a>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=eliminar&id=<?= $adj['id'] ?>"
                                   class="d-inline"
                                   onsubmit="return confirm('¿Eliminar este archivo?');">
                                 <input type="hidden" name="redirect" value="index.php?page=actividades&action=editar&id=<?= $actividad['id'] ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>

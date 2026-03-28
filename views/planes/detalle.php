@@ -293,7 +293,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 </td>
                                 <td>
                                     <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=hito&entidad_id=<?= $hito['id'] ?>&nombre=<?= urlencode($hito['nombre']) ?>"
-                                       class="btn btn-sm btn-outline-info me-1" title="Agendar seguimiento">
+                                       class="btn-action btn-action-info" title="Agendar seguimiento">
                                         <i class="bi bi-calendar-event"></i>
                                     </a>
                                     <?php if ($hito['estado'] !== 'alcanzado'): ?>
@@ -334,14 +334,14 @@ require_once __DIR__ . '/../layout/header.php';
                         </div>
                         <div class="d-flex gap-2">
                             <a href="<?= BASE_URL ?>index.php?page=adjuntos&action=descargar&id=<?= $archivo['id'] ?>"
-                               class="btn btn-sm btn-outline-primary" title="Descargar">
+                               class="btn-action btn-action-primary" title="Descargar">
                                 <i class="bi bi-download"></i>
                             </a>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=eliminar&id=<?= $archivo['id'] ?>"
                                   class="d-inline"
                                   onsubmit="return confirm('¿Está seguro de que desea eliminar este archivo?');">
                                 <input type="hidden" name="redirect" value="index.php?page=planes&action=detalle&id=<?= $plan['id'] ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>

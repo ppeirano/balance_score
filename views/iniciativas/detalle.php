@@ -208,7 +208,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td class="text-center"><?= number_format($pda['peso'], 1) ?>%</td>
                                 <td class="text-end">
                                     <a href="<?= BASE_URL ?>index.php?page=planes&action=detalle&id=<?= (int)$pda['id'] ?>"
-                                       class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                       class="btn-action btn-action-primary" title="Ver detalle">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>

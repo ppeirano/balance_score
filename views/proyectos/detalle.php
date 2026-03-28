@@ -187,10 +187,12 @@ require_once __DIR__ . '/../layout/header.php';
                         </form>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="toggleEditAct(<?= $a['id'] ?>)" title="Editar"><i class="bi bi-pencil"></i></button>
-                        <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_actividad&id=<?= $a['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?')">
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                        </form>
+                        <div class="d-flex gap-1 justify-content-end">
+                            <button class="btn-action btn-action-secondary" onclick="toggleEditAct(<?= $a['id'] ?>)" title="Editar"><i class="bi bi-pencil"></i></button>
+                            <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_actividad&id=<?= $a['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?')">
+                                <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 <!-- Fila de edición (oculta por defecto) -->
@@ -490,7 +492,7 @@ require_once __DIR__ . '/../layout/header.php';
                     </td>
                     <td>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_entregable&id=<?= $e['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?')">
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
                 </tr>
@@ -555,7 +557,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= sanitize($v['entidad_nombre'] ?? '-') ?></td>
                     <td>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_vinculo&id=<?= $v['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar vínculo?')">
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i></button>
+                            <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-x-lg"></i></button>
                         </form>
                     </td>
                 </tr>
@@ -649,10 +651,10 @@ require_once __DIR__ . '/../layout/header.php';
                             <small class="text-muted ms-2">(<?= round($adj['tamano'] / 1024, 1) ?> KB)</small>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="<?= BASE_URL ?>index.php?page=adjuntos&action=descargar&id=<?= $adj['id'] ?>" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></a>
+                            <a href="<?= BASE_URL ?>index.php?page=adjuntos&action=descargar&id=<?= $adj['id'] ?>" class="btn-action btn-action-primary" title="Descargar"><i class="bi bi-download"></i></a>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=eliminar&id=<?= $adj['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?');">
                                 <input type="hidden" name="redirect" value="index.php?page=proyectos&action=detalle&id=<?= $id ?>">
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                             </form>
                         </div>
                     </li>

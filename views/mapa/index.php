@@ -245,7 +245,7 @@ require_once __DIR__ . '/../layout/header.php';
                         <?php endif; ?>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=mapa&action=eliminar_relacion&id=<?= $rel['id'] ?>"
                               class="ms-auto" onsubmit="return confirm('¿Eliminar esta relación?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                            <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>

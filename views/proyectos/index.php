@@ -52,11 +52,13 @@ require_once __DIR__ . '/../layout/header.php';
                         <?= $p['presupuesto'] ? '$ ' . number_format($p['presupuesto'], 2, ',', '.') : '-' ?>
                     </td>
                     <td>
-                        <a href="<?= BASE_URL ?>index.php?page=proyectos&action=detalle&id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-primary" title="Ver detalle"><i class="bi bi-eye"></i></a>
-                        <a href="<?= BASE_URL ?>index.php?page=proyectos&action=editar&id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar&id=<?= $p['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar este proyecto y todos sus entregables?')">
-                            <button class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
-                        </form>
+                        <div class="d-flex gap-1 justify-content-end">
+                            <a href="<?= BASE_URL ?>index.php?page=proyectos&action=detalle&id=<?= $p['id'] ?>" class="btn-action btn-action-primary" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                            <a href="<?= BASE_URL ?>index.php?page=proyectos&action=editar&id=<?= $p['id'] ?>" class="btn-action btn-action-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar&id=<?= $p['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar este proyecto y todos sus entregables?')">
+                                <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
