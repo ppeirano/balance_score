@@ -42,6 +42,11 @@ if ($ownerSeleccionado) {
                            ORDER BY FIELD(r.nivel, 'critico','alto','medio','bajo')");
     $stmt->execute([$ownerSeleccionado]);
     $datosPorOwner['riesgos'] = $stmt->fetchAll();
+
+    // Proyectos a cargo
+    $stmt = $pdo->prepare("SELECT p.* FROM proyectos p WHERE p.responsable = ? ORDER BY p.prioridad DESC, p.nombre");
+    $stmt->execute([$ownerSeleccionado]);
+    $datosPorOwner['proyectos'] = $stmt->fetchAll();
 }
 
 require_once __DIR__ . '/../layout/header.php';
@@ -70,8 +75,8 @@ require_once __DIR__ . '/../layout/header.php';
 <?php if ($ownerSeleccionado): ?>
 
 <!-- Resumen -->
-<div class="row mb-4">
-    <div class="col-md-3">
+<div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
+    <div class="col">
         <div class="card dashboard-card border-start border-primary border-4">
             <div class="card-body text-center">
                 <div class="stat-number text-primary"><?= count($datosPorOwner['planes']) ?></div>
@@ -79,7 +84,7 @@ require_once __DIR__ . '/../layout/header.php';
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col">
         <div class="card dashboard-card border-start border-info border-4">
             <div class="card-body text-center">
                 <div class="stat-number text-info"><?= count($datosPorOwner['actividades']) ?></div>
@@ -87,7 +92,7 @@ require_once __DIR__ . '/../layout/header.php';
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col">
         <div class="card dashboard-card border-start border-warning border-4">
             <div class="card-body text-center">
                 <div class="stat-number text-warning"><?= count($datosPorOwner['compromisos']) ?></div>
@@ -95,11 +100,19 @@ require_once __DIR__ . '/../layout/header.php';
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col">
         <div class="card dashboard-card border-start border-danger border-4">
             <div class="card-body text-center">
                 <div class="stat-number text-danger"><?= count($datosPorOwner['riesgos']) ?></div>
                 <small class="text-muted">Riesgos Abiertos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card dashboard-card border-start border-success border-4">
+            <div class="card-body text-center">
+                <div class="stat-number text-success"><?= count($datosPorOwner['proyectos']) ?></div>
+                <small class="text-muted">Proyectos</small>
             </div>
         </div>
     </div>
@@ -186,6 +199,43 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= nivelRiesgoBadge($r['nivel']) ?></td>
                     <td><?= $r['ie_codigo'] ? sanitize($r['ie_codigo']) : '-' ?></td>
                     <td><?= sanitize(mb_substr($r['descripcion'], 0, 80)) ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Proyectos -->
+<?php if (!empty($datosPorOwner['proyectos'])): ?>
+<div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0"><i class="bi bi-kanban me-2"></i>Proyectos</h6></div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Nombre</th><th>Avance</th><th>Estado</th><th>Prioridad</th><th>Inicio</th><th>Fin</th></tr></thead>
+            <tbody>
+                <?php
+                $prioridadLabels = [1 => 'Baja', 2 => 'Media', 3 => 'Alta', 4 => 'Muy Alta', 5 => 'Crítica'];
+                $prioridadClases = [1 => 'bg-secondary', 2 => 'bg-info text-dark', 3 => 'bg-warning text-dark', 4 => 'bg-danger', 5 => 'bg-dark'];
+                foreach ($datosPorOwner['proyectos'] as $proy):
+                    $avProy = intval($proy['avance']);
+                    $barColor = $avProy >= 75 ? 'bg-success' : ($avProy >= 40 ? 'bg-warning' : 'bg-danger');
+                ?>
+                <tr>
+                    <td><a href="<?= BASE_URL ?>index.php?page=proyectos&action=detalle&id=<?= $proy['id'] ?>"><?= sanitize($proy['nombre']) ?></a></td>
+                    <td style="min-width:110px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress flex-grow-1" style="height:8px;">
+                                <div class="progress-bar <?= $barColor ?>" style="width:<?= $avProy ?>%"></div>
+                            </div>
+                            <small class="text-muted"><?= $avProy ?>%</small>
+                        </div>
+                    </td>
+                    <td><?= estadoBadge($proy['estado']) ?></td>
+                    <td><span class="badge <?= $prioridadClases[$proy['prioridad']] ?? 'bg-secondary' ?>"><?= $prioridadLabels[$proy['prioridad']] ?? '-' ?></span></td>
+                    <td><?= $proy['fecha_inicio'] ? formatDate($proy['fecha_inicio']) : '-' ?></td>
+                    <td><?= $proy['fecha_fin'] ? formatDate($proy['fecha_fin']) : '-' ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
