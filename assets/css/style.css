@@ -17,16 +17,31 @@ body {
     min-height: 100vh;
     margin-top: 0;
     padding-top: 0;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    align-self: flex-start;
     z-index: 1040;
 }
-.sidebar .offcanvas-body {
-    padding: 0;
-    overflow-y: auto;
+@media (min-width: 768px) {
+    .sidebar {
+        display: flex !important;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+    .sidebar .offcanvas-body {
+        display: flex !important;
+        flex-direction: column;
+        padding: 0;
+        overflow-y: auto;
+        flex-grow: 1;
+    }
+}
+@media (max-width: 767.98px) {
+    .sidebar .offcanvas-body {
+        padding: 0;
+        overflow-y: auto;
+    }
 }
 .sidebar-brand {
     padding: 18px 20px 14px;
