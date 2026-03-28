@@ -40,10 +40,10 @@
                     <?php endif; ?>
 
                     <!-- Principal -->
-                    <div class="sidebar-section-label collapsed" data-bs-toggle="collapse" data-bs-target="#navPrincipal">
+                    <div class="sidebar-section-label" data-bs-toggle="collapse" data-bs-target="#navPrincipal">
                         Principal <i class="bi bi-chevron-down"></i>
                     </div>
-                    <div class="collapse" id="navPrincipal">
+                    <div class="collapse show" id="navPrincipal">
                         <ul class="nav flex-column">
                             <li class="nav-item">
                                 <a class="nav-link <?= activeNav('dashboard', $page) ?>" href="<?= BASE_URL ?>index.php?page=dashboard">
@@ -81,10 +81,10 @@
                     <hr>
 
                     <!-- Gestión -->
-                    <div class="sidebar-section-label collapsed" data-bs-toggle="collapse" data-bs-target="#navGestion">
+                    <div class="sidebar-section-label" data-bs-toggle="collapse" data-bs-target="#navGestion">
                         Gestión <i class="bi bi-chevron-down"></i>
                     </div>
-                    <div class="collapse" id="navGestion">
+                    <div class="collapse show" id="navGestion">
                         <ul class="nav flex-column">
                             <li class="nav-item">
                                 <a class="nav-link <?= activeNav('reuniones', $page) ?>" href="<?= BASE_URL ?>index.php?page=reuniones">
