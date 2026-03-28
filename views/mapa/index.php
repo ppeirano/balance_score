@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../../models/Perspectiva.php';
 require_once __DIR__ . '/../../models/Iniciativa.php';
 
-// Obtener perspectivas ordenadas de mayor a menor (Financiera=1 arriba, Aprendizaje=4 abajo)
-$perspectivas = $pdo->query("SELECT * FROM perspectivas ORDER BY orden ASC")->fetchAll();
+// Obtener perspectivas ordenadas de base a resultado (Aprendizaje=4 arriba, Financiera=1 abajo)
+$perspectivas = $pdo->query("SELECT * FROM perspectivas ORDER BY orden DESC")->fetchAll();
 
 // Obtener todas las iniciativas
 $iniciativas = $pdo->query("
@@ -48,7 +48,7 @@ require_once __DIR__ . '/../layout/header.php';
     Las flechas representan relaciones causa-efecto entre iniciativas.
 </p>
 
-<!-- Mapa Estrategico: bandas de perspectivas de arriba a abajo (Financiera -> Aprendizaje) -->
+<!-- Mapa Estrategico: piramide BSC de base a resultado (Aprendizaje -> Financiera) -->
 <div class="card mb-4">
     <div class="card-body p-3">
         <?php foreach ($perspectivas as $persp): ?>
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../layout/header.php';
             if ($persp['id'] !== $lastPersp['id']):
             ?>
                 <div class="text-center my-1">
-                    <i class="bi bi-arrow-up fs-4 text-muted"></i>
+                    <i class="bi bi-arrow-down fs-4 text-muted"></i>
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
