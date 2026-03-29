@@ -48,10 +48,17 @@ require_once __DIR__ . '/../layout/header.php';
         <div class="row align-items-center">
             <div class="col-md-<?= $proyecto['presupuesto'] ? '4' : '6' ?>">
                 <label class="form-label text-muted mb-1 small">Avance</label>
-                <div class="progress" style="height: 22px;">
-                    <div class="progress-bar <?= $proyecto['avance'] >= 75 ? 'bg-success' : ($proyecto['avance'] >= 40 ? 'bg-primary' : 'bg-warning') ?>"
-                         style="width: <?= $proyecto['avance'] ?>%"><?= $proyecto['avance'] ?>%</div>
-                </div>
+                <?php $avProy = calcularAvanceProyecto($pdo, $proyecto['id']); ?>
+                <?php if ($avProy < 0): ?>
+                    <div class="progress" style="height: 22px; background: #e9ecef;">
+                        <div class="progress-bar" style="width: 100%; background: #dee2e6; color: #9ca3af;">Sin actividades</div>
+                    </div>
+                <?php else: ?>
+                    <div class="progress" style="height: 22px;">
+                        <div class="progress-bar <?= $avProy >= 75 ? 'bg-success' : ($avProy >= 40 ? 'bg-primary' : 'bg-warning') ?>"
+                             style="width: <?= $avProy ?>%"><?= $avProy ?>%</div>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="col-md-<?= $proyecto['presupuesto'] ? '2' : '3' ?> text-center">
                 <small class="text-muted d-block">Inicio</small>

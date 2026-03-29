@@ -105,10 +105,21 @@ require_once __DIR__ . '/../layout/header.php';
                            value="<?= $proyecto['presupuesto'] ?? '' ?>" placeholder="0.00">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Avance: <span id="avanceLabel"><?= $proyecto['avance'] ?? 0 ?>%</span></label>
-                    <input type="range" class="form-range" name="avance" min="0" max="100"
-                           value="<?= $proyecto['avance'] ?? 0 ?>"
-                           oninput="document.getElementById('avanceLabel').textContent = this.value + '%'">
+                    <label class="form-label">Avance</label>
+                    <?php
+                    $avanceCalc = isset($proyecto['id']) ? calcularAvanceProyecto($pdo, $proyecto['id']) : -1;
+                    ?>
+                    <?php if ($avanceCalc < 0): ?>
+                        <div class="progress" style="height: 22px; background: #e9ecef;">
+                            <div class="progress-bar" style="width: 100%; background: #dee2e6; color: #9ca3af;">Sin actividades</div>
+                        </div>
+                    <?php else: ?>
+                        <div class="progress" style="height: 22px;">
+                            <div class="progress-bar <?= $avanceCalc >= 75 ? 'bg-success' : ($avanceCalc >= 40 ? 'bg-primary' : 'bg-warning') ?>"
+                                 style="width: <?= $avanceCalc ?>%"><?= $avanceCalc ?>%</div>
+                        </div>
+                    <?php endif; ?>
+                    <small class="text-muted">Calculado autom&aacute;ticamente desde las actividades</small>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Período</label>

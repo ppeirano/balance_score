@@ -234,8 +234,12 @@ switch ($page) {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
                     $estado = $_POST['estado'] ?? 'pendiente';
                     $pdo->prepare("UPDATE proyecto_actividades SET estado = ? WHERE id = ?")->execute([$estado, $id]);
-                    flash('success', 'Estado actualizado.');
                     $proyectoId = $_POST['proyecto_id'] ?? '';
+                    if ($proyectoId) {
+                        $avance = calcularAvanceProyecto($pdo, $proyectoId);
+                        $pdo->prepare("UPDATE proyectos SET avance = ? WHERE id = ?")->execute([max(0, $avance), $proyectoId]);
+                    }
+                    flash('success', 'Estado actualizado.');
                     redirect('index.php?page=proyectos&action=detalle&id=' . $proyectoId);
                 }
                 break;

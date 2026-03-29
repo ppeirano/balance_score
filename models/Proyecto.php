@@ -31,7 +31,7 @@ class Proyecto {
                 UPDATE proyectos
                 SET nombre = ?, descripcion = ?, responsable = ?, estado = ?,
                     fecha_inicio = ?, fecha_fin = ?, presupuesto = ?,
-                    prioridad = ?, avance = ?, periodo_id = ?
+                    prioridad = ?, periodo_id = ?
                 WHERE id = ?
             ");
             $stmt->execute([
@@ -43,7 +43,6 @@ class Proyecto {
                 $data['fecha_fin'] ?: null,
                 $data['presupuesto'] ?: null,
                 $data['prioridad'] ?? 1,
-                $data['avance'] ?? 0,
                 $data['periodo_id'] ?: null,
                 $data['id']
             ]);
@@ -53,8 +52,8 @@ class Proyecto {
             redirect('index.php?page=proyectos&action=detalle&id=' . $data['id']);
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO proyectos (nombre, descripcion, responsable, estado, fecha_inicio, fecha_fin, presupuesto, prioridad, avance, periodo_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO proyectos (nombre, descripcion, responsable, estado, fecha_inicio, fecha_fin, presupuesto, prioridad, periodo_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['nombre'],
@@ -65,7 +64,6 @@ class Proyecto {
                 $data['fecha_fin'] ?: null,
                 $data['presupuesto'] ?: null,
                 $data['prioridad'] ?? 1,
-                $data['avance'] ?? 0,
                 $data['periodo_id'] ?: null
             ]);
             $newId = $pdo->lastInsertId();
@@ -219,6 +217,9 @@ class Proyecto {
                 $data['actividad_id']
             ]);
             flash('success', 'Actividad actualizada.');
+            $proyectoId = $data['proyecto_id'];
+            $avance = calcularAvanceProyecto($pdo, $proyectoId);
+            $pdo->prepare("UPDATE proyectos SET avance = ? WHERE id = ?")->execute([max(0, $avance), $proyectoId]);
         } else {
             $stmt = $pdo->prepare("
                 INSERT INTO proyecto_actividades (proyecto_id, nombre, descripcion, grupo, fase, color, responsable, fecha_inicio, fecha_fin, estado, orden)
@@ -238,6 +239,9 @@ class Proyecto {
                 $data['act_orden'] ?? 0
             ]);
             flash('success', 'Actividad agregada.');
+            $proyectoId = $data['proyecto_id'];
+            $avance = calcularAvanceProyecto($pdo, $proyectoId);
+            $pdo->prepare("UPDATE proyectos SET avance = ? WHERE id = ?")->execute([max(0, $avance), $proyectoId]);
         }
         redirect('index.php?page=proyectos&action=detalle&id=' . $data['proyecto_id']);
     }
@@ -247,6 +251,10 @@ class Proyecto {
         $stmt->execute([$id]);
         $act = $stmt->fetch();
         $pdo->prepare("DELETE FROM proyecto_actividades WHERE id = ?")->execute([$id]);
+        if ($act) {
+            $avance = calcularAvanceProyecto($pdo, $act['proyecto_id']);
+            $pdo->prepare("UPDATE proyectos SET avance = ? WHERE id = ?")->execute([max(0, $avance), $act['proyecto_id']]);
+        }
         flash('success', 'Actividad eliminada.');
         if ($act) {
             redirect('index.php?page=proyectos&action=detalle&id=' . $act['proyecto_id']);

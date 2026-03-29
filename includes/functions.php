@@ -155,3 +155,12 @@ function calcularAvancePDA($pdo, $planId) {
     if ($result['total'] == 0) return 0;
     return round(($result['completadas'] / $result['total']) * 100);
 }
+
+// Calcular avance de proyecto basado en actividades
+function calcularAvanceProyecto($pdo, $proyectoId) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total, SUM(CASE WHEN estado = 'completado' THEN 1 ELSE 0 END) as completadas FROM proyecto_actividades WHERE proyecto_id = ?");
+    $stmt->execute([$proyectoId]);
+    $result = $stmt->fetch();
+    if ($result['total'] == 0) return -1;
+    return round(($result['completadas'] / $result['total']) * 100);
+}

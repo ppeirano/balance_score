@@ -37,10 +37,17 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= estadoBadge($p['estado']) ?></td>
                     <td><?= prioridadBadge($p['prioridad']) ?></td>
                     <td style="min-width: 120px;">
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar <?= $p['avance'] >= 75 ? 'bg-success' : ($p['avance'] >= 40 ? 'bg-primary' : 'bg-warning') ?>"
-                                 style="width: <?= $p['avance'] ?>%"><?= $p['avance'] ?>%</div>
-                        </div>
+                        <?php $avProy = calcularAvanceProyecto($pdo, $p['id']); ?>
+                        <?php if ($avProy < 0): ?>
+                            <div class="progress" style="height: 20px; background: #e9ecef;">
+                                <div class="progress-bar" style="width: 100%; background: #dee2e6; color: #9ca3af; font-size: 11px;">Sin act.</div>
+                            </div>
+                        <?php else: ?>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar <?= $avProy >= 75 ? 'bg-success' : ($avProy >= 40 ? 'bg-primary' : 'bg-warning') ?>"
+                                     style="width: <?= $avProy ?>%"><?= $avProy ?>%</div>
+                            </div>
+                        <?php endif; ?>
                     </td>
                     <td>
                         <small>
