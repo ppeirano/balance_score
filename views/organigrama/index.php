@@ -176,7 +176,7 @@ function renderNodo($nodo, $depth = 0) {
     gap: 4px;
     justify-content: center;
 }
-.org-ie-count, .org-child-count {
+.org-ie-count, .org-child-count, .org-risk-count {
     display: inline-flex;
     align-items: center;
     gap: 2px;
