@@ -140,7 +140,8 @@ class Responsable {
         $kpisByIE = [];
         $stmtK = $pdo->query("
             SELECT k.id, k.nombre, k.valor_actual, k.meta, k.unidad, k.estado_semaforo,
-                   k.es_entero, k.tipo, k.valor_cualitativo, k.iniciativa_id
+                   k.es_entero, k.tipo, k.valor_cualitativo, k.iniciativa_id,
+                   k.umbral_verde, k.umbral_amarillo, k.direccion
             FROM kpis k
             WHERE k.activo = 1 AND k.iniciativa_id IS NOT NULL
             ORDER BY k.nombre

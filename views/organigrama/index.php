@@ -87,7 +87,10 @@ function renderNodo($nodo, $depth = 0) {
                                     <div class="org-ie-section-title"><i class="bi bi-speedometer2"></i> KPIs</div>
                                     <?php foreach ($ie['kpis'] as $kpi):
                                         $semaforoColors = ['verde' => '#22c55e', 'amarillo' => '#f59e0b', 'rojo' => '#ef4444', 'gris' => '#9ca3af'];
-                                        $sColor = $semaforoColors[$kpi['estado_semaforo']] ?? '#9ca3af';
+                                        $semaforo = $kpi['tipo'] === 'cuantitativo'
+                                            ? calcularSemaforo($kpi['valor_actual'], $kpi['meta'], $kpi['umbral_verde'], $kpi['umbral_amarillo'], $kpi['direccion'])
+                                            : ($kpi['estado_semaforo'] ?? 'gris');
+                                        $sColor = $semaforoColors[$semaforo] ?? '#9ca3af';
                                         $valorDisplay = $kpi['tipo'] === 'cualitativo'
                                             ? ($kpi['valor_cualitativo'] ?: '-')
                                             : formatKpiValor($kpi['valor_actual'], $kpi['es_entero']);

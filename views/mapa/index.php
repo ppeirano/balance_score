@@ -76,7 +76,8 @@ foreach ($stmtRiesgos->fetchAll() as $row) {
 $kpisByIE = [];
 $stmtKpis = $pdo->query("
     SELECT k.id, k.nombre, k.valor_actual, k.meta, k.unidad, k.estado_semaforo,
-           k.es_entero, k.tipo, k.valor_cualitativo, k.iniciativa_id
+           k.es_entero, k.tipo, k.valor_cualitativo, k.iniciativa_id,
+           k.umbral_verde, k.umbral_amarillo, k.direccion
     FROM kpis k
     WHERE k.activo = 1 AND k.iniciativa_id IS NOT NULL
     ORDER BY k.nombre
@@ -367,7 +368,10 @@ require_once __DIR__ . '/../layout/header.php';
                                             <?php
                                             $semaforoColors = ['verde' => '#22c55e', 'amarillo' => '#f59e0b', 'rojo' => '#ef4444', 'gris' => '#9ca3af'];
                                             foreach ($ieKpis as $kpi):
-                                                $sColor = $semaforoColors[$kpi['estado_semaforo']] ?? '#9ca3af';
+                                                $semaforo = $kpi['tipo'] === 'cuantitativo'
+                                                    ? calcularSemaforo($kpi['valor_actual'], $kpi['meta'], $kpi['umbral_verde'], $kpi['umbral_amarillo'], $kpi['direccion'])
+                                                    : ($kpi['estado_semaforo'] ?? 'gris');
+                                                $sColor = $semaforoColors[$semaforo] ?? '#9ca3af';
                                                 $valorDisplay = $kpi['tipo'] === 'cualitativo'
                                                     ? ($kpi['valor_cualitativo'] ?: '-')
                                                     : formatKpiValor($kpi['valor_actual'], $kpi['es_entero']);
