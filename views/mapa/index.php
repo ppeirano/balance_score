@@ -72,6 +72,19 @@ foreach ($stmtRiesgos->fetchAll() as $row) {
     $riesgosByIE[$row['iniciativa_id']][] = $row;
 }
 
+// KPIs activos por IE
+$kpisByIE = [];
+$stmtKpis = $pdo->query("
+    SELECT k.id, k.nombre, k.valor_actual, k.meta, k.unidad, k.estado_semaforo,
+           k.es_entero, k.tipo, k.valor_cualitativo, k.iniciativa_id
+    FROM kpis k
+    WHERE k.activo = 1 AND k.iniciativa_id IS NOT NULL
+    ORDER BY k.nombre
+");
+foreach ($stmtKpis->fetchAll() as $row) {
+    $kpisByIE[$row['iniciativa_id']][] = $row;
+}
+
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
@@ -285,6 +298,19 @@ require_once __DIR__ . '/../layout/header.php';
 .mapa-detail-link:hover {
     color: #1d4ed8;
 }
+.mapa-detail-semaforo {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.mapa-detail-kpi-valor {
+    font-size: 9px;
+    font-weight: 600;
+    color: #6b7280;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
 </style>
 
 <!-- Mapa Estratégico -->
@@ -306,7 +332,8 @@ require_once __DIR__ . '/../layout/header.php';
                             $barColor = $avance >= 70 ? '#22c55e' : ($avance >= 40 ? '#f59e0b' : '#ef4444');
                             $iePlanes = $pdaByIE[$ie['id']] ?? [];
                             $ieRiesgos = $riesgosByIE[$ie['id']] ?? [];
-                            $hasDetail = !empty($iePlanes) || !empty($ieRiesgos);
+                            $ieKpis = $kpisByIE[$ie['id']] ?? [];
+                            $hasDetail = !empty($iePlanes) || !empty($ieRiesgos) || !empty($ieKpis);
                             $collapseId = 'mapaIE' . (int)$ie['id'];
                         ?>
                             <div class="mapa-ie-wrapper">
@@ -326,7 +353,7 @@ require_once __DIR__ . '/../layout/header.php';
                                     <?php if ($hasDetail): ?>
                                         <div class="mapa-ie-toggle">
                                             <i class="bi bi-chevron-down"></i>
-                                            <span><?= count($iePlanes) ?> planes · <?= count($ieRiesgos) ?> riesgos</span>
+                                            <span><?= count($iePlanes) ?> planes · <?= count($ieKpis) ?> kpis · <?= count($ieRiesgos) ?> riesgos</span>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -334,6 +361,29 @@ require_once __DIR__ . '/../layout/header.php';
                                 <?php if ($hasDetail): ?>
                                 <div class="collapse" id="<?= $collapseId ?>">
                                     <div class="mapa-ie-detail">
+                                        <?php if (!empty($ieKpis)): ?>
+                                        <div class="mapa-detail-section">
+                                            <div class="mapa-detail-title"><i class="bi bi-speedometer2"></i> KPIs</div>
+                                            <?php
+                                            $semaforoColors = ['verde' => '#22c55e', 'amarillo' => '#f59e0b', 'rojo' => '#ef4444', 'gris' => '#9ca3af'];
+                                            foreach ($ieKpis as $kpi):
+                                                $sColor = $semaforoColors[$kpi['estado_semaforo']] ?? '#9ca3af';
+                                                $valorDisplay = $kpi['tipo'] === 'cualitativo'
+                                                    ? ($kpi['valor_cualitativo'] ?: '-')
+                                                    : formatKpiValor($kpi['valor_actual'], $kpi['es_entero']);
+                                                $metaDisplay = $kpi['tipo'] === 'cualitativo'
+                                                    ? ''
+                                                    : ' / ' . formatKpiValor($kpi['meta'], $kpi['es_entero']) . ($kpi['unidad'] ? ' ' . $kpi['unidad'] : '');
+                                            ?>
+                                                <a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= (int)$kpi['id'] ?>" class="mapa-detail-item">
+                                                    <span class="mapa-detail-semaforo" style="background-color: <?= $sColor ?>;"></span>
+                                                    <span class="mapa-detail-name"><?= sanitize(mb_substr($kpi['nombre'], 0, 40)) ?></span>
+                                                    <span class="mapa-detail-kpi-valor"><?= $valorDisplay ?><?= $metaDisplay ?></span>
+                                                </a>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <?php endif; ?>
+
                                         <?php if (!empty($iePlanes)): ?>
                                         <div class="mapa-detail-section">
                                             <div class="mapa-detail-title"><i class="bi bi-clipboard-check"></i> Planes de Acción</div>
