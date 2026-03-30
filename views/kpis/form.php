@@ -102,8 +102,13 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <label class="form-label">Unidad de medida</label>
-                        <input type="text" class="form-control" name="unidad"
-                               value="<?= sanitize($kpi['unidad'] ?? '') ?>" placeholder="Ej: %, USD, unidades">
+                        <select class="form-select" name="unidad">
+                            <option value="">Sin unidad</option>
+                            <option value="%" <?= ($kpi['unidad'] ?? '') === '%' ? 'selected' : '' ?>>%</option>
+                            <option value="USD" <?= ($kpi['unidad'] ?? '') === 'USD' ? 'selected' : '' ?>>USD</option>
+                            <option value="unidades" <?= ($kpi['unidad'] ?? '') === 'unidades' ? 'selected' : '' ?>>unidades</option>
+                            <option value="índice" <?= ($kpi['unidad'] ?? '') === 'índice' ? 'selected' : '' ?>>índice</option>
+                        </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Meta</label>
