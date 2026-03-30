@@ -33,7 +33,7 @@ $nombresEntidad = [
     'actividad' => 'Actividad',
     'kpi' => 'KPI',
     'proyecto' => 'Proyecto',
-    'riesgo' => 'Riesgo',
+    'riesgo' => 'Restricción/Riesgo',
     'reunion' => 'Reunión',
     'compromiso' => 'Compromiso',
 ];

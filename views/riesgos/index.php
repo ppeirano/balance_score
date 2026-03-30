@@ -7,13 +7,13 @@ require_once __DIR__ . '/../layout/header.php';
 
 <div class="d-flex justify-content-end align-items-center mb-4">
     <a href="<?= BASE_URL ?>index.php?page=riesgos&action=crear" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i>Nuevo Riesgo
+        <i class="bi bi-plus-lg me-1"></i>Nueva Restricci&oacute;n / Riesgo
     </a>
 </div>
 
 <!-- Matriz de Riesgos Visual -->
 <div class="card mb-4">
-    <div class="card-header"><h6 class="mb-0"><i class="bi bi-grid-3x3 me-2"></i>Matriz de Riesgos</h6></div>
+    <div class="card-header"><h6 class="mb-0"><i class="bi bi-grid-3x3 me-2"></i>Matriz de Restricciones y Riesgos</h6></div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="risk-matrix">
@@ -65,7 +65,7 @@ require_once __DIR__ . '/../layout/header.php';
 
 <!-- Listado de Riesgos -->
 <div class="card">
-    <div class="card-header"><h6 class="mb-0">Listado de Riesgos</h6></div>
+    <div class="card-header"><h6 class="mb-0">Listado de Restricciones y Riesgos</h6></div>
     <div class="card-body">
         <table class="table table-hover">
             <thead>
@@ -104,7 +104,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($riesgos)): ?>
-                <tr><td colspan="8" class="text-center text-muted">No hay riesgos registrados.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted">No hay restricciones ni riesgos registrados.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

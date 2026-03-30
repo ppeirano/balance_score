@@ -75,7 +75,7 @@ $esEditar = ($reunion !== null);
                             </span>
                         </div>
                         <div class="col-md-5">
-                            <small class="text-muted">Analiza planes, actividades, compromisos y riesgos del responsable para armar la agenda.</small>
+                            <small class="text-muted">Analiza planes, actividades, compromisos, restricciones y riesgos del responsable para armar la agenda.</small>
                         </div>
                     </div>
                 </div>

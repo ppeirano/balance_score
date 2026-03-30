@@ -106,7 +106,7 @@ require_once __DIR__ . '/../layout/header.php';
         <div class="card dashboard-card border-start border-danger border-4">
             <div class="card-body text-center">
                 <div class="stat-number text-danger"><?= count($datosPorOwner['riesgos']) ?></div>
-                <small class="text-muted">Riesgos Abiertos</small>
+                <small class="text-muted">Restricciones / Riesgos</small>
             </div>
         </div>
     </div>
@@ -192,7 +192,7 @@ require_once __DIR__ . '/../layout/header.php';
 <!-- Riesgos abiertos -->
 <?php if (!empty($datosPorOwner['riesgos'])): ?>
 <div class="card mb-4">
-    <div class="card-header"><h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Riesgos Abiertos</h6></div>
+    <div class="card-header"><h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Restricciones y Riesgos Abiertos</h6></div>
     <div class="card-body">
         <table class="table table-sm">
             <thead><tr><th>Nivel</th><th>IE</th><th>Descripción</th></tr></thead>

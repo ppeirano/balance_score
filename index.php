@@ -385,7 +385,7 @@ switch ($page) {
                     $riesgoDesc = $stmtN->fetchColumn() ?: 'Desconocido';
                     $pdo->prepare("DELETE FROM riesgos WHERE id = ?")->execute([$id]);
                     Bitacora::registrar($pdo, 'riesgo', $id, $riesgoDesc, 'eliminado');
-                    flash('success', 'Riesgo eliminado.');
+                    flash('success', 'Restricción/Riesgo eliminado.');
                 }
                 redirect('index.php?page=riesgos');
                 break;

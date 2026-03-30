@@ -188,7 +188,7 @@ require_once __DIR__ . '/../layout/header.php';
     <div class="col-md-6">
         <div class="card dashboard-card">
             <div class="card-header bg-warning bg-opacity-10">
-                <h6 class="mb-0 text-warning"><i class="bi bi-exclamation-triangle me-2"></i>Riesgos Críticos</h6>
+                <h6 class="mb-0 text-warning"><i class="bi bi-exclamation-triangle me-2"></i>Restricciones y Riesgos Cr&iacute;ticos</h6>
             </div>
             <div class="card-body">
                 <?php if (!empty($riesgosCriticos)): ?>
@@ -205,7 +205,7 @@ require_once __DIR__ . '/../layout/header.php';
                     </tbody>
                 </table>
                 <?php else: ?>
-                <p class="text-success mb-0"><i class="bi bi-check-circle me-2"></i>Sin riesgos críticos.</p>
+                <p class="text-success mb-0"><i class="bi bi-check-circle me-2"></i>Sin restricciones ni riesgos cr&iacute;ticos.</p>
                 <?php endif; ?>
             </div>
         </div>

@@ -17,7 +17,7 @@ $esEditar = ($riesgo !== null);
 ?>
 
 <h4 class="mb-4">
-    <i class="bi bi-exclamation-triangle me-2"></i><?= $esEditar ? 'Editar' : 'Nuevo' ?> Riesgo
+    <i class="bi bi-exclamation-triangle me-2"></i><?= $esEditar ? 'Editar' : 'Nueva' ?> Restricci&oacute;n / Riesgo
 </h4>
 
 <div class="card">
@@ -28,7 +28,7 @@ $esEditar = ($riesgo !== null);
             <?php endif; ?>
 
             <div class="mb-3">
-                <label class="form-label">Descripción del Riesgo *</label>
+                <label class="form-label">Descripci&oacute;n de la Restricci&oacute;n / Riesgo *</label>
                 <textarea class="form-control" name="descripcion" rows="3" required><?= sanitize($riesgo['descripcion'] ?? '') ?></textarea>
             </div>
 

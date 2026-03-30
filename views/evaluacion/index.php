@@ -21,7 +21,7 @@ require_once __DIR__ . '/../layout/header.php';
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-clipboard2-data me-2"></i>Evaluación General</h5>
-                <p class="card-text text-muted">Análisis completo del BSC: avance de todas las IE, estado de KPIs, riesgos críticos y recomendaciones estratégicas.</p>
+                <p class="card-text text-muted">Análisis completo del BSC: avance de todas las IE, estado de KPIs, restricciones, riesgos cr&iacute;ticos y recomendaciones estrat&eacute;gicas.</p>
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=evaluacion&action=solicitar">
                     <input type="hidden" name="tipo" value="general">
                     <button type="submit" class="btn btn-primary" <?= !$apiKeyConfigurada ? 'disabled' : '' ?>>
@@ -37,7 +37,7 @@ require_once __DIR__ . '/../layout/header.php';
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-bullseye me-2"></i>Evaluación por Iniciativa</h5>
-                <p class="card-text text-muted">Análisis focalizado en una IE específica con sus PDAs, KPIs y riesgos.</p>
+                <p class="card-text text-muted">An&aacute;lisis focalizado en una IE espec&iacute;fica con sus PDAs, KPIs, restricciones y riesgos.</p>
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=evaluacion&action=solicitar">
                     <input type="hidden" name="tipo" value="iniciativa">
                     <div class="mb-2">
@@ -84,12 +84,12 @@ require_once __DIR__ . '/../layout/header.php';
     <div class="col-md-6 mb-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-exclamation-triangle me-2"></i>Análisis de Riesgos</h5>
-                <p class="card-text text-muted">Evalúa la matriz de riesgos completa y sugiere priorización y acciones de mitigación.</p>
+                <h5 class="card-title"><i class="bi bi-exclamation-triangle me-2"></i>An&aacute;lisis de Restricciones y Riesgos</h5>
+                <p class="card-text text-muted">Eval&uacute;a la matriz de restricciones y riesgos completa y sugiere priorizaci&oacute;n y acciones de mitigaci&oacute;n.</p>
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=evaluacion&action=solicitar">
                     <input type="hidden" name="tipo" value="riesgos">
                     <button type="submit" class="btn btn-primary" <?= !$apiKeyConfigurada ? 'disabled' : '' ?>>
-                        <i class="bi bi-send me-1"></i>Analizar Riesgos
+                        <i class="bi bi-send me-1"></i>Analizar Restricciones y Riesgos
                     </button>
                 </form>
             </div>

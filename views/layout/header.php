@@ -94,7 +94,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link <?= activeNav('riesgos', $page) ?>" href="<?= BASE_URL ?>index.php?page=riesgos">
-                                    <i class="bi bi-exclamation-triangle me-2"></i><span class="nav-text">Riesgos</span>
+                                    <i class="bi bi-exclamation-triangle me-2"></i><span class="nav-text">Restricciones y Riesgos</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -181,7 +181,7 @@
                     'planes' => 'Planes de Acción',
                     'kpis' => 'Indicadores (KPIs)',
                     'reuniones' => 'Reuniones',
-                    'riesgos' => 'Gestión de Riesgos',
+                    'riesgos' => 'Restricciones y Riesgos',
                     'proyectos' => 'Proyectos',
                     'bitacora' => 'Bitácora de Cambios',
                     'calendario' => 'Calendario',

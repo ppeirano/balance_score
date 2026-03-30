@@ -303,7 +303,7 @@ require_once __DIR__ . '/../layout/header.php';
 <!-- Riesgos -->
 <div class="card mb-4">
     <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Riesgos (<?= count($riesgos) ?>)</h5>
+        <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Restricciones y Riesgos (<?= count($riesgos) ?>)</h5>
     </div>
     <div class="card-body p-0">
         <?php if (!empty($riesgos)): ?>
@@ -350,7 +350,7 @@ require_once __DIR__ . '/../layout/header.php';
         <?php else: ?>
             <div class="p-4 text-center text-muted">
                 <i class="bi bi-shield-check fs-1 d-block mb-2"></i>
-                No hay riesgos registrados para esta iniciativa.
+                No hay restricciones ni riesgos registrados para esta iniciativa.
             </div>
         <?php endif; ?>
     </div>

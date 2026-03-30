@@ -52,7 +52,7 @@ class Riesgo {
                 $data['estado'] ?? 'abierto',
                 $data['id']
             ]);
-            flash('success', 'Riesgo actualizado correctamente.');
+            flash('success', 'Restricción/Riesgo actualizado correctamente.');
             require_once __DIR__ . '/Bitacora.php';
             Bitacora::registrar($pdo, 'riesgo', $data['id'], $data['descripcion'], 'editado');
         } else {
@@ -71,7 +71,7 @@ class Riesgo {
                 $data['responsable'] ?: null,
                 $data['estado'] ?? 'abierto'
             ]);
-            flash('success', 'Riesgo creado correctamente.');
+            flash('success', 'Restricción/Riesgo creado correctamente.');
             require_once __DIR__ . '/Bitacora.php';
             Bitacora::registrar($pdo, 'riesgo', $pdo->lastInsertId(), $data['descripcion'], 'creado');
         }
