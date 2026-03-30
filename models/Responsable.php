@@ -98,6 +98,20 @@ class Responsable {
             $avanceByIE[$ieId] = round($av);
         }
 
+        // Riesgos abiertos por responsable
+        $riesgosByResp = [];
+        $stmtR = $pdo->query("
+            SELECT r.id, r.descripcion, r.nivel, r.probabilidad, r.impacto, r.estado, r.responsable,
+                   ie.codigo AS ie_codigo
+            FROM riesgos r
+            LEFT JOIN iniciativas_estrategicas ie ON r.iniciativa_id = ie.id
+            WHERE r.responsable IS NOT NULL AND r.responsable != '' AND r.estado = 'abierto'
+            ORDER BY FIELD(r.nivel, 'critico', 'alto', 'medio', 'bajo')
+        ");
+        foreach ($stmtR->fetchAll() as $row) {
+            $riesgosByResp[$row['responsable']][] = $row;
+        }
+
         // Construir árbol
         $byId = [];
         foreach ($todos as &$r) {
@@ -107,6 +121,7 @@ class Responsable {
                 $ie['avance'] = $avanceByIE[$ie['id']] ?? 0;
             }
             $r['iniciativas'] = array_values($ies);
+            $r['riesgos'] = $riesgosByResp[$r['nombre']] ?? [];
             $byId[$r['id']] = &$r;
         }
         unset($r);

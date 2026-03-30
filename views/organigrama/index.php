@@ -20,8 +20,10 @@ function renderNodo($nodo, $depth = 0) {
 
     $cantIE = count($nodo['iniciativas']);
     $cantHijos = count($nodo['hijos']);
+    $cantRiesgos = count($nodo['riesgos'] ?? []);
     $ieId = 'orgIE' . $nodo['id'];
     $childId = 'orgChild' . $nodo['id'];
+    $riskId = 'orgRisk' . $nodo['id'];
     // Depth 0 = root, children shown. Depth 1+ = collapsed
     $childrenOpen = ($depth === 0);
 ?>
@@ -36,6 +38,11 @@ function renderNodo($nodo, $depth = 0) {
                 <?php if ($cantIE > 0): ?>
                     <span class="org-ie-count" data-bs-toggle="collapse" data-bs-target="#<?= $ieId ?>" role="button" title="Ver IE asignadas">
                         <i class="bi bi-bullseye"></i> <?= $cantIE ?>
+                    </span>
+                <?php endif; ?>
+                <?php if ($cantRiesgos > 0): ?>
+                    <span class="org-risk-count" data-bs-toggle="collapse" data-bs-target="#<?= $riskId ?>" role="button" title="Ver restricciones y riesgos">
+                        <i class="bi bi-exclamation-triangle"></i> <?= $cantRiesgos ?>
                     </span>
                 <?php endif; ?>
                 <?php if ($cantHijos > 0): ?>
@@ -65,6 +72,28 @@ function renderNodo($nodo, $depth = 0) {
                             </div>
                             <small><?= $avance ?>%</small>
                         </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($cantRiesgos > 0): ?>
+        <div class="collapse" id="<?= $riskId ?>">
+            <div class="org-risk-list">
+                <?php foreach ($nodo['riesgos'] as $riesgo):
+                    $nivelColors = ['critico' => '#ef4444', 'alto' => '#f59e0b', 'medio' => '#3b82f6', 'bajo' => '#22c55e'];
+                    $nivelColor = $nivelColors[$riesgo['nivel']] ?? '#6b7280';
+                ?>
+                    <a href="<?= BASE_URL ?>index.php?page=riesgos&action=editar&id=<?= (int)$riesgo['id'] ?>"
+                       class="org-risk-item">
+                        <span class="org-risk-nivel" style="background-color: <?= $nivelColor ?>;">
+                            <?= ucfirst($riesgo['nivel']) ?>
+                        </span>
+                        <span class="org-risk-desc"><?= sanitize(mb_substr($riesgo['descripcion'], 0, 60)) ?><?= mb_strlen($riesgo['descripcion']) > 60 ? '...' : '' ?></span>
+                        <?php if ($riesgo['ie_codigo']): ?>
+                            <span class="org-risk-ie"><?= sanitize($riesgo['ie_codigo']) ?></span>
+                        <?php endif; ?>
                     </a>
                 <?php endforeach; ?>
             </div>
@@ -174,6 +203,14 @@ function renderNodo($nodo, $depth = 0) {
 .org-child-count:hover {
     background: #ede9fe;
 }
+.org-risk-count {
+    color: #ef4444;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+.org-risk-count:hover {
+    background: #fee2e2;
+}
 
 /* IE list */
 .org-ie-list {
@@ -233,6 +270,59 @@ function renderNodo($nodo, $depth = 0) {
     color: #6b7280;
     min-width: 22px;
     text-align: right;
+}
+
+/* Risk list */
+.org-risk-list {
+    background: #fff;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 4px;
+    margin-top: 4px;
+    width: 240px;
+    box-shadow: 0 4px 12px rgba(239,68,68,0.08);
+    z-index: 3;
+    position: relative;
+}
+.org-risk-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+.org-risk-item:hover {
+    background: #fef2f2;
+    color: inherit;
+}
+.org-risk-nivel {
+    font-size: 8px;
+    font-weight: 700;
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.org-risk-desc {
+    font-size: 10px;
+    font-weight: 500;
+    color: #374151;
+    flex-grow: 1;
+    line-height: 1.2;
+}
+.org-risk-ie {
+    font-size: 8px;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 1px 4px;
+    border-radius: 4px;
+    flex-shrink: 0;
 }
 
 /* Children & connectors */
@@ -296,7 +386,7 @@ function renderNodo($nodo, $depth = 0) {
             </div>
         <?php else: ?>
             <p class="text-muted small mb-2">
-                <i class="bi bi-info-circle me-1"></i>Click en <span class="org-ie-count" style="cursor:default;"><i class="bi bi-bullseye"></i> N</span> para ver IE asignadas, en <span class="org-child-count" style="cursor:default;"><i class="bi bi-people"></i> N</span> para expandir reportes directos.
+                <i class="bi bi-info-circle me-1"></i>Click en <span class="org-ie-count" style="cursor:default;"><i class="bi bi-bullseye"></i> N</span> para ver IE asignadas, <span class="org-risk-count" style="cursor:default;"><i class="bi bi-exclamation-triangle"></i> N</span> para restricciones/riesgos, <span class="org-child-count" style="cursor:default;"><i class="bi bi-people"></i> N</span> para reportes directos.
             </p>
             <div class="org-wrapper">
                 <div class="org-tree">
