@@ -56,23 +56,93 @@ function renderNodo($nodo, $depth = 0) {
         <?php if ($cantIE > 0): ?>
         <div class="collapse" id="<?= $ieId ?>">
             <div class="org-ie-list">
-                <?php foreach ($nodo['iniciativas'] as $ie):
+                <?php foreach ($nodo['iniciativas'] as $ieIdx => $ie):
                     $avance = (int)$ie['avance'];
                     $barColor = $avance >= 70 ? '#22c55e' : ($avance >= 40 ? '#f59e0b' : '#ef4444');
+                    $detailId = 'orgIEDetail_' . $nodo['id'] . '_' . $ie['id'];
+                    $hasDetail = !empty($ie['kpis']) || !empty($ie['planes']) || !empty($ie['riesgos_ie']);
                 ?>
-                    <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>"
-                       class="org-ie-item">
-                        <span class="org-ie-code" style="background-color: <?= sanitize($ie['perspectiva_color']) ?>;">
-                            <?= sanitize($ie['codigo']) ?>
-                        </span>
-                        <span class="org-ie-name"><?= sanitize($ie['nombre']) ?></span>
-                        <div class="org-ie-progress">
-                            <div class="progress">
-                                <div class="progress-bar" style="width: <?= $avance ?>%; background-color: <?= $barColor ?>;"></div>
+                    <div class="org-ie-item-wrap">
+                        <div class="org-ie-item <?= $hasDetail ? 'org-ie-expandable' : '' ?>"
+                             <?php if ($hasDetail): ?>data-bs-toggle="collapse" data-bs-target="#<?= $detailId ?>" role="button"<?php endif; ?>>
+                            <span class="org-ie-code" style="background-color: <?= sanitize($ie['perspectiva_color']) ?>;">
+                                <?= sanitize($ie['codigo']) ?>
+                            </span>
+                            <span class="org-ie-name"><?= sanitize($ie['nombre']) ?></span>
+                            <div class="org-ie-progress">
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: <?= $avance ?>%; background-color: <?= $barColor ?>;"></div>
+                                </div>
+                                <small><?= $avance ?>%</small>
                             </div>
-                            <small><?= $avance ?>%</small>
+                            <?php if ($hasDetail): ?>
+                                <i class="bi bi-chevron-down org-ie-chevron"></i>
+                            <?php endif; ?>
                         </div>
-                    </a>
+                        <?php if ($hasDetail): ?>
+                        <div class="collapse" id="<?= $detailId ?>">
+                            <div class="org-ie-detail">
+                                <?php if (!empty($ie['kpis'])): ?>
+                                <div class="org-ie-section">
+                                    <div class="org-ie-section-title"><i class="bi bi-speedometer2"></i> KPIs</div>
+                                    <?php foreach ($ie['kpis'] as $kpi):
+                                        $semaforoColors = ['verde' => '#22c55e', 'amarillo' => '#f59e0b', 'rojo' => '#ef4444', 'gris' => '#9ca3af'];
+                                        $sColor = $semaforoColors[$kpi['estado_semaforo']] ?? '#9ca3af';
+                                        $valorDisplay = $kpi['tipo'] === 'cualitativo'
+                                            ? ($kpi['valor_cualitativo'] ?: '-')
+                                            : formatKpiValor($kpi['valor_actual'], $kpi['es_entero']);
+                                        $metaDisplay = $kpi['tipo'] === 'cualitativo'
+                                            ? ''
+                                            : ' / ' . formatKpiValor($kpi['meta'], $kpi['es_entero']) . ($kpi['unidad'] ? ' ' . $kpi['unidad'] : '');
+                                    ?>
+                                        <a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= (int)$kpi['id'] ?>" class="org-ie-kpi-item">
+                                            <span class="org-ie-semaforo" style="background-color: <?= $sColor ?>;"></span>
+                                            <span class="org-ie-kpi-name"><?= sanitize(mb_substr($kpi['nombre'], 0, 40)) ?><?= mb_strlen($kpi['nombre']) > 40 ? '...' : '' ?></span>
+                                            <span class="org-ie-kpi-valor"><?= $valorDisplay ?><?= $metaDisplay ?></span>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($ie['planes'])): ?>
+                                <div class="org-ie-section">
+                                    <div class="org-ie-section-title"><i class="bi bi-list-check"></i> Planes de Acción</div>
+                                    <?php foreach ($ie['planes'] as $pda):
+                                        $pdaAvance = (int)$pda['avance'];
+                                        $pdaBarColor = $pdaAvance >= 70 ? '#22c55e' : ($pdaAvance >= 40 ? '#f59e0b' : '#ef4444');
+                                    ?>
+                                        <a href="<?= BASE_URL ?>index.php?page=planes&action=detalle&id=<?= (int)$pda['id'] ?>" class="org-ie-pda-item">
+                                            <span class="org-ie-pda-name"><?= sanitize(mb_substr($pda['nombre'], 0, 35)) ?><?= mb_strlen($pda['nombre']) > 35 ? '...' : '' ?></span>
+                                            <div class="org-ie-pda-progress">
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: <?= $pdaAvance ?>%; background-color: <?= $pdaBarColor ?>;"></div>
+                                                </div>
+                                                <small><?= $pdaAvance ?>%</small>
+                                            </div>
+                                            <?= estadoBadge($pda['estado']) ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($ie['riesgos_ie'])): ?>
+                                <div class="org-ie-section">
+                                    <div class="org-ie-section-title"><i class="bi bi-exclamation-triangle"></i> Restricciones y Riesgos</div>
+                                    <?php foreach ($ie['riesgos_ie'] as $riesgo):
+                                        $nivelColors = ['critico' => '#ef4444', 'alto' => '#f59e0b', 'medio' => '#3b82f6', 'bajo' => '#22c55e'];
+                                        $nivelColor = $nivelColors[$riesgo['nivel']] ?? '#6b7280';
+                                    ?>
+                                        <a href="<?= BASE_URL ?>index.php?page=riesgos&action=editar&id=<?= (int)$riesgo['id'] ?>" class="org-ie-risk-item">
+                                            <span class="org-risk-nivel" style="background-color: <?= $nivelColor ?>;"><?= ucfirst($riesgo['nivel']) ?></span>
+                                            <span class="org-ie-risk-desc"><?= sanitize(mb_substr($riesgo['descripcion'], 0, 45)) ?><?= mb_strlen($riesgo['descripcion']) > 45 ? '...' : '' ?></span>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -219,10 +289,17 @@ function renderNodo($nodo, $depth = 0) {
     border-radius: 10px;
     padding: 4px;
     margin-top: 4px;
-    width: 240px;
+    width: 260px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     z-index: 3;
     position: relative;
+}
+.org-ie-item-wrap {
+    border-radius: 6px;
+    overflow: hidden;
+}
+.org-ie-item-wrap:not(:last-child) {
+    margin-bottom: 1px;
 }
 .org-ie-item {
     display: flex;
@@ -234,9 +311,24 @@ function renderNodo($nodo, $depth = 0) {
     color: inherit;
     transition: background 0.15s;
 }
-.org-ie-item:hover {
+.org-ie-expandable {
+    cursor: pointer;
+}
+.org-ie-expandable:hover {
+    background: #f0f7ff;
+}
+.org-ie-item:not(.org-ie-expandable):hover {
     background: #f8fafc;
     color: inherit;
+}
+.org-ie-chevron {
+    font-size: 9px;
+    color: #9ca3af;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+.org-ie-item-wrap .org-ie-item[aria-expanded="true"] .org-ie-chevron {
+    transform: rotate(180deg);
 }
 .org-ie-code {
     font-size: 9px;
@@ -272,6 +364,136 @@ function renderNodo($nodo, $depth = 0) {
     text-align: right;
 }
 
+/* IE Detail panel (explotar) */
+.org-ie-detail {
+    padding: 2px 4px 4px;
+    border-top: 1px solid #e5e7eb;
+    background: #fafbfc;
+    border-radius: 0 0 6px 6px;
+}
+.org-ie-section {
+    margin-bottom: 3px;
+}
+.org-ie-section:last-child {
+    margin-bottom: 0;
+}
+.org-ie-section-title {
+    font-size: 8px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 6px 1px;
+}
+.org-ie-section-title i {
+    font-size: 8px;
+}
+
+/* KPI items inside IE detail */
+.org-ie-kpi-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+.org-ie-kpi-item:hover {
+    background: #f0f4f8;
+    color: inherit;
+}
+.org-ie-semaforo {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.org-ie-kpi-name {
+    font-size: 9px;
+    font-weight: 500;
+    color: #374151;
+    flex-grow: 1;
+    line-height: 1.2;
+}
+.org-ie-kpi-valor {
+    font-size: 8px;
+    font-weight: 600;
+    color: #6b7280;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* PDA items inside IE detail */
+.org-ie-pda-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+.org-ie-pda-item:hover {
+    background: #f0f4f8;
+    color: inherit;
+}
+.org-ie-pda-name {
+    font-size: 9px;
+    font-weight: 500;
+    color: #374151;
+    flex-grow: 1;
+    line-height: 1.2;
+}
+.org-ie-pda-progress {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    width: 42px;
+}
+.org-ie-pda-progress .progress {
+    flex-grow: 1;
+    height: 2px;
+}
+.org-ie-pda-progress small {
+    font-size: 8px;
+    font-weight: 600;
+    color: #6b7280;
+    min-width: 18px;
+    text-align: right;
+}
+.org-ie-pda-item .badge {
+    font-size: 7px !important;
+    padding: 1px 4px !important;
+    flex-shrink: 0;
+}
+
+/* Risk items inside IE detail */
+.org-ie-risk-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+.org-ie-risk-item:hover {
+    background: #fef2f2;
+    color: inherit;
+}
+.org-ie-risk-desc {
+    font-size: 9px;
+    font-weight: 500;
+    color: #374151;
+    flex-grow: 1;
+    line-height: 1.2;
+}
+
 /* Risk list */
 .org-risk-list {
     background: #fff;
@@ -279,7 +501,7 @@ function renderNodo($nodo, $depth = 0) {
     border-radius: 10px;
     padding: 4px;
     margin-top: 4px;
-    width: 240px;
+    width: 260px;
     box-shadow: 0 4px 12px rgba(239,68,68,0.08);
     z-index: 3;
     position: relative;
@@ -386,7 +608,7 @@ function renderNodo($nodo, $depth = 0) {
             </div>
         <?php else: ?>
             <p class="text-muted small mb-2">
-                <i class="bi bi-info-circle me-1"></i>Click en <span class="org-ie-count" style="cursor:default;"><i class="bi bi-bullseye"></i> N</span> para ver IE asignadas, <span class="org-risk-count" style="cursor:default;"><i class="bi bi-exclamation-triangle"></i> N</span> para restricciones/riesgos, <span class="org-child-count" style="cursor:default;"><i class="bi bi-people"></i> N</span> para reportes directos.
+                <i class="bi bi-info-circle me-1"></i>Click en <span class="org-ie-count" style="cursor:default;"><i class="bi bi-bullseye"></i> N</span> para ver IE asignadas (y explotar cada una), <span class="org-risk-count" style="cursor:default;"><i class="bi bi-exclamation-triangle"></i> N</span> para restricciones/riesgos, <span class="org-child-count" style="cursor:default;"><i class="bi bi-people"></i> N</span> para reportes directos.
             </p>
             <div class="org-wrapper">
                 <div class="org-tree">

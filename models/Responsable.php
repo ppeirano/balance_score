@@ -112,6 +112,43 @@ class Responsable {
             $riesgosByResp[$row['responsable']][] = $row;
         }
 
+        // PDAs por IE y owner (para explotar IE)
+        $pdaByIEOwner = [];
+        $stmtPDA = $pdo->query("
+            SELECT pa.id, pa.nombre, pa.avance, pa.estado, pa.iniciativa_id, pa.owner
+            FROM planes_accion pa
+            WHERE pa.owner IS NOT NULL AND pa.owner != ''
+            ORDER BY pa.nombre
+        ");
+        foreach ($stmtPDA->fetchAll() as $row) {
+            $pdaByIEOwner[$row['owner']][$row['iniciativa_id']][] = $row;
+        }
+
+        // Riesgos abiertos por IE (para explotar IE)
+        $riesgosByIE = [];
+        $stmtRI = $pdo->query("
+            SELECT r.id, r.descripcion, r.nivel, r.iniciativa_id
+            FROM riesgos r
+            WHERE r.estado = 'abierto' AND r.iniciativa_id IS NOT NULL
+            ORDER BY FIELD(r.nivel, 'critico', 'alto', 'medio', 'bajo')
+        ");
+        foreach ($stmtRI->fetchAll() as $row) {
+            $riesgosByIE[$row['iniciativa_id']][] = $row;
+        }
+
+        // KPIs activos por IE (para explotar IE)
+        $kpisByIE = [];
+        $stmtK = $pdo->query("
+            SELECT k.id, k.nombre, k.valor_actual, k.meta, k.unidad, k.estado_semaforo,
+                   k.es_entero, k.tipo, k.valor_cualitativo, k.iniciativa_id
+            FROM kpis k
+            WHERE k.activo = 1 AND k.iniciativa_id IS NOT NULL
+            ORDER BY k.nombre
+        ");
+        foreach ($stmtK->fetchAll() as $row) {
+            $kpisByIE[$row['iniciativa_id']][] = $row;
+        }
+
         // Construir árbol
         $byId = [];
         foreach ($todos as &$r) {
@@ -119,6 +156,9 @@ class Responsable {
             $ies = $ieByResp[$r['nombre']] ?? [];
             foreach ($ies as &$ie) {
                 $ie['avance'] = $avanceByIE[$ie['id']] ?? 0;
+                $ie['planes'] = $pdaByIEOwner[$r['nombre']][$ie['id']] ?? [];
+                $ie['riesgos_ie'] = $riesgosByIE[$ie['id']] ?? [];
+                $ie['kpis'] = $kpisByIE[$ie['id']] ?? [];
             }
             $r['iniciativas'] = array_values($ies);
             $r['riesgos'] = $riesgosByResp[$r['nombre']] ?? [];
