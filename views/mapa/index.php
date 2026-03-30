@@ -36,12 +36,20 @@ $relaciones = $pdo->query("
     ORDER BY io.orden ASC
 ")->fetchAll();
 
-// Calcular avance por IE
+// Calcular avance por IE + cargar PDAs por IE
 $avanceByIE = [];
-foreach ($iniciativas as $ie) {
-    $stmt = $pdo->prepare("SELECT avance, peso FROM planes_accion WHERE iniciativa_id = ?");
-    $stmt->execute([$ie['id']]);
-    $pdas = $stmt->fetchAll();
+$pdaByIE = [];
+$allPdas = $pdo->query("
+    SELECT pa.id, pa.nombre, pa.avance, pa.estado, pa.peso, pa.iniciativa_id
+    FROM planes_accion pa
+    ORDER BY pa.nombre
+")->fetchAll();
+$grouped = [];
+foreach ($allPdas as $pda) {
+    $grouped[$pda['iniciativa_id']][] = $pda;
+}
+foreach ($grouped as $ieId => $pdas) {
+    $pdaByIE[$ieId] = $pdas;
     $pesoTotal = array_sum(array_column($pdas, 'peso'));
     $avance = 0;
     if ($pesoTotal > 0) {
@@ -49,7 +57,19 @@ foreach ($iniciativas as $ie) {
             $avance += ($pda['avance'] * $pda['peso'] / $pesoTotal);
         }
     }
-    $avanceByIE[$ie['id']] = round($avance);
+    $avanceByIE[$ieId] = round($avance);
+}
+
+// Riesgos abiertos por IE
+$riesgosByIE = [];
+$stmtRiesgos = $pdo->query("
+    SELECT r.id, r.descripcion, r.nivel, r.iniciativa_id
+    FROM riesgos r
+    WHERE r.estado = 'abierto' AND r.iniciativa_id IS NOT NULL
+    ORDER BY FIELD(r.nivel, 'critico', 'alto', 'medio', 'bajo')
+");
+foreach ($stmtRiesgos->fetchAll() as $row) {
+    $riesgosByIE[$row['iniciativa_id']][] = $row;
 }
 
 require_once __DIR__ . '/../layout/header.php';
@@ -79,7 +99,8 @@ require_once __DIR__ . '/../layout/header.php';
     padding: 16px 14px 12px;
     text-align: center;
     min-width: 160px;
-    max-width: 220px;
+    max-width: 260px;
+    width: 100%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     border-top: 3px solid transparent;
     transition: all 0.2s ease;
@@ -130,6 +151,140 @@ require_once __DIR__ . '/../layout/header.php';
     color: #d1d5db;
     font-size: 1.2rem;
 }
+
+/* IE Wrapper para expand */
+.mapa-ie-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 160px;
+    max-width: 260px;
+}
+.mapa-ie-expandable {
+    cursor: pointer;
+}
+.mapa-ie-expandable:hover .mapa-ie-toggle i {
+    transform: translateY(1px);
+}
+.mapa-ie-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 6px;
+    font-size: 9px;
+    color: #9ca3af;
+    transition: color 0.15s;
+}
+.mapa-ie-toggle i {
+    font-size: 10px;
+    transition: transform 0.2s;
+}
+[aria-expanded="true"] .mapa-ie-toggle i {
+    transform: rotate(180deg) !important;
+}
+.mapa-ie-expandable:hover .mapa-ie-toggle {
+    color: #6b7280;
+}
+
+/* Detail panel */
+.mapa-ie-detail {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px;
+    margin-top: 6px;
+    width: 260px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+}
+.mapa-detail-section {
+    margin-bottom: 6px;
+}
+.mapa-detail-section:last-of-type {
+    margin-bottom: 4px;
+}
+.mapa-detail-title {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9ca3af;
+    padding: 3px 6px;
+    margin-bottom: 2px;
+}
+.mapa-detail-title i {
+    font-size: 9px;
+    margin-right: 3px;
+}
+.mapa-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.12s;
+}
+.mapa-detail-item:hover {
+    background: #f8fafc;
+    color: inherit;
+}
+.mapa-detail-name {
+    font-size: 10px;
+    font-weight: 500;
+    color: #374151;
+    flex: 1;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mapa-detail-progress {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+}
+.mapa-detail-progress small {
+    font-size: 9px;
+    font-weight: 600;
+    color: #6b7280;
+}
+.mapa-detail-nivel {
+    font-size: 8px;
+    font-weight: 700;
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+}
+.mapa-detail-item .badge-neutral,
+.mapa-detail-item .badge-info,
+.mapa-detail-item .badge-ok,
+.mapa-detail-item .badge-bad,
+.mapa-detail-item .badge-warn {
+    font-size: 8px;
+    padding: 1px 6px;
+    flex-shrink: 0;
+}
+.mapa-detail-link {
+    display: block;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    color: #3b82f6;
+    text-decoration: none;
+    padding: 5px 0 2px;
+    border-top: 1px solid #f3f4f6;
+    margin-top: 4px;
+    transition: color 0.15s;
+}
+.mapa-detail-link:hover {
+    color: #1d4ed8;
+}
 </style>
 
 <!-- Mapa Estratégico -->
@@ -149,20 +304,80 @@ require_once __DIR__ . '/../layout/header.php';
                         <?php foreach ($iesPersp as $ie):
                             $avance = $avanceByIE[$ie['id']] ?? 0;
                             $barColor = $avance >= 70 ? '#22c55e' : ($avance >= 40 ? '#f59e0b' : '#ef4444');
+                            $iePlanes = $pdaByIE[$ie['id']] ?? [];
+                            $ieRiesgos = $riesgosByIE[$ie['id']] ?? [];
+                            $hasDetail = !empty($iePlanes) || !empty($ieRiesgos);
+                            $collapseId = 'mapaIE' . (int)$ie['id'];
                         ?>
-                            <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>"
-                               class="mapa-ie-card" style="border-top-color: <?= sanitize($ie['perspectiva_color']) ?>;">
-                                <span class="ie-code" style="background-color: <?= sanitize($ie['perspectiva_color']) ?>;">
-                                    <?= sanitize($ie['codigo']) ?>
-                                </span>
-                                <div class="ie-name"><?= sanitize($ie['nombre']) ?></div>
-                                <div class="ie-avance">
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: <?= $avance ?>%; background-color: <?= $barColor ?>;"></div>
+                            <div class="mapa-ie-wrapper">
+                                <div class="mapa-ie-card <?= $hasDetail ? 'mapa-ie-expandable' : '' ?>"
+                                     style="border-top-color: <?= sanitize($ie['perspectiva_color']) ?>;"
+                                     <?php if ($hasDetail): ?>data-bs-toggle="collapse" data-bs-target="#<?= $collapseId ?>" role="button"<?php endif; ?>>
+                                    <span class="ie-code" style="background-color: <?= sanitize($ie['perspectiva_color']) ?>;">
+                                        <?= sanitize($ie['codigo']) ?>
+                                    </span>
+                                    <div class="ie-name"><?= sanitize($ie['nombre']) ?></div>
+                                    <div class="ie-avance">
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: <?= $avance ?>%; background-color: <?= $barColor ?>;"></div>
+                                        </div>
+                                        <small><?= $avance ?>%</small>
                                     </div>
-                                    <small><?= $avance ?>%</small>
+                                    <?php if ($hasDetail): ?>
+                                        <div class="mapa-ie-toggle">
+                                            <i class="bi bi-chevron-down"></i>
+                                            <span><?= count($iePlanes) ?> planes · <?= count($ieRiesgos) ?> riesgos</span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                            </a>
+
+                                <?php if ($hasDetail): ?>
+                                <div class="collapse" id="<?= $collapseId ?>">
+                                    <div class="mapa-ie-detail">
+                                        <?php if (!empty($iePlanes)): ?>
+                                        <div class="mapa-detail-section">
+                                            <div class="mapa-detail-title"><i class="bi bi-clipboard-check"></i> Planes de Acción</div>
+                                            <?php foreach ($iePlanes as $pda):
+                                                $pdaAvance = (int)$pda['avance'];
+                                                $pdaColor = $pdaAvance >= 70 ? '#22c55e' : ($pdaAvance >= 40 ? '#f59e0b' : '#ef4444');
+                                            ?>
+                                                <a href="<?= BASE_URL ?>index.php?page=planes&action=detalle&id=<?= (int)$pda['id'] ?>" class="mapa-detail-item">
+                                                    <span class="mapa-detail-name"><?= sanitize(mb_substr($pda['nombre'], 0, 50)) ?></span>
+                                                    <div class="mapa-detail-progress">
+                                                        <div class="progress" style="width:40px;height:3px;">
+                                                            <div class="progress-bar" style="width:<?= $pdaAvance ?>%;background-color:<?= $pdaColor ?>;"></div>
+                                                        </div>
+                                                        <small><?= $pdaAvance ?>%</small>
+                                                    </div>
+                                                    <?= estadoBadge($pda['estado']) ?>
+                                                </a>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($ieRiesgos)): ?>
+                                        <div class="mapa-detail-section">
+                                            <div class="mapa-detail-title"><i class="bi bi-exclamation-triangle"></i> Restricciones y Riesgos</div>
+                                            <?php
+                                            $nivelColors = ['critico' => '#ef4444', 'alto' => '#f59e0b', 'medio' => '#3b82f6', 'bajo' => '#22c55e'];
+                                            foreach ($ieRiesgos as $riesgo):
+                                                $nColor = $nivelColors[$riesgo['nivel']] ?? '#6b7280';
+                                            ?>
+                                                <a href="<?= BASE_URL ?>index.php?page=riesgos&action=editar&id=<?= (int)$riesgo['id'] ?>" class="mapa-detail-item">
+                                                    <span class="mapa-detail-nivel" style="background-color:<?= $nColor ?>;"><?= ucfirst($riesgo['nivel']) ?></span>
+                                                    <span class="mapa-detail-name"><?= sanitize(mb_substr($riesgo['descripcion'], 0, 55)) ?></span>
+                                                </a>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <?php endif; ?>
+
+                                        <a href="<?= BASE_URL ?>index.php?page=iniciativas&action=detalle&id=<?= (int)$ie['id'] ?>" class="mapa-detail-link">
+                                            <i class="bi bi-box-arrow-up-right"></i> Ver IE completa
+                                        </a>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="text-muted small py-2">Sin iniciativas en esta perspectiva</div>
