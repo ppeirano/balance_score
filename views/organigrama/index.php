@@ -432,6 +432,7 @@ document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(el) {
     var target = document.querySelector(el.getAttribute('data-bs-target'));
     if (target) {
         target.addEventListener('shown.bs.collapse', function() { setTimeout(drawOrgRails, 50); });
+        target.addEventListener('hidden.bs.collapse', function() { setTimeout(drawOrgRails, 50); });
     }
 });
 </script>
