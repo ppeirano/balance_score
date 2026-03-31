@@ -354,15 +354,17 @@ class ClaudeApi {
             return self::extraerTextoDePptBinario($filePath);
         }
 
-        $zip = new ZipArchive();
-        if ($zip->open($filePath) !== true) return false;
+        // Leer archivo dentro del zip usando zip:// stream wrapper
+        $leerZip = function($entry) use ($filePath) {
+            $path = 'zip://' . $filePath . '#' . $entry;
+            return @file_get_contents($path);
+        };
 
         $texto = '';
 
         if (strpos($mimeType, 'presentation') !== false) {
-            // PPTX: extraer texto de cada slide
             for ($i = 1; $i <= 100; $i++) {
-                $xml = $zip->getFromName("ppt/slides/slide{$i}.xml");
+                $xml = $leerZip("ppt/slides/slide{$i}.xml");
                 if ($xml === false) break;
                 $texto .= "--- Slide {$i} ---\n";
                 preg_match_all('/<a:t>(.*?)<\/a:t>/s', $xml, $matches);
@@ -371,15 +373,14 @@ class ClaudeApi {
                 }
             }
         } elseif (strpos($mimeType, 'spreadsheet') !== false) {
-            // XLSX: extraer shared strings y sheet data
             $sharedStrings = [];
-            $ssXml = $zip->getFromName('xl/sharedStrings.xml');
+            $ssXml = $leerZip('xl/sharedStrings.xml');
             if ($ssXml) {
                 preg_match_all('/<t[^>]*>(.*?)<\/t>/s', $ssXml, $matches);
                 $sharedStrings = $matches[1] ?? [];
             }
             for ($i = 1; $i <= 20; $i++) {
-                $xml = $zip->getFromName("xl/worksheets/sheet{$i}.xml");
+                $xml = $leerZip("xl/worksheets/sheet{$i}.xml");
                 if ($xml === false) break;
                 $texto .= "--- Hoja {$i} ---\n";
                 preg_match_all('/<row[^>]*>(.*?)<\/row>/s', $xml, $rows);
@@ -388,7 +389,6 @@ class ClaudeApi {
                     preg_match_all('/<c[^>]*(?:t="s"[^>]*)?>.*?<v>(.*?)<\/v>/s', $rowXml, $cells, PREG_SET_ORDER);
                     foreach ($cells as $cell) {
                         $val = $cell[1];
-                        // Si es referencia a shared string
                         if (strpos($cell[0], 't="s"') !== false && isset($sharedStrings[(int)$val])) {
                             $val = $sharedStrings[(int)$val];
                         }
@@ -399,7 +399,6 @@ class ClaudeApi {
             }
         }
 
-        $zip->close();
         return $texto ?: false;
     }
 
