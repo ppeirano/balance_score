@@ -211,6 +211,10 @@ class ClaudeApi {
     }
 
     static function llamarApi($prompt) {
+        return self::llamarApiMultimodal([['type' => 'text', 'text' => $prompt]]);
+    }
+
+    static function llamarApiMultimodal($contentBlocks) {
         if (empty(CLAUDE_API_KEY)) {
             return false;
         }
@@ -221,7 +225,7 @@ class ClaudeApi {
             'model' => 'claude-sonnet-4-20250514',
             'max_tokens' => 4096,
             'messages' => [
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $contentBlocks]
             ]
         ];
 
@@ -252,6 +256,91 @@ class ClaudeApi {
         }
 
         return false;
+    }
+
+    static function extraerKpisDeDocumento($pdo, $filePath, $mimeType) {
+        // Cargar KPIs activos
+        $kpis = $pdo->query("
+            SELECT id, nombre, tipo, unidad, meta, valor_actual, es_entero, direccion, iniciativa_id
+            FROM kpis WHERE activo = 1 ORDER BY nombre
+        ")->fetchAll();
+
+        if (empty($kpis)) return ['error' => 'No hay KPIs activos en el sistema.'];
+
+        $kpisJson = json_encode($kpis, JSON_UNESCAPED_UNICODE);
+
+        $promptText = "Eres un analista de datos experto. Te envio un documento y una lista de KPIs del sistema.\n"
+            . "Analiza el documento y extrae los valores que correspondan a cada KPI.\n\n"
+            . "KPIS DEL SISTEMA:\n" . $kpisJson . "\n\n"
+            . "INSTRUCCIONES:\n"
+            . "- Busca valores que correspondan a cada KPI por nombre o concepto similar\n"
+            . "- Si encontras una serie temporal (varios meses/periodos), inclui todos los valores con su fecha\n"
+            . "- Para cada valor encontrado indica el periodo como fecha YYYY-MM-DD (primer dia del mes si es mensual)\n"
+            . "- Indica tu nivel de confianza: \"alta\" (match exacto), \"media\" (match por concepto), \"baja\" (inferido)\n"
+            . "- Si no encontras un KPI en el documento, no lo incluyas\n"
+            . "- Los valores numericos deben ser numeros (sin separador de miles, punto como decimal)\n\n"
+            . "Responde SOLO con un JSON valido, sin markdown, sin texto adicional:\n"
+            . "{\"propuestas\": [{\"kpi_id\": 5, \"kpi_nombre\": \"Nombre\", \"valores\": [{\"valor\": 17.6, \"periodo\": \"2026-02-01\", \"observaciones\": \"Fuente en el doc\", \"confianza\": \"alta\"}]}]}";
+
+        // Construir content blocks
+        $contentBlocks = [];
+
+        if (str_starts_with($mimeType, 'text/') || $mimeType === 'application/csv') {
+            // CSV/texto: leer como texto
+            $texto = file_get_contents($filePath);
+            $contentBlocks[] = ['type' => 'text', 'text' => "CONTENIDO DEL DOCUMENTO:\n" . $texto];
+        } elseif ($mimeType === 'application/pdf') {
+            // PDF: enviar como document base64
+            $base64 = base64_encode(file_get_contents($filePath));
+            $contentBlocks[] = [
+                'type' => 'document',
+                'source' => ['type' => 'base64', 'media_type' => 'application/pdf', 'data' => $base64]
+            ];
+        } elseif (str_starts_with($mimeType, 'image/')) {
+            // Imagen: enviar como image base64
+            $base64 = base64_encode(file_get_contents($filePath));
+            $contentBlocks[] = [
+                'type' => 'image',
+                'source' => ['type' => 'base64', 'media_type' => $mimeType, 'data' => $base64]
+            ];
+        } else {
+            return ['error' => 'Formato de archivo no soportado: ' . $mimeType];
+        }
+
+        $contentBlocks[] = ['type' => 'text', 'text' => $promptText];
+
+        $respuesta = self::llamarApiMultimodal($contentBlocks);
+
+        if ($respuesta === false) {
+            return ['error' => 'Error al comunicarse con la API de Claude. Verifica la API key.'];
+        }
+
+        // Limpiar respuesta (a veces Claude envuelve en ```json ... ```)
+        $respuesta = trim($respuesta);
+        $respuesta = preg_replace('/^```json\s*/i', '', $respuesta);
+        $respuesta = preg_replace('/\s*```$/', '', $respuesta);
+
+        $parsed = json_decode($respuesta, true);
+        if (!$parsed || !isset($parsed['propuestas'])) {
+            return ['error' => 'No se pudo interpretar la respuesta de la IA.', 'raw' => $respuesta];
+        }
+
+        // Enriquecer con datos del KPI actual
+        $kpisById = [];
+        foreach ($kpis as $k) { $kpisById[$k['id']] = $k; }
+
+        foreach ($parsed['propuestas'] as &$prop) {
+            $kpiData = $kpisById[$prop['kpi_id']] ?? null;
+            if ($kpiData) {
+                $prop['valor_actual'] = $kpiData['valor_actual'];
+                $prop['unidad'] = $kpiData['unidad'];
+                $prop['meta'] = $kpiData['meta'];
+                $prop['es_entero'] = $kpiData['es_entero'];
+            }
+        }
+        unset($prop);
+
+        return $parsed;
     }
 
     static function getHistorial($pdo) {

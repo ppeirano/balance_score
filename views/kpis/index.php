@@ -19,7 +19,10 @@ if ($filtroTipo) {
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<div class="d-flex justify-content-end align-items-center mb-4">
+<div class="d-flex justify-content-end align-items-center gap-2 mb-4">
+    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalCargarDoc">
+        <i class="bi bi-file-earmark-arrow-up me-1"></i>Cargar desde documento
+    </button>
     <a href="<?= BASE_URL ?>index.php?page=kpis&action=crear<?= $filtroIE ? '&filtro_ie=' . (int)$filtroIE : '' ?><?= $filtroTipo ? '&filtro_tipo=' . urlencode($filtroTipo) : '' ?>" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo KPI
     </a>
@@ -161,5 +164,40 @@ require_once __DIR__ . '/../layout/header.php';
     <a href="<?= BASE_URL ?>index.php?page=kpis&action=crear">Crear el primero</a>.
 </div>
 <?php endif; ?>
+
+<!-- Modal Cargar desde documento -->
+<div class="modal fade" id="modalCargarDoc" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="<?= BASE_URL ?>index.php?page=kpis&action=procesar_documento" enctype="multipart/form-data" id="formCargarDoc">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-robot me-2"></i>Cargar KPIs desde documento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Subi un documento con datos de KPIs. La IA va a analizar el contenido y proponer valores para cargar.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Documento</label>
+                        <input type="file" class="form-control" name="documento" accept=".pdf,.png,.jpg,.jpeg,.csv,.txt" required>
+                        <small class="text-muted">PDF, imagen (PNG/JPG), CSV o texto. Max 10MB.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnAnalizar">
+                        <i class="bi bi-cpu me-1"></i>Analizar documento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('formCargarDoc').addEventListener('submit', function() {
+    var btn = document.getElementById('btnAnalizar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Analizando...';
+});
+</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

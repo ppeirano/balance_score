@@ -298,6 +298,79 @@ switch ($page) {
                 if (!empty($_POST['tipo'])) $filtros[] = 'tipo=' . urlencode($_POST['tipo']);
                 redirect('index.php?page=kpis' . ($filtros ? '&' . implode('&', $filtros) : ''));
                 break;
+            case 'procesar_documento':
+                if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_FILES['documento'])) {
+                    flash('warning', 'No se recibió ningún documento.');
+                    redirect('index.php?page=kpis');
+                    break;
+                }
+                $archivo = $_FILES['documento'];
+                if ($archivo['error'] !== UPLOAD_ERR_OK) {
+                    flash('danger', 'Error al subir el archivo.');
+                    redirect('index.php?page=kpis');
+                    break;
+                }
+                if ($archivo['size'] > 10 * 1024 * 1024) {
+                    flash('danger', 'El archivo supera el límite de 10MB.');
+                    redirect('index.php?page=kpis');
+                    break;
+                }
+                $allowedTypes = [
+                    'application/pdf', 'image/png', 'image/jpeg', 'image/jpg',
+                    'text/csv', 'text/plain',
+                    'application/vnd.ms-excel', 'application/csv'
+                ];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_file($finfo, $archivo['tmp_name']);
+                finfo_close($finfo);
+                if (!in_array($mimeType, $allowedTypes)) {
+                    flash('danger', 'Formato de archivo no soportado. Usá PDF, imagen (PNG/JPG), CSV o texto.');
+                    redirect('index.php?page=kpis');
+                    break;
+                }
+                require_once __DIR__ . '/models/ClaudeApi.php';
+                $resultado = ClaudeApi::extraerKpisDeDocumento($pdo, $archivo['tmp_name'], $mimeType);
+                if ($resultado === false) {
+                    $_SESSION['kpi_propuestas'] = [];
+                    $_SESSION['kpi_propuestas_error'] = 'Error al comunicarse con la IA. Verificá que la API key esté configurada.';
+                } else {
+                    $_SESSION['kpi_propuestas'] = $resultado;
+                    $_SESSION['kpi_propuestas_error'] = null;
+                }
+                require __DIR__ . '/views/kpis/revision_ia.php';
+                unset($_SESSION['kpi_propuestas'], $_SESSION['kpi_propuestas_error']);
+                break;
+            case 'confirmar_ia':
+                if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                    redirect('index.php?page=kpis');
+                    break;
+                }
+                require_once __DIR__ . '/models/Kpi.php';
+                $valoresSeleccionados = $_POST['valores'] ?? [];
+                $dataRows = $_POST['data'] ?? [];
+                $count = 0;
+                foreach ($dataRows as $idx => $row) {
+                    if (!isset($valoresSeleccionados[$idx])) continue;
+                    $kpiId = (int)($row['kpi_id'] ?? 0);
+                    $valor = $row['valor'] ?? '';
+                    $periodo = $row['periodo'] ?? '';
+                    $observaciones = $row['observaciones'] ?? '';
+                    if (!$kpiId || $valor === '') continue;
+                    Kpi::registrarValor($pdo, [
+                        'kpi_id' => $kpiId,
+                        'valor' => $valor,
+                        'periodo' => $periodo,
+                        'observaciones' => $observaciones
+                    ]);
+                    $count++;
+                }
+                if ($count > 0) {
+                    flash('success', $count . ' valor' . ($count > 1 ? 'es' : '') . ' de KPI registrado' . ($count > 1 ? 's' : '') . ' correctamente.');
+                } else {
+                    flash('warning', 'No se seleccionó ningún valor para registrar.');
+                }
+                redirect('index.php?page=kpis');
+                break;
             default:
                 require __DIR__ . '/views/kpis/index.php';
         }
