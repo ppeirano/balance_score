@@ -306,7 +306,13 @@ class ClaudeApi {
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ])) {
             $texto = self::extraerTextoDeOffice($filePath, $mimeType);
-            if (!$texto) return ['error' => 'No se pudo extraer texto del archivo Office.'];
+            if (!$texto) {
+                // Debug: intentar leer primeros bytes para verificar que es ZIP
+                $header = bin2hex(substr(file_get_contents($filePath, false, null, 0, 4), 0, 4));
+                $fsize = filesize($filePath);
+                $entries = self::listarEntradasZip($filePath);
+                return ['error' => "No se pudo extraer texto del archivo Office. Debug: header=$header, size=$fsize, entries=" . implode(', ', array_slice($entries, 0, 10))];
+            }
             $contentBlocks[] = ['type' => 'text', 'text' => "CONTENIDO DEL DOCUMENTO:\n" . $texto];
         } else {
             return ['error' => 'Formato de archivo no soportado: ' . $mimeType];
@@ -424,6 +430,32 @@ class ClaudeApi {
         }
 
         return $texto ?: false;
+    }
+
+    static function listarEntradasZip($filePath) {
+        $entries = [];
+        $fh = @fopen($filePath, 'rb');
+        if (!$fh) return ['fopen_failed'];
+        while (!feof($fh)) {
+            $sig = fread($fh, 4);
+            if ($sig !== "PK\x03\x04") break;
+            $raw = fread($fh, 26);
+            if (strlen($raw) < 26) break;
+            $header = unpack('vversion/vflags/vmethod/vmtime/vmdate/Vcrc/Vcsize/Vsize/vnamelen/vextralen', $raw);
+            $name = fread($fh, $header['namelen']);
+            $entries[] = $name . '(' . $header['csize'] . ')';
+            if ($header['extralen'] > 0) fread($fh, $header['extralen']);
+            // Si csize es 0 y hay data descriptor flag, no podemos avanzar fácilmente
+            if ($header['csize'] == 0 && ($header['flags'] & 0x08)) {
+                $entries[] = 'DATA_DESC_FLAG';
+                break;
+            }
+            if ($header['csize'] > 0) {
+                fseek($fh, $header['csize'], SEEK_CUR);
+            }
+        }
+        fclose($fh);
+        return $entries;
     }
 
     static function extraerTextoDePptBinario($filePath) {
