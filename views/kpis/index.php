@@ -226,7 +226,17 @@ function procesarDocumento() {
         method: 'POST',
         body: formData
     })
-    .then(function(r) { return r.json(); })
+    .then(function(r) {
+        if (!r.ok) {
+            return r.text().then(function(txt) {
+                throw new Error('HTTP ' + r.status + ': ' + txt.substring(0, 300));
+            });
+        }
+        return r.text().then(function(txt) {
+            try { return JSON.parse(txt); }
+            catch(e) { throw new Error('Respuesta no válida: ' + txt.substring(0, 300)); }
+        });
+    })
     .then(function(data) {
         if (data.error) {
             mostrarError(data.error);
@@ -237,7 +247,7 @@ function procesarDocumento() {
         }
     })
     .catch(function(err) {
-        mostrarError('Error de conexión. Intentá de nuevo.');
+        mostrarError(err.message || 'Error de conexión. Intentá de nuevo.');
     });
 }
 
