@@ -349,18 +349,22 @@ class ClaudeApi {
     }
 
     static function extraerTextoDeOffice($filePath, $mimeType) {
+        // PPT binario (formato antiguo): extraer strings legibles
+        if ($mimeType === 'application/vnd.ms-powerpoint') {
+            return self::extraerTextoDePptBinario($filePath);
+        }
+
         $zip = new ZipArchive();
         if ($zip->open($filePath) !== true) return false;
 
         $texto = '';
 
-        if (strpos($mimeType, 'presentation') !== false || strpos($mimeType, 'powerpoint') !== false) {
+        if (strpos($mimeType, 'presentation') !== false) {
             // PPTX: extraer texto de cada slide
             for ($i = 1; $i <= 100; $i++) {
                 $xml = $zip->getFromName("ppt/slides/slide{$i}.xml");
                 if ($xml === false) break;
                 $texto .= "--- Slide {$i} ---\n";
-                // Extraer texto de tags <a:t>
                 preg_match_all('/<a:t>(.*?)<\/a:t>/s', $xml, $matches);
                 if (!empty($matches[1])) {
                     $texto .= implode(' ', $matches[1]) . "\n";
@@ -397,6 +401,36 @@ class ClaudeApi {
 
         $zip->close();
         return $texto ?: false;
+    }
+
+    static function extraerTextoDePptBinario($filePath) {
+        $content = file_get_contents($filePath);
+        if (!$content) return false;
+
+        // Extraer strings UTF-16LE (formato interno de PPT binario)
+        $texto = '';
+        $lines = [];
+        // Buscar secuencias de caracteres UTF-16LE (byte + \x00)
+        preg_match_all('/(?:[\x20-\x7E]\x00){4,}/', $content, $matches);
+        foreach ($matches[0] as $match) {
+            $str = mb_convert_encoding($match, 'UTF-8', 'UTF-16LE');
+            $str = trim($str);
+            if (strlen($str) >= 3 && !preg_match('/^[\x00-\x1F\x80-\x9F]+$/', $str)) {
+                $lines[] = $str;
+            }
+        }
+
+        // Deduplicar líneas consecutivas iguales
+        $prev = '';
+        $filtered = [];
+        foreach ($lines as $line) {
+            if ($line !== $prev) {
+                $filtered[] = $line;
+                $prev = $line;
+            }
+        }
+
+        return $filtered ? implode("\n", $filtered) : false;
     }
 
     static function getHistorial($pdo) {

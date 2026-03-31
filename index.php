@@ -335,17 +335,19 @@ switch ($page) {
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mimeType = finfo_file($finfo, $archivo['tmp_name']);
                 finfo_close($finfo);
-                // Fallback: detectar por extensión si finfo da application/zip (pptx/xlsx son zips)
+                // Fallback: detectar por extensión cuando finfo no identifica bien archivos Office
                 $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-                if ($mimeType === 'application/zip') {
-                    $extMap = [
-                        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    ];
-                    if (isset($extMap[$ext])) $mimeType = $extMap[$ext];
+                $extMap = [
+                    'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'ppt' => 'application/vnd.ms-powerpoint',
+                    'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'xls' => 'application/vnd.ms-excel',
+                ];
+                if (isset($extMap[$ext]) && !in_array($mimeType, $allowedTypes)) {
+                    $mimeType = $extMap[$ext];
                 }
                 if (!in_array($mimeType, $allowedTypes)) {
-                    $respondError('Formato de archivo no soportado. Usá PDF, imagen (PNG/JPG), CSV, texto, PPTX o XLSX.');
+                    $respondError('Formato de archivo no soportado (' . $mimeType . ', ext: .' . $ext . '). Usá PDF, imagen, CSV, texto, PowerPoint o Excel.');
                     break;
                 }
                 require_once __DIR__ . '/models/ClaudeApi.php';
