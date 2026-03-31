@@ -106,6 +106,7 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
                             <option value="">Sin unidad</option>
                             <option value="%" <?= ($kpi['unidad'] ?? '') === '%' ? 'selected' : '' ?>>%</option>
                             <option value="USD" <?= ($kpi['unidad'] ?? '') === 'USD' ? 'selected' : '' ?>>USD</option>
+                            <option value="ARS" <?= ($kpi['unidad'] ?? '') === 'ARS' ? 'selected' : '' ?>>ARS</option>
                             <option value="unidades" <?= ($kpi['unidad'] ?? '') === 'unidades' ? 'selected' : '' ?>>unidades</option>
                             <option value="índice" <?= ($kpi['unidad'] ?? '') === 'índice' ? 'selected' : '' ?>>índice</option>
                         </select>
