@@ -306,12 +306,11 @@ class ClaudeApi {
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ])) {
             $texto = self::extraerTextoDeOffice($filePath, $mimeType);
+            if ($texto === 'encrypted') {
+                return ['error' => 'El archivo está protegido con contraseña. Por favor subí una versión sin contraseña o exportalo como PDF.'];
+            }
             if (!$texto) {
-                // Debug: intentar leer primeros bytes para verificar que es ZIP
-                $header = bin2hex(substr(file_get_contents($filePath, false, null, 0, 4), 0, 4));
-                $fsize = filesize($filePath);
-                $entries = self::listarEntradasZip($filePath);
-                return ['error' => "No se pudo extraer texto del archivo Office. Debug: header=$header, size=$fsize, entries=" . implode(', ', array_slice($entries, 0, 10))];
+                return ['error' => 'No se pudo extraer texto del archivo Office. Probá exportándolo como PDF.'];
             }
             $contentBlocks[] = ['type' => 'text', 'text' => "CONTENIDO DEL DOCUMENTO:\n" . $texto];
         } else {
@@ -360,34 +359,66 @@ class ClaudeApi {
             return self::extraerTextoDePptBinario($filePath);
         }
 
-        // Leer entry de un zip manualmente (sin ZipArchive ni ext-zip)
+        // Verificar si el ZIP está encriptado
+        $fhCheck = @fopen($filePath, 'rb');
+        if ($fhCheck) {
+            $sig = fread($fhCheck, 4);
+            if ($sig === "PK\x03\x04") {
+                $hdr = unpack('vversion/vflags', fread($fhCheck, 4));
+                if ($hdr['flags'] & 0x01) {
+                    fclose($fhCheck);
+                    return 'encrypted';
+                }
+            }
+            fclose($fhCheck);
+        }
+
+        // Leer entries usando central directory (más confiable que local headers)
         $leerZip = function($entry) use ($filePath) {
             // Intentar zip:// stream wrapper primero
             $content = @file_get_contents('zip://' . $filePath . '#' . $entry);
             if ($content !== false) return $content;
 
-            // Fallback: parseo manual del formato ZIP
-            $fh = fopen($filePath, 'rb');
-            if (!$fh) return false;
-            $result = false;
-            while (!feof($fh)) {
-                $sig = fread($fh, 4);
-                if ($sig !== "PK\x03\x04") break;
-                $header = unpack('vversion/vflags/vmethod/vmtime/vmdate/Vcrc/Vcsize/Vsize/vnamelen/vextralen', fread($fh, 26));
-                $name = fread($fh, $header['namelen']);
-                if ($header['extralen'] > 0) fread($fh, $header['extralen']);
-                $compressed = fread($fh, $header['csize']);
-                if ($name === $entry) {
-                    if ($header['method'] === 0) {
-                        $result = $compressed;
-                    } elseif ($header['method'] === 8) {
-                        $result = @gzinflate($compressed);
-                    }
+            // Fallback: parseo manual usando central directory al final del archivo
+            $fileData = file_get_contents($filePath);
+            if ($fileData === false) return false;
+            $len = strlen($fileData);
+
+            // Buscar End of Central Directory record (PK\x05\x06)
+            $eocdPos = false;
+            for ($i = $len - 22; $i >= max(0, $len - 65557); $i--) {
+                if (substr($fileData, $i, 4) === "PK\x05\x06") {
+                    $eocdPos = $i;
                     break;
                 }
             }
-            fclose($fh);
-            return $result;
+            if ($eocdPos === false) return false;
+
+            $eocd = unpack('vdisk/vcdDisk/vcdEntries/vcdTotal/VcdSize/VcdOffset', substr($fileData, $eocdPos + 4, 16));
+            $pos = $eocd['cdOffset'];
+
+            // Recorrer central directory entries
+            for ($i = 0; $i < $eocd['cdTotal']; $i++) {
+                if (substr($fileData, $pos, 4) !== "PK\x01\x02") break;
+                $cd = unpack('vversionMade/vversionNeeded/vflags/vmethod/vmtime/vmdate/Vcrc/Vcsize/Vsize/vnamelen/vextralen/vcommentlen/vdisk/vintAttr/VextAttr/VlocalOffset', substr($fileData, $pos + 4, 42));
+                $name = substr($fileData, $pos + 46, $cd['namelen']);
+                $pos += 46 + $cd['namelen'] + $cd['extralen'] + $cd['commentlen'];
+
+                if ($name === $entry) {
+                    // Ir al local file header para leer los datos
+                    $lpos = $cd['localOffset'];
+                    if (substr($fileData, $lpos, 4) !== "PK\x03\x04") return false;
+                    $lh = unpack('vversion/vflags/vmethod/vmtime/vmdate/Vcrc/Vcsize/Vsize/vnamelen/vextralen', substr($fileData, $lpos + 4, 26));
+                    $dataStart = $lpos + 30 + $lh['namelen'] + $lh['extralen'];
+                    $csize = $cd['csize']; // Usar csize del central directory (más confiable)
+                    $compressed = substr($fileData, $dataStart, $csize);
+
+                    if ($cd['method'] === 0) return $compressed;
+                    if ($cd['method'] === 8) return @gzinflate($compressed);
+                    return false;
+                }
+            }
+            return false;
         };
 
         $texto = '';
