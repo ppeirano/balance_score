@@ -1,18 +1,11 @@
 <?php
-require_once __DIR__ . '/../layout/header.php';
+$propuestas = $_SESSION['kpi_propuestas']['propuestas'] ?? [];
+unset($_SESSION['kpi_propuestas']);
 
-$propuestas = $_SESSION['kpi_propuestas'] ?? [];
-$error = $_SESSION['kpi_propuestas_error'] ?? null;
+require_once __DIR__ . '/../layout/header.php';
 ?>
 
-<?php if ($error): ?>
-<div class="alert alert-warning">
-    <i class="bi bi-exclamation-triangle me-1"></i><?= sanitize($error) ?>
-</div>
-<a href="<?= BASE_URL ?>index.php?page=kpis" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-1"></i>Volver a KPIs
-</a>
-<?php elseif (empty($propuestas)): ?>
+<?php if (empty($propuestas)): ?>
 <div class="alert alert-info">
     <i class="bi bi-info-circle me-1"></i>La IA no encontro datos de KPIs en el documento subido.
 </div>

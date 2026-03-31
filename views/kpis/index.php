@@ -166,38 +166,96 @@ require_once __DIR__ . '/../layout/header.php';
 <?php endif; ?>
 
 <!-- Modal Cargar desde documento -->
-<div class="modal fade" id="modalCargarDoc" tabindex="-1">
+<div class="modal fade" id="modalCargarDoc" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="<?= BASE_URL ?>index.php?page=kpis&action=procesar_documento" enctype="multipart/form-data" id="formCargarDoc">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-robot me-2"></i>Cargar KPIs desde documento</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-muted small">Subi un documento con datos de KPIs. La IA va a analizar el contenido y proponer valores para cargar.</p>
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-robot me-2"></i>Cargar KPIs desde documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" id="btnCerrarModal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="pasoUpload">
+                    <p class="text-muted small">Subí un documento con datos de KPIs. La IA va a analizar el contenido y proponer valores para cargar.</p>
                     <div class="mb-3">
                         <label class="form-label">Documento</label>
-                        <input type="file" class="form-control" name="documento" accept=".pdf,.png,.jpg,.jpeg,.csv,.txt" required>
-                        <small class="text-muted">PDF, imagen (PNG/JPG), CSV o texto. Max 10MB.</small>
+                        <input type="file" class="form-control" id="inputDocumento" accept=".pdf,.png,.jpg,.jpeg,.csv,.txt" required>
+                        <small class="text-muted">PDF, imagen (PNG/JPG), CSV o texto. Máx 10MB.</small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="btnAnalizar">
-                        <i class="bi bi-cpu me-1"></i>Analizar documento
-                    </button>
+                <div id="pasoProcesando" class="d-none text-center py-4">
+                    <div class="spinner-border text-primary mb-3" role="status" style="width:3rem;height:3rem;"></div>
+                    <p class="fw-semibold mb-1">Analizando documento con IA...</p>
+                    <p class="text-muted small">Esto puede tardar hasta 1 minuto dependiendo del tamaño del archivo.</p>
                 </div>
-            </form>
+                <div id="pasoError" class="d-none">
+                    <div class="alert alert-danger mb-0">
+                        <i class="bi bi-exclamation-triangle me-1"></i><span id="errorMsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="footerUpload">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnAnalizar" onclick="procesarDocumento()">
+                    <i class="bi bi-cpu me-1"></i>Analizar documento
+                </button>
+            </div>
+            <div class="modal-footer d-none" id="footerError">
+                <button type="button" class="btn btn-secondary" onclick="resetModal()">Volver a intentar</button>
+            </div>
         </div>
     </div>
 </div>
 <script>
-document.getElementById('formCargarDoc').addEventListener('submit', function() {
-    var btn = document.getElementById('btnAnalizar');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Analizando...';
-});
+function procesarDocumento() {
+    var fileInput = document.getElementById('inputDocumento');
+    if (!fileInput.files.length) { alert('Seleccioná un archivo.'); return; }
+    var file = fileInput.files[0];
+    if (file.size > 10 * 1024 * 1024) { alert('El archivo excede 10MB.'); return; }
+
+    document.getElementById('pasoUpload').classList.add('d-none');
+    document.getElementById('footerUpload').classList.add('d-none');
+    document.getElementById('pasoError').classList.add('d-none');
+    document.getElementById('footerError').classList.add('d-none');
+    document.getElementById('pasoProcesando').classList.remove('d-none');
+    document.getElementById('btnCerrarModal').classList.add('d-none');
+
+    var formData = new FormData();
+    formData.append('documento', file);
+
+    fetch('<?= BASE_URL ?>index.php?page=kpis&action=procesar_documento', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.error) {
+            mostrarError(data.error);
+            return;
+        }
+        if (data.ok && data.redirect) {
+            window.location.href = data.redirect;
+        }
+    })
+    .catch(function(err) {
+        mostrarError('Error de conexión. Intentá de nuevo.');
+    });
+}
+
+function mostrarError(msg) {
+    document.getElementById('pasoProcesando').classList.add('d-none');
+    document.getElementById('pasoError').classList.remove('d-none');
+    document.getElementById('footerError').classList.remove('d-none');
+    document.getElementById('btnCerrarModal').classList.remove('d-none');
+    document.getElementById('errorMsg').textContent = msg;
+}
+
+function resetModal() {
+    document.getElementById('pasoError').classList.add('d-none');
+    document.getElementById('footerError').classList.add('d-none');
+    document.getElementById('pasoUpload').classList.remove('d-none');
+    document.getElementById('footerUpload').classList.remove('d-none');
+    document.getElementById('inputDocumento').value = '';
+}
 </script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

@@ -90,14 +90,14 @@ class Kpi {
         redirect('index.php?page=kpis' . ($filtros ? '&' . implode('&', $filtros) : ''));
     }
 
-    static function registrarValor($pdo, $data) {
-        // Insert into historial
+    static function registrarValorSilencioso($pdo, $data) {
         $stmt = $pdo->prepare("
             INSERT INTO kpi_historial (kpi_id, valor, valor_cualitativo, semaforo, periodo, observaciones)
             VALUES (?, ?, ?, ?, ?, ?)
         ");
 
         $kpi = self::getById($pdo, $data['kpi_id']);
+        if (!$kpi) return false;
         $semaforo = null;
 
         if ($kpi['tipo'] === 'cuantitativo') {
@@ -117,11 +117,9 @@ class Kpi {
                 $data['observaciones'] ?: null
             ]);
 
-            // Update current value on kpis table
             $upd = $pdo->prepare("UPDATE kpis SET valor_actual = ?, estado_semaforo = ? WHERE id = ?");
             $upd->execute([$data['valor'], $semaforo, $data['kpi_id']]);
         } else {
-            // Cualitativo
             $semaforo = self::calcularSemaforoKpi(array_merge($kpi, ['valor_cualitativo' => $data['valor_cualitativo']]));
             $stmt->execute([
                 $data['kpi_id'],
@@ -136,6 +134,11 @@ class Kpi {
             $upd->execute([$data['valor_cualitativo'], $semaforo, $data['kpi_id']]);
         }
 
+        return true;
+    }
+
+    static function registrarValor($pdo, $data) {
+        self::registrarValorSilencioso($pdo, $data);
         flash('success', 'Valor registrado correctamente.');
         redirect('index.php?page=kpis&action=historial&id=' . $data['kpi_id']);
     }

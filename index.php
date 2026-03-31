@@ -299,21 +299,19 @@ switch ($page) {
                 redirect('index.php?page=kpis' . ($filtros ? '&' . implode('&', $filtros) : ''));
                 break;
             case 'procesar_documento':
+                header('Content-Type: application/json');
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_FILES['documento'])) {
-                    flash('warning', 'No se recibió ningún documento.');
-                    redirect('index.php?page=kpis');
-                    break;
+                    echo json_encode(['error' => 'No se recibió ningún documento.']);
+                    exit;
                 }
                 $archivo = $_FILES['documento'];
                 if ($archivo['error'] !== UPLOAD_ERR_OK) {
-                    flash('danger', 'Error al subir el archivo.');
-                    redirect('index.php?page=kpis');
-                    break;
+                    echo json_encode(['error' => 'Error al subir el archivo.']);
+                    exit;
                 }
                 if ($archivo['size'] > 10 * 1024 * 1024) {
-                    flash('danger', 'El archivo supera el límite de 10MB.');
-                    redirect('index.php?page=kpis');
-                    break;
+                    echo json_encode(['error' => 'El archivo supera el límite de 10MB.']);
+                    exit;
                 }
                 $allowedTypes = [
                     'application/pdf', 'image/png', 'image/jpeg', 'image/jpg',
@@ -324,21 +322,24 @@ switch ($page) {
                 $mimeType = finfo_file($finfo, $archivo['tmp_name']);
                 finfo_close($finfo);
                 if (!in_array($mimeType, $allowedTypes)) {
-                    flash('danger', 'Formato de archivo no soportado. Usá PDF, imagen (PNG/JPG), CSV o texto.');
-                    redirect('index.php?page=kpis');
-                    break;
+                    echo json_encode(['error' => 'Formato de archivo no soportado. Usá PDF, imagen (PNG/JPG), CSV o texto.']);
+                    exit;
                 }
                 require_once __DIR__ . '/models/ClaudeApi.php';
                 $resultado = ClaudeApi::extraerKpisDeDocumento($pdo, $archivo['tmp_name'], $mimeType);
                 if ($resultado === false) {
-                    $_SESSION['kpi_propuestas'] = [];
-                    $_SESSION['kpi_propuestas_error'] = 'Error al comunicarse con la IA. Verificá que la API key esté configurada.';
-                } else {
-                    $_SESSION['kpi_propuestas'] = $resultado;
-                    $_SESSION['kpi_propuestas_error'] = null;
+                    echo json_encode(['error' => 'Error al comunicarse con la IA. Verificá que la API key esté configurada.']);
+                    exit;
                 }
+                if (isset($resultado['error'])) {
+                    echo json_encode(['error' => $resultado['error']]);
+                    exit;
+                }
+                $_SESSION['kpi_propuestas'] = $resultado;
+                echo json_encode(['ok' => true, 'redirect' => BASE_URL . 'index.php?page=kpis&action=revision_ia']);
+                exit;
+            case 'revision_ia':
                 require __DIR__ . '/views/kpis/revision_ia.php';
-                unset($_SESSION['kpi_propuestas'], $_SESSION['kpi_propuestas_error']);
                 break;
             case 'confirmar_ia':
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -356,7 +357,7 @@ switch ($page) {
                     $periodo = $row['periodo'] ?? '';
                     $observaciones = $row['observaciones'] ?? '';
                     if (!$kpiId || $valor === '') continue;
-                    Kpi::registrarValor($pdo, [
+                    Kpi::registrarValorSilencioso($pdo, [
                         'kpi_id' => $kpiId,
                         'valor' => $valor,
                         'periodo' => $periodo,
