@@ -354,10 +354,34 @@ class ClaudeApi {
             return self::extraerTextoDePptBinario($filePath);
         }
 
-        // Leer archivo dentro del zip usando zip:// stream wrapper
+        // Leer entry de un zip manualmente (sin ZipArchive ni ext-zip)
         $leerZip = function($entry) use ($filePath) {
-            $path = 'zip://' . $filePath . '#' . $entry;
-            return @file_get_contents($path);
+            // Intentar zip:// stream wrapper primero
+            $content = @file_get_contents('zip://' . $filePath . '#' . $entry);
+            if ($content !== false) return $content;
+
+            // Fallback: parseo manual del formato ZIP
+            $fh = fopen($filePath, 'rb');
+            if (!$fh) return false;
+            $result = false;
+            while (!feof($fh)) {
+                $sig = fread($fh, 4);
+                if ($sig !== "PK\x03\x04") break;
+                $header = unpack('vversion/vflags/vmethod/vmtime/vmdate/Vcrc/Vcsize/Vsize/vnamelen/vextralen', fread($fh, 26));
+                $name = fread($fh, $header['namelen']);
+                if ($header['extralen'] > 0) fread($fh, $header['extralen']);
+                $compressed = fread($fh, $header['csize']);
+                if ($name === $entry) {
+                    if ($header['method'] === 0) {
+                        $result = $compressed;
+                    } elseif ($header['method'] === 8) {
+                        $result = @gzinflate($compressed);
+                    }
+                    break;
+                }
+            }
+            fclose($fh);
+            return $result;
         };
 
         $texto = '';
