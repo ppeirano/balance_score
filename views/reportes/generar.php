@@ -49,6 +49,17 @@ if ($tipoReporte === 'informe') {
     exit;
 }
 
+if ($tipoReporte === 'generar_plan_ia') {
+    require_once __DIR__ . '/../../models/ClaudeApi.php';
+    $resultado = ClaudeApi::generarPlanAccionEstrategico($pdo);
+    if ($resultado === false) {
+        flash('error', 'Error al generar el análisis. Verificá la API key en config/database.php.');
+    } else {
+        flash('success', 'Análisis estratégico generado correctamente.');
+    }
+    redirect('index.php?page=reportes&tipo=informe');
+}
+
 if ($tipoReporte === 'csv_actividades') {
     $stmt = $pdo->query("SELECT a.codigo, a.descripcion, a.responsable, a.estado, a.fecha_limite,
                           pa.codigo as plan_codigo, pa.nombre as plan_nombre,

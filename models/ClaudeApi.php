@@ -254,6 +254,133 @@ class ClaudeApi {
         return false;
     }
 
+    static function generarPlanAccionEstrategico($pdo) {
+        // Recopilar datos completos del BSC
+        $datos = "=== ESTADO DEL BALANCED SCORECARD - TEMIS LOSTALO ===\n";
+        $datos .= "Fecha: " . date('d/m/Y') . "\n\n";
+
+        $perspectivas = $pdo->query("SELECT * FROM perspectivas ORDER BY orden")->fetchAll();
+        foreach ($perspectivas as $p) {
+            $datos .= "## Perspectiva: " . $p['nombre'] . "\n";
+
+            $stmt = $pdo->prepare("SELECT * FROM iniciativas_estrategicas WHERE perspectiva_id = ? ORDER BY orden");
+            $stmt->execute([$p['id']]);
+            $iniciativas = $stmt->fetchAll();
+
+            foreach ($iniciativas as $ie) {
+                // Avance ponderado
+                $stmtPda = $pdo->prepare("SELECT avance, peso FROM planes_accion WHERE iniciativa_id = ?");
+                $stmtPda->execute([$ie['id']]);
+                $pdas = $stmtPda->fetchAll();
+                $pesoTotal = array_sum(array_column($pdas, 'peso'));
+                $avIE = 0;
+                if ($pesoTotal > 0) {
+                    foreach ($pdas as $pd) { $avIE += ($pd['avance'] * $pd['peso'] / $pesoTotal); }
+                }
+                $datos .= "\n### " . $ie['codigo'] . ": " . $ie['nombre'] . " (Avance: " . round($avIE) . "%)\n";
+
+                // PDAs
+                $stmtPda2 = $pdo->prepare("SELECT codigo, nombre, owner, avance, estado, peso FROM planes_accion WHERE iniciativa_id = ? ORDER BY prioridad");
+                $stmtPda2->execute([$ie['id']]);
+                foreach ($stmtPda2->fetchAll() as $pa) {
+                    $datos .= "  PDA " . $pa['codigo'] . ": " . $pa['nombre']
+                        . " | Owner: " . ($pa['owner'] ?: 'Sin asignar')
+                        . " | Avance: " . $pa['avance'] . "% | Estado: " . $pa['estado']
+                        . " | Peso: " . $pa['peso'] . "%\n";
+                }
+
+                // KPIs con semáforo recalculado
+                $stmtK = $pdo->prepare("SELECT * FROM kpis WHERE iniciativa_id = ? AND activo = 1");
+                $stmtK->execute([$ie['id']]);
+                foreach ($stmtK->fetchAll() as $kpi) {
+                    $sem = $kpi['tipo'] === 'cuantitativo'
+                        ? calcularSemaforo($kpi['valor_actual'], $kpi['meta'], $kpi['umbral_verde'], $kpi['umbral_amarillo'], $kpi['direccion'])
+                        : ($kpi['estado_semaforo'] ?? 'gris');
+                    $datos .= "  KPI: " . $kpi['nombre']
+                        . " | Actual: " . ($kpi['valor_actual'] ?? 'N/A')
+                        . " | Meta: " . ($kpi['meta'] ?? 'N/A')
+                        . " | Unidad: " . ($kpi['unidad'] ?? '')
+                        . " | Semaforo: " . $sem
+                        . " | Direccion: " . ($kpi['direccion'] ?? '') . "\n";
+                }
+
+                // Riesgos
+                $stmtR = $pdo->prepare("SELECT descripcion, nivel, probabilidad, impacto, plan_mitigacion, responsable FROM riesgos WHERE iniciativa_id = ? AND estado = 'abierto'");
+                $stmtR->execute([$ie['id']]);
+                foreach ($stmtR->fetchAll() as $r) {
+                    $datos .= "  RIESGO [" . $r['nivel'] . "]: " . $r['descripcion']
+                        . " | Prob: " . $r['probabilidad'] . " | Impacto: " . $r['impacto']
+                        . " | Resp: " . ($r['responsable'] ?: 'Sin asignar')
+                        . ($r['plan_mitigacion'] ? " | Mitigacion: " . mb_substr($r['plan_mitigacion'], 0, 100) : "") . "\n";
+                }
+            }
+            $datos .= "\n";
+        }
+
+        // Relaciones causa-efecto
+        $relaciones = $pdo->query("
+            SELECT r.descripcion, io.codigo AS origen, id2.codigo AS destino
+            FROM relaciones_causa_efecto r
+            JOIN iniciativas_estrategicas io ON r.iniciativa_origen_id = io.id
+            JOIN iniciativas_estrategicas id2 ON r.iniciativa_destino_id = id2.id
+        ")->fetchAll();
+        $datos .= "=== RELACIONES CAUSA-EFECTO ===\n";
+        foreach ($relaciones as $rel) {
+            $datos .= $rel['origen'] . " → " . $rel['destino'] . ($rel['descripcion'] ? ": " . $rel['descripcion'] : '') . "\n";
+        }
+
+        // Proyectos
+        $proyectos = $pdo->query("SELECT nombre, responsable, estado, avance, prioridad FROM proyectos ORDER BY prioridad")->fetchAll();
+        $datos .= "\n=== PROYECTOS (" . count($proyectos) . ") ===\n";
+        foreach ($proyectos as $pr) {
+            $datos .= "- " . $pr['nombre'] . " | Resp: " . ($pr['responsable'] ?: '-')
+                . " | Estado: " . $pr['estado'] . " | Avance: " . $pr['avance'] . "% | Prioridad: " . $pr['prioridad'] . "\n";
+        }
+
+        // Compromisos pendientes
+        $compromisos = $pdo->query("
+            SELECT c.descripcion, c.responsable, c.fecha_limite, c.estado
+            FROM compromisos c WHERE c.estado != 'completado' ORDER BY c.fecha_limite
+        ")->fetchAll();
+        $datos .= "\n=== COMPROMISOS PENDIENTES (" . count($compromisos) . ") ===\n";
+        foreach ($compromisos as $c) {
+            $datos .= "- " . $c['descripcion'] . " | Resp: " . ($c['responsable'] ?: '-')
+                . " | Fecha: " . ($c['fecha_limite'] ?: 'Sin definir') . " | Estado: " . $c['estado'] . "\n";
+        }
+
+        $prompt = "Eres un consultor senior de estrategia y Balanced Scorecard para el laboratorio "
+            . "farmacéutico Temis Lostalo.\n\n"
+            . "A partir de los datos del BSC, generá un ANÁLISIS ESTRATÉGICO y PLAN DE ACCIÓN.\n\n"
+            . "El análisis debe incluir:\n\n"
+            . "1. **DIAGNÓSTICO**: Estado actual en 4-5 líneas (avance global, qué funciona bien, "
+            . "qué preocupa, principales cuellos de botella)\n\n"
+            . "2. **ACCIONES PRIORITARIAS**: Las 5-8 acciones más importantes ordenadas por "
+            . "impacto × urgencia. Para cada una:\n"
+            . "   - **Acción concreta** y palanca estratégica (IE/PDA con código)\n"
+            . "   - **KPI que impacta**: nombre, valor actual → meta, y qué se espera lograr\n"
+            . "   - **Riesgos a considerar**: restricciones que pueden frenar esta acción\n"
+            . "   - **Prioridad**: 🔴 Crítica / 🟡 Alta / 🟢 Media\n\n"
+            . "3. **FOCOS DEL PRÓXIMO PERÍODO**: 3-4 recomendaciones claras de dónde "
+            . "concentrar esfuerzos y recursos\n\n"
+            . "4. **ALERTAS**: Situaciones que requieren atención inmediata (KPIs en rojo, "
+            . "riesgos críticos sin mitigar, planes estancados)\n\n"
+            . "Sé concreto y usá los códigos de IE/PDA/KPI. No seas genérico.\n"
+            . "Formato: Markdown en español.\n\n"
+            . $datos;
+
+        $respuesta = self::llamarApi($prompt);
+
+        if ($respuesta === false) {
+            return false;
+        }
+
+        // Guardar en evaluaciones_ia
+        $stmt = $pdo->prepare("INSERT INTO evaluaciones_ia (tipo, entidad_id, prompt_enviado, respuesta) VALUES (?, NULL, ?, ?)");
+        $stmt->execute(['general', $prompt, $respuesta]);
+
+        return $respuesta;
+    }
+
     static function getHistorial($pdo) {
         $stmt = $pdo->query("
             SELECT e.*, ie.nombre AS entidad_nombre

@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../models/Kpi.php';
 require_once __DIR__ . '/../../models/Riesgo.php';
 require_once __DIR__ . '/../../models/Proyecto.php';
 require_once __DIR__ . '/../../models/Compromiso.php';
+require_once __DIR__ . '/../../models/ClaudeApi.php';
 
 // --- Datos ---
 $periodo = getPeriodoActivo($pdo);
@@ -89,6 +90,33 @@ $proyectos = Proyecto::getAll($pdo);
 
 // Compromisos pendientes
 $compromisos = Compromiso::getPendientes($pdo);
+
+// Datos para diagrama de acción: IEs que tienen al menos riesgos, PDAs o KPIs
+$iesConDatos = [];
+foreach ($iniciativas as $ie) {
+    $ieId = $ie['id'];
+    $ieRiesgos = $riesgosByIE[$ieId] ?? [];
+    $iePdas = $pdaByIE[$ieId] ?? [];
+    $ieKpis = $kpisByIE[$ieId] ?? [];
+    if (!empty($ieRiesgos) || !empty($iePdas) || !empty($ieKpis)) {
+        $iesConDatos[] = [
+            'ie' => $ie,
+            'avance' => $avanceByIE[$ieId] ?? 0,
+            'riesgos' => $ieRiesgos,
+            'pdas' => $iePdas,
+            'kpis' => $ieKpis,
+        ];
+    }
+}
+
+// Última evaluación IA del plan de acción (cache 24h)
+$stmtEvalIA = $pdo->query("
+    SELECT id, respuesta, created_at FROM evaluaciones_ia
+    WHERE tipo = 'general' AND prompt_enviado LIKE '%PLAN DE ACCIÓN%'
+    ORDER BY created_at DESC LIMIT 1
+");
+$evalIA = $stmtEvalIA->fetch();
+$evalIAReciente = $evalIA && (strtotime($evalIA['created_at']) > strtotime('-24 hours'));
 
 require_once __DIR__ . '/../layout/header.php';
 ?>
@@ -383,6 +411,165 @@ require_once __DIR__ . '/../layout/header.php';
     border-bottom: 2px solid #e5e7eb;
 }
 
+/* === Plan de Acción Estratégico - Diagrama === */
+.plan-action-map {
+    margin-bottom: 20px;
+}
+.plan-action-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+}
+.plan-action-row .plan-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.plan-col-restrictions { max-width: 30%; }
+.plan-col-levers { max-width: 30%; }
+.plan-col-kpis { max-width: 30%; }
+.plan-col-arrow {
+    flex: 0 0 24px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d1d5db;
+    font-size: 16px;
+}
+.plan-ie-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    text-align: center;
+}
+.plan-card {
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 10px;
+    line-height: 1.3;
+}
+.plan-card-title {
+    font-weight: 600;
+    margin-bottom: 1px;
+}
+.plan-card-sub {
+    font-size: 9px;
+    opacity: 0.8;
+    font-style: italic;
+}
+/* Restriction cards */
+.plan-card-restriction {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 3px solid #ef4444;
+    color: #7f1d1d;
+}
+.plan-card-restriction.nivel-alto {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+    color: #78350f;
+}
+.plan-card-restriction.nivel-medio {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+    color: #78350f;
+}
+.plan-card-restriction.nivel-bajo {
+    border-left-color: #22c55e;
+    background: #f0fdf4;
+    color: #14532d;
+}
+/* Lever cards */
+.plan-card-lever {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a5f;
+}
+/* KPI cards */
+.plan-card-kpi {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #14532d;
+}
+.plan-card-kpi .plan-kpi-value {
+    font-size: 11px;
+    font-weight: 700;
+}
+.plan-card-kpi .plan-kpi-direction {
+    font-size: 9px;
+    font-weight: 600;
+}
+.plan-col-header {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9ca3af;
+    text-align: center;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 8px;
+}
+.plan-empty-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #d1d5db;
+    font-style: italic;
+    min-height: 30px;
+}
+
+/* AI Narrative */
+.plan-ia-section {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+    background: #fafbfc;
+}
+.plan-ia-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1b2333;
+    margin-bottom: 10px;
+}
+.plan-ia-content {
+    font-size: 11px;
+    line-height: 1.6;
+    color: #374151;
+}
+.plan-ia-content h1, .plan-ia-content h2, .plan-ia-content h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1b2333;
+    margin: 12px 0 6px;
+}
+.plan-ia-content ul, .plan-ia-content ol {
+    padding-left: 18px;
+}
+.plan-ia-content li {
+    margin-bottom: 4px;
+}
+.plan-ia-content strong {
+    color: #1b2333;
+}
+.plan-ia-meta {
+    font-size: 9px;
+    color: #9ca3af;
+    margin-top: 8px;
+    text-align: right;
+}
+
 /* Print */
 @media print {
     body { font-size: 10px; }
@@ -392,6 +579,7 @@ require_once __DIR__ . '/../layout/header.php';
     .informe-perspectiva { page-break-inside: avoid; }
     .informe-ie { page-break-inside: avoid; }
     .informe-section { page-break-inside: avoid; }
+    .plan-action-row { page-break-inside: avoid; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 }
 </style>
@@ -715,6 +903,139 @@ require_once __DIR__ . '/../layout/header.php';
         <?php endif; ?>
     </div>
 
+    <!-- G) Plan de Acción Estratégico -->
+    <div class="informe-section">
+        <h3><i class="bi bi-signpost-split me-2"></i>Plan de Acción Estratégico</h3>
+
+        <?php if (!empty($iesConDatos)): ?>
+        <!-- Cabeceras de columna -->
+        <div style="display:flex;gap:0;margin-bottom:4px;">
+            <div class="plan-col plan-col-restrictions"><div class="plan-col-header">Restricciones / Riesgos</div></div>
+            <div class="plan-col-arrow"></div>
+            <div class="plan-col plan-col-levers"><div class="plan-col-header">Palancas (Planes de Acción)</div></div>
+            <div class="plan-col-arrow"></div>
+            <div class="plan-col plan-col-kpis"><div class="plan-col-header">KPIs Impactados</div></div>
+        </div>
+
+        <div class="plan-action-map">
+            <?php foreach ($iesConDatos as $item):
+                $ie = $item['ie'];
+                $ieColor = $ie['perspectiva_color'];
+            ?>
+            <div class="plan-action-row">
+                <!-- Restricciones -->
+                <div class="plan-col plan-col-restrictions">
+                    <div class="plan-ie-label" style="background-color:<?= sanitize($ieColor) ?>;"><?= sanitize($ie['codigo']) ?></div>
+                    <?php if (!empty($item['riesgos'])): ?>
+                        <?php foreach ($item['riesgos'] as $riesgo):
+                            $nivelClass = 'nivel-' . $riesgo['nivel'];
+                        ?>
+                        <div class="plan-card plan-card-restriction <?= $nivelClass ?>">
+                            <div class="plan-card-title"><?= sanitize(mb_substr($riesgo['descripcion'], 0, 50)) ?><?= mb_strlen($riesgo['descripcion']) > 50 ? '...' : '' ?></div>
+                            <?php if ($riesgo['responsable']): ?>
+                                <div class="plan-card-sub"><?= sanitize($riesgo['responsable']) ?></div>
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="plan-empty-col">Sin restricciones</div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Flecha -->
+                <div class="plan-col-arrow"><i class="bi bi-arrow-right"></i></div>
+
+                <!-- Palancas (PDAs) -->
+                <div class="plan-col plan-col-levers">
+                    <div class="plan-ie-label" style="background-color:<?= sanitize($ieColor) ?>;"><?= sanitize($ie['codigo']) ?></div>
+                    <?php if (!empty($item['pdas'])): ?>
+                        <?php foreach ($item['pdas'] as $pda):
+                            $pdaAv = (int)$pda['avance'];
+                            $pdaColor = $pdaAv >= 70 ? '#22c55e' : ($pdaAv >= 40 ? '#f59e0b' : '#ef4444');
+                        ?>
+                        <div class="plan-card plan-card-lever" style="border-left:3px solid <?= sanitize($ieColor) ?>;">
+                            <div class="plan-card-title"><?= sanitize(mb_substr($pda['nombre'], 0, 45)) ?><?= mb_strlen($pda['nombre']) > 45 ? '...' : '' ?></div>
+                            <div class="plan-card-sub">
+                                <span class="inline-bar">
+                                    <span class="inline-bar-track"><span class="inline-bar-fill" style="width:<?= $pdaAv ?>%;background:<?= $pdaColor ?>;"></span></span>
+                                    <span class="inline-bar-text"><?= $pdaAv ?>%</span>
+                                </span>
+                                · <?= sanitize($pda['owner'] ?? 'Sin owner') ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="plan-empty-col">Sin planes</div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Flecha -->
+                <div class="plan-col-arrow"><i class="bi bi-arrow-right"></i></div>
+
+                <!-- KPIs -->
+                <div class="plan-col plan-col-kpis">
+                    <div class="plan-ie-label" style="background-color:<?= sanitize($ieColor) ?>;"><?= sanitize($ie['codigo']) ?></div>
+                    <?php if (!empty($item['kpis'])): ?>
+                        <?php
+                        $semaforoColors = ['verde' => '#22c55e', 'amarillo' => '#f59e0b', 'rojo' => '#ef4444', 'gris' => '#9ca3af'];
+                        foreach ($item['kpis'] as $kpi):
+                            $semaforo = $kpi['tipo'] === 'cuantitativo'
+                                ? calcularSemaforo($kpi['valor_actual'], $kpi['meta'], $kpi['umbral_verde'], $kpi['umbral_amarillo'], $kpi['direccion'])
+                                : ($kpi['estado_semaforo'] ?? 'gris');
+                            $sColor = $semaforoColors[$semaforo] ?? '#9ca3af';
+                            $valorDisplay = $kpi['tipo'] === 'cualitativo'
+                                ? ($kpi['valor_cualitativo'] ?: '-')
+                                : formatKpiValor($kpi['valor_actual'], $kpi['es_entero']);
+                            $metaDisplay = $kpi['tipo'] === 'cualitativo' ? '' : formatKpiValor($kpi['meta'], $kpi['es_entero']);
+                            $dirLabel = ($kpi['direccion'] ?? '') === 'menor_mejor' ? 'bajar' : 'subir';
+                        ?>
+                        <div class="plan-card plan-card-kpi" style="border-left:3px solid <?= $sColor ?>;">
+                            <div class="plan-card-title"><?= sanitize(mb_substr($kpi['nombre'], 0, 40)) ?></div>
+                            <div class="plan-card-sub">
+                                <span class="plan-kpi-value"><?= $valorDisplay ?></span>
+                                <?php if ($metaDisplay): ?>
+                                    <span class="plan-kpi-direction"> → <?= $metaDisplay ?> <?= sanitize($kpi['unidad'] ?? '') ?> (<?= $dirLabel ?>)</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="plan-empty-col">Sin KPIs</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php else: ?>
+        <p style="color:#9ca3af;font-size:10px;">No hay datos suficientes para generar el diagrama.</p>
+        <?php endif; ?>
+
+        <!-- Narrativa IA -->
+        <?php if ($evalIA): ?>
+        <div class="plan-ia-section">
+            <h4><i class="bi bi-robot me-1"></i> Análisis Estratégico (IA)</h4>
+            <div class="plan-ia-content" id="planIAContent"></div>
+            <div class="plan-ia-meta">
+                Generado el <?= date('d/m/Y H:i', strtotime($evalIA['created_at'])) ?>
+                <?php if (!$evalIAReciente): ?>
+                    <span style="color:#f59e0b;"> · Desactualizado (>24h)</span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="text-center no-print" style="margin-top:12px;">
+            <form method="POST" action="<?= BASE_URL ?>index.php?page=reportes&tipo=generar_plan_ia" style="display:inline;">
+                <button type="submit" class="btn btn-sm <?= $evalIA ? 'btn-outline-primary' : 'btn-primary' ?>">
+                    <i class="bi bi-robot me-1"></i><?= $evalIA ? 'Regenerar análisis con IA' : 'Generar análisis con IA' ?>
+                </button>
+            </form>
+            <?php if (!defined('CLAUDE_API_KEY') || empty(CLAUDE_API_KEY)): ?>
+                <div class="text-muted small mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Configurá la API key de Claude en config/database.php</div>
+            <?php endif; ?>
+        </div>
+    </div>
+
     <!-- Botón imprimir (no-print) -->
     <div class="text-center no-print" style="margin: 20px 0;">
         <button onclick="window.print()" class="btn btn-primary">
@@ -725,5 +1046,17 @@ require_once __DIR__ . '/../layout/header.php';
         </a>
     </div>
 </div>
+
+<?php if ($evalIA): ?>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var el = document.getElementById('planIAContent');
+    if (el) {
+        el.innerHTML = marked.parse(<?= json_encode($evalIA['respuesta']) ?>);
+    }
+});
+</script>
+<?php endif; ?>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
