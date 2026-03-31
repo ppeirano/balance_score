@@ -44,6 +44,11 @@ if ($tipoReporte === 'csv_kpis') {
     exit;
 }
 
+if ($tipoReporte === 'informe') {
+    require_once __DIR__ . '/informe.php';
+    exit;
+}
+
 if ($tipoReporte === 'csv_actividades') {
     $stmt = $pdo->query("SELECT a.codigo, a.descripcion, a.responsable, a.estado, a.fecha_limite,
                           pa.codigo as plan_codigo, pa.nombre as plan_nombre,
@@ -68,6 +73,22 @@ if ($tipoReporte === 'csv_actividades') {
 
 require_once __DIR__ . '/../layout/header.php';
 ?>
+
+<!-- Informe de Estrategia -->
+<div class="card mb-4">
+    <div class="card-body d-flex align-items-center gap-3">
+        <div style="width:48px;height:48px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
+            <i class="bi bi-file-earmark-bar-graph" style="font-size:24px;color:#3b82f6;"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h5 class="card-title mb-1"><i class="bi bi-clipboard-data me-2"></i>Informe de Estrategia</h5>
+            <p class="card-text text-muted mb-0">Reporte completo con resumen ejecutivo, detalle por perspectiva e IE (KPIs, planes, riesgos), matriz de riesgos, proyectos y compromisos pendientes.</p>
+        </div>
+        <a href="<?= BASE_URL ?>index.php?page=reportes&tipo=informe" class="btn btn-primary">
+            <i class="bi bi-eye me-1"></i>Ver Informe
+        </a>
+    </div>
+</div>
 
 <div class="row">
     <!-- Exportar CSV -->
