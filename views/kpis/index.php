@@ -178,8 +178,8 @@ require_once __DIR__ . '/../layout/header.php';
                     <p class="text-muted small">Subí un documento con datos de KPIs. La IA va a analizar el contenido y proponer valores para cargar.</p>
                     <div class="mb-3">
                         <label class="form-label">Documento</label>
-                        <input type="file" class="form-control" id="inputDocumento" accept=".pdf,.png,.jpg,.jpeg,.csv,.txt" required>
-                        <small class="text-muted">PDF, imagen (PNG/JPG), CSV o texto. Máx 10MB.</small>
+                        <input type="file" class="form-control" id="inputDocumento" accept=".pdf,.png,.jpg,.jpeg,.csv,.txt,.pptx,.xlsx" required>
+                        <small class="text-muted">PDF, imagen (PNG/JPG), CSV, texto, PPTX o XLSX. Máx 10MB.</small>
                     </div>
                 </div>
                 <div id="pasoProcesando" class="d-none text-center py-4">

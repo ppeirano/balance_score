@@ -299,45 +299,73 @@ switch ($page) {
                 redirect('index.php?page=kpis' . ($filtros ? '&' . implode('&', $filtros) : ''));
                 break;
             case 'procesar_documento':
-                header('Content-Type: application/json');
+                $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+                    || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+                    || (isset($_SERVER['HTTP_SEC_FETCH_MODE']) && $_SERVER['HTTP_SEC_FETCH_MODE'] === 'cors');
+                $respondError = function($msg) use ($isAjax) {
+                    if ($isAjax) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['error' => $msg]);
+                        exit;
+                    }
+                    flash('danger', $msg);
+                    redirect('index.php?page=kpis');
+                };
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_FILES['documento'])) {
-                    echo json_encode(['error' => 'No se recibió ningún documento.']);
-                    exit;
+                    $respondError('No se recibió ningún documento.');
+                    break;
                 }
                 $archivo = $_FILES['documento'];
                 if ($archivo['error'] !== UPLOAD_ERR_OK) {
-                    echo json_encode(['error' => 'Error al subir el archivo.']);
-                    exit;
+                    $respondError('Error al subir el archivo.');
+                    break;
                 }
                 if ($archivo['size'] > 10 * 1024 * 1024) {
-                    echo json_encode(['error' => 'El archivo supera el límite de 10MB.']);
-                    exit;
+                    $respondError('El archivo supera el límite de 10MB.');
+                    break;
                 }
                 $allowedTypes = [
                     'application/pdf', 'image/png', 'image/jpeg', 'image/jpg',
                     'text/csv', 'text/plain',
-                    'application/vnd.ms-excel', 'application/csv'
+                    'application/vnd.ms-excel', 'application/csv',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 ];
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mimeType = finfo_file($finfo, $archivo['tmp_name']);
                 finfo_close($finfo);
+                // Fallback: detectar por extensión si finfo da application/zip (pptx/xlsx son zips)
+                $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+                if ($mimeType === 'application/zip') {
+                    $extMap = [
+                        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    ];
+                    if (isset($extMap[$ext])) $mimeType = $extMap[$ext];
+                }
                 if (!in_array($mimeType, $allowedTypes)) {
-                    echo json_encode(['error' => 'Formato de archivo no soportado. Usá PDF, imagen (PNG/JPG), CSV o texto.']);
-                    exit;
+                    $respondError('Formato de archivo no soportado. Usá PDF, imagen (PNG/JPG), CSV, texto, PPTX o XLSX.');
+                    break;
                 }
                 require_once __DIR__ . '/models/ClaudeApi.php';
                 $resultado = ClaudeApi::extraerKpisDeDocumento($pdo, $archivo['tmp_name'], $mimeType);
                 if ($resultado === false) {
-                    echo json_encode(['error' => 'Error al comunicarse con la IA. Verificá que la API key esté configurada.']);
-                    exit;
+                    $respondError('Error al comunicarse con la IA. Verificá que la API key esté configurada.');
+                    break;
                 }
                 if (isset($resultado['error'])) {
-                    echo json_encode(['error' => $resultado['error']]);
-                    exit;
+                    $respondError($resultado['error']);
+                    break;
                 }
                 $_SESSION['kpi_propuestas'] = $resultado;
-                echo json_encode(['ok' => true, 'redirect' => BASE_URL . 'index.php?page=kpis&action=revision_ia']);
-                exit;
+                if ($isAjax) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['ok' => true, 'redirect' => BASE_URL . 'index.php?page=kpis&action=revision_ia']);
+                    exit;
+                }
+                redirect('index.php?page=kpis&action=revision_ia');
+                break;
             case 'revision_ia':
                 require __DIR__ . '/views/kpis/revision_ia.php';
                 break;

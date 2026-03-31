@@ -286,23 +286,28 @@ class ClaudeApi {
         $contentBlocks = [];
 
         if (str_starts_with($mimeType, 'text/') || $mimeType === 'application/csv') {
-            // CSV/texto: leer como texto
             $texto = file_get_contents($filePath);
             $contentBlocks[] = ['type' => 'text', 'text' => "CONTENIDO DEL DOCUMENTO:\n" . $texto];
         } elseif ($mimeType === 'application/pdf') {
-            // PDF: enviar como document base64
             $base64 = base64_encode(file_get_contents($filePath));
             $contentBlocks[] = [
                 'type' => 'document',
                 'source' => ['type' => 'base64', 'media_type' => 'application/pdf', 'data' => $base64]
             ];
         } elseif (str_starts_with($mimeType, 'image/')) {
-            // Imagen: enviar como image base64
             $base64 = base64_encode(file_get_contents($filePath));
             $contentBlocks[] = [
                 'type' => 'image',
                 'source' => ['type' => 'base64', 'media_type' => $mimeType, 'data' => $base64]
             ];
+        } elseif (in_array($mimeType, [
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ])) {
+            $texto = self::extraerTextoDeOffice($filePath, $mimeType);
+            if (!$texto) return ['error' => 'No se pudo extraer texto del archivo Office.'];
+            $contentBlocks[] = ['type' => 'text', 'text' => "CONTENIDO DEL DOCUMENTO:\n" . $texto];
         } else {
             return ['error' => 'Formato de archivo no soportado: ' . $mimeType];
         }
@@ -341,6 +346,57 @@ class ClaudeApi {
         unset($prop);
 
         return $parsed;
+    }
+
+    static function extraerTextoDeOffice($filePath, $mimeType) {
+        $zip = new ZipArchive();
+        if ($zip->open($filePath) !== true) return false;
+
+        $texto = '';
+
+        if (strpos($mimeType, 'presentation') !== false || strpos($mimeType, 'powerpoint') !== false) {
+            // PPTX: extraer texto de cada slide
+            for ($i = 1; $i <= 100; $i++) {
+                $xml = $zip->getFromName("ppt/slides/slide{$i}.xml");
+                if ($xml === false) break;
+                $texto .= "--- Slide {$i} ---\n";
+                // Extraer texto de tags <a:t>
+                preg_match_all('/<a:t>(.*?)<\/a:t>/s', $xml, $matches);
+                if (!empty($matches[1])) {
+                    $texto .= implode(' ', $matches[1]) . "\n";
+                }
+            }
+        } elseif (strpos($mimeType, 'spreadsheet') !== false) {
+            // XLSX: extraer shared strings y sheet data
+            $sharedStrings = [];
+            $ssXml = $zip->getFromName('xl/sharedStrings.xml');
+            if ($ssXml) {
+                preg_match_all('/<t[^>]*>(.*?)<\/t>/s', $ssXml, $matches);
+                $sharedStrings = $matches[1] ?? [];
+            }
+            for ($i = 1; $i <= 20; $i++) {
+                $xml = $zip->getFromName("xl/worksheets/sheet{$i}.xml");
+                if ($xml === false) break;
+                $texto .= "--- Hoja {$i} ---\n";
+                preg_match_all('/<row[^>]*>(.*?)<\/row>/s', $xml, $rows);
+                foreach ($rows[1] ?? [] as $rowXml) {
+                    $celdas = [];
+                    preg_match_all('/<c[^>]*(?:t="s"[^>]*)?>.*?<v>(.*?)<\/v>/s', $rowXml, $cells, PREG_SET_ORDER);
+                    foreach ($cells as $cell) {
+                        $val = $cell[1];
+                        // Si es referencia a shared string
+                        if (strpos($cell[0], 't="s"') !== false && isset($sharedStrings[(int)$val])) {
+                            $val = $sharedStrings[(int)$val];
+                        }
+                        $celdas[] = $val;
+                    }
+                    if ($celdas) $texto .= implode("\t", $celdas) . "\n";
+                }
+            }
+        }
+
+        $zip->close();
+        return $texto ?: false;
     }
 
     static function getHistorial($pdo) {
