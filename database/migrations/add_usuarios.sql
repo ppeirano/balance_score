@@ -12,4 +12,4 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 -- Usuario admin inicial (password: admin123)
 INSERT INTO usuarios (email, password_hash, perfil) VALUES
-('admin@temislostalo.com', '$2y$12$96P1sqEsOGofZnkHmzjSjOv.oJY6aMw4W1nOumQV7GGhWiIA7vaSe', 'admin');
+('admin@temislostalo.com', '$2y$12$.6K.e7NFaWAbnXy4kTdv9ebvg5mXah7kmIUbSH/DbHnx2L7Se/ggm', 'admin');
