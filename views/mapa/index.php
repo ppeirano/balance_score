@@ -452,11 +452,14 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Relaciones Causa-Efecto</h5>
+        <?php if (isAdmin()): ?>
         <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#nuevaRelacion">
             <i class="bi bi-plus-lg me-1"></i>Agregar
         </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php if (isAdmin()): ?>
         <!-- Formulario nueva relación -->
         <div class="collapse mb-3" id="nuevaRelacion">
             <div class="card card-body bg-light">
@@ -489,6 +492,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </form>
             </div>
         </div>
+        <?php endif; ?>
 
         <?php if (!empty($relaciones)): ?>
             <div class="list-group list-group-flush">
@@ -512,12 +516,14 @@ require_once __DIR__ . '/../layout/header.php';
                                 <i class="bi bi-info-circle me-1"></i><?= sanitize($rel['descripcion']) ?>
                             </small>
                         <?php endif; ?>
+                        <?php if (isAdmin()): ?>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=mapa&action=eliminar_relacion&id=<?= $rel['id'] ?>"
                               class="ms-auto" onsubmit="return confirm('¿Eliminar esta relación?');">
                             <button type="submit" class="btn-action btn-action-danger" title="Eliminar">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>

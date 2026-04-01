@@ -34,7 +34,9 @@ require_once __DIR__ . '/../layout/header.php';
         </p>
     </div>
     <div>
+        <?php if (isAdmin()): ?>
         <a href="<?= BASE_URL ?>index.php?page=proyectos&action=editar&id=<?= $id ?>" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1"></i>Editar</a>
+        <?php endif; ?>
         <a href="<?= BASE_URL ?>index.php?page=proyectos" class="btn btn-outline-secondary btn-sm">Volver</a>
     </div>
 </div>
@@ -82,9 +84,11 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0"><i class="bi bi-list-task me-2"></i>Actividades</h6>
+        <?php if (isAdmin()): ?>
         <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#nuevaActividad">
             <i class="bi bi-plus-lg me-1"></i>Agregar
         </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
         <?php
@@ -99,6 +103,7 @@ require_once __DIR__ . '/../layout/header.php';
             <?php foreach ($fasesExist as $f): ?><option value="<?= sanitize($f) ?>"><?php endforeach; ?>
         </datalist>
 
+        <?php if (isAdmin()): ?>
         <div class="collapse mb-3" id="nuevaActividad">
             <div class="card card-body bg-light">
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_actividad">
@@ -147,6 +152,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </form>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- Tabla de actividades -->
         <table class="table table-sm mb-4">
@@ -184,6 +190,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= formatDate($a['fecha_inicio']) ?></td>
                     <td><?= formatDate($a['fecha_fin']) ?></td>
                     <td>
+                        <?php if (isAdmin()): ?>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=cambiar_estado_actividad&id=<?= $a['id'] ?>" class="d-inline">
                             <input type="hidden" name="proyecto_id" value="<?= $id ?>">
                             <select name="estado" class="form-select form-select-sm d-inline-block" style="width:auto;" onchange="this.form.submit()">
@@ -192,13 +199,18 @@ require_once __DIR__ . '/../layout/header.php';
                                 <?php endforeach; ?>
                             </select>
                         </form>
+                        <?php else: ?>
+                            <?= estadoBadge($a['estado']) ?>
+                        <?php endif; ?>
                     </td>
                     <td>
                         <div class="d-flex gap-1 justify-content-end">
+                            <?php if (isAdmin()): ?>
                             <button class="btn-action btn-action-secondary" onclick="toggleEditAct(<?= $a['id'] ?>)" title="Editar"><i class="bi bi-pencil"></i></button>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_actividad&id=<?= $a['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?')">
                                 <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </td>
                 </tr>
@@ -423,11 +435,14 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0"><i class="bi bi-box-seam me-2"></i>Entregables</h6>
+        <?php if (isAdmin()): ?>
         <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#nuevoEntregable">
             <i class="bi bi-plus-lg me-1"></i>Agregar
         </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php if (isAdmin()): ?>
         <div class="collapse mb-3" id="nuevoEntregable">
             <div class="card card-body bg-light">
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_entregable">
@@ -466,6 +481,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </form>
             </div>
         </div>
+        <?php endif; ?>
 
         <table class="table table-sm">
             <thead>
@@ -488,6 +504,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= formatDate($e['fecha_prevista']) ?></td>
                     <td><?= formatDate($e['fecha_real']) ?></td>
                     <td>
+                        <?php if (isAdmin()): ?>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=cambiar_estado_entregable&id=<?= $e['id'] ?>" class="d-inline">
                             <input type="hidden" name="proyecto_id" value="<?= $id ?>">
                             <select name="estado" class="form-select form-select-sm d-inline-block" style="width:auto;" onchange="this.form.submit()">
@@ -496,11 +513,16 @@ require_once __DIR__ . '/../layout/header.php';
                                 <option value="completado" <?= $e['estado'] == 'completado' ? 'selected' : '' ?>>Completado</option>
                             </select>
                         </form>
+                        <?php else: ?>
+                            <?= estadoBadge($e['estado']) ?>
+                        <?php endif; ?>
                     </td>
                     <td>
+                        <?php if (isAdmin()): ?>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_entregable&id=<?= $e['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?')">
                             <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -516,11 +538,14 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Vínculos con IEs y Planes</h6>
+        <?php if (isAdmin()): ?>
         <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#nuevoVinculo">
             <i class="bi bi-plus-lg me-1"></i>Agregar
         </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php if (isAdmin()): ?>
         <div class="collapse mb-3" id="nuevoVinculo">
             <div class="card card-body bg-light">
                 <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_vinculo">
@@ -554,6 +579,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </form>
             </div>
         </div>
+        <?php endif; ?>
         <table class="table table-sm">
             <thead><tr><th>Tipo</th><th>Código</th><th>Nombre</th><th>Acciones</th></tr></thead>
             <tbody>
@@ -563,9 +589,11 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= sanitize($v['entidad_codigo'] ?? '-') ?></td>
                     <td><?= sanitize($v['entidad_nombre'] ?? '-') ?></td>
                     <td>
+                        <?php if (isAdmin()): ?>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_vinculo&id=<?= $v['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar vínculo?')">
                             <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-x-lg"></i></button>
                         </form>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -594,6 +622,7 @@ require_once __DIR__ . '/../layout/header.php';
         <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php if (isAdmin()): ?>
         <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=guardar_nota" class="mb-4" id="formNotaProy">
             <input type="hidden" name="proyecto_id" value="<?= $id ?>">
             <input type="hidden" name="imagen" id="pNotaImagen" value="">
@@ -609,6 +638,7 @@ require_once __DIR__ . '/../layout/header.php';
                 <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-send me-1"></i>Agregar nota</button>
             </div>
         </form>
+        <?php endif; ?>
 
         <?php if (!empty($notas)): ?>
             <div class="pnota-timeline">
@@ -626,9 +656,11 @@ require_once __DIR__ . '/../layout/header.php';
                                     </div>
                                 <?php endif; ?>
                             </div>
+                            <?php if (isAdmin()): ?>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar_nota&id=<?= $nota['id'] ?>" class="ms-2" onsubmit="return confirm('¿Eliminar esta nota?');">
                                 <button type="submit" class="btn btn-sm btn-link text-danger btn-eliminar-pnota p-0"><i class="bi bi-x-lg"></i></button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -659,15 +691,18 @@ require_once __DIR__ . '/../layout/header.php';
                         </div>
                         <div class="d-flex gap-2">
                             <a href="<?= BASE_URL ?>index.php?page=adjuntos&action=descargar&id=<?= $adj['id'] ?>" class="btn-action btn-action-primary" title="Descargar"><i class="bi bi-download"></i></a>
+                            <?php if (isAdmin()): ?>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=eliminar&id=<?= $adj['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar?');">
                                 <input type="hidden" name="redirect" value="index.php?page=proyectos&action=detalle&id=<?= $id ?>">
                                 <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
+        <?php if (isAdmin()): ?>
         <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=subir" enctype="multipart/form-data">
             <input type="hidden" name="entidad_tipo" value="proyecto">
             <input type="hidden" name="entidad_id" value="<?= $id ?>">
@@ -677,6 +712,7 @@ require_once __DIR__ . '/../layout/header.php';
                 <button type="submit" class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i>Subir</button>
             </div>
         </form>
+        <?php endif; ?>
     </div>
 </div>
 

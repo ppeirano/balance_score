@@ -1,12 +1,59 @@
 <?php
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/models/Bitacora.php';
 
 $pdo = getDB();
 $page = $_GET['page'] ?? 'dashboard';
 $action = $_GET['action'] ?? 'index';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+
+// --- Auth: login/logout ---
+if ($page === 'login') {
+    if (isLoggedIn()) { redirect('index.php?page=dashboard'); }
+    $loginError = null;
+    $loginEmail = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        require_once __DIR__ . '/models/Usuario.php';
+        $loginEmail = $_POST['email'] ?? '';
+        $user = Usuario::login($pdo, $loginEmail, $_POST['password'] ?? '');
+        if ($user) {
+            redirect('index.php?page=dashboard');
+        } else {
+            $loginError = 'Email o contraseña incorrectos.';
+        }
+    }
+    require __DIR__ . '/views/auth/login.php';
+    exit;
+}
+if ($page === 'logout') {
+    require_once __DIR__ . '/models/Usuario.php';
+    Usuario::logout();
+    flash('success', 'Sesión cerrada.');
+    redirect('index.php?page=login');
+}
+
+// Requiere login para todo lo demás
+requireLogin();
+
+// Bloquear acciones de escritura para consultor
+$writeActions = ['crear','editar','guardar','eliminar','registrar_valor','confirmar_ia',
+                 'activar','guardar_relacion','eliminar_relacion','guardar_vinculo','eliminar_vinculo',
+                 'guardar_entregable','eliminar_entregable','cambiar_estado_entregable',
+                 'guardar_actividad','eliminar_actividad','cambiar_estado_actividad',
+                 'guardar_nota','eliminar_nota','subir_imagen_nota','completar',
+                 'procesar_documento','cambiar_estado','solicitar'];
+$adminPages = ['admin_responsables','periodos','admin_usuarios'];
+
+if (in_array($page, $adminPages) && !isAdmin()) {
+    flash('warning', 'No tenés permiso para acceder a esta sección.');
+    redirect('index.php?page=dashboard');
+}
+if (in_array($action, $writeActions) && !isAdmin()) {
+    flash('warning', 'No tenés permiso para realizar esta acción.');
+    redirect('index.php?page=' . urlencode($page));
+}
 
 // Obtener período activo
 $periodoActivo = getPeriodoActivo($pdo);
@@ -518,6 +565,32 @@ switch ($page) {
                 break;
             default:
                 require __DIR__ . '/views/admin_responsables/index.php';
+        }
+        break;
+    case 'admin_usuarios':
+        require __DIR__ . '/models/Usuario.php';
+        switch ($action) {
+            case 'crear':
+            case 'editar':
+                require __DIR__ . '/views/admin_usuarios/form.php';
+                break;
+            case 'guardar':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    Usuario::guardar($pdo, $_POST);
+                }
+                break;
+            case 'eliminar':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    if ($id == $_SESSION['user_id']) {
+                        flash('warning', 'No podés eliminar tu propio usuario.');
+                    } else {
+                        Usuario::eliminar($pdo, $id);
+                    }
+                }
+                redirect('index.php?page=admin_usuarios');
+                break;
+            default:
+                require __DIR__ . '/views/admin_usuarios/index.php';
         }
         break;
     case 'reportes':

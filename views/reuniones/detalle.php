@@ -24,7 +24,9 @@ require_once __DIR__ . '/../layout/header.php';
         </p>
     </div>
     <div>
+        <?php if (isAdmin()): ?>
         <a href="<?= BASE_URL ?>index.php?page=reuniones&action=editar&id=<?= $id ?>" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1"></i>Editar</a>
+        <?php endif; ?>
         <a href="<?= BASE_URL ?>index.php?page=reuniones" class="btn btn-outline-secondary btn-sm">Volver</a>
     </div>
 </div>
@@ -52,11 +54,14 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0"><i class="bi bi-check2-square me-2"></i>Compromisos</h6>
+        <?php if (isAdmin()): ?>
         <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#nuevoCompromiso">
             <i class="bi bi-plus-lg me-1"></i>Agregar
         </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php if (isAdmin()): ?>
         <!-- Formulario nuevo compromiso -->
         <div class="collapse mb-3" id="nuevoCompromiso">
             <div class="card card-body bg-light">
@@ -96,6 +101,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </form>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- Lista de compromisos -->
         <table class="table table-sm">
@@ -118,6 +124,7 @@ require_once __DIR__ . '/../layout/header.php';
                     <td><?= $c['plan_nombre'] ? sanitize($c['plan_nombre']) : '-' ?></td>
                     <td><?= estadoBadge($c['estado']) ?></td>
                     <td>
+                        <?php if (isAdmin()): ?>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=compromisos&action=cambiar_estado&id=<?= $c['id'] ?>" class="d-inline">
                             <input type="hidden" name="reunion_id" value="<?= $id ?>">
                             <select name="estado" class="form-select form-select-sm d-inline-block" style="width:auto;" onchange="this.form.submit()">
@@ -126,6 +133,9 @@ require_once __DIR__ . '/../layout/header.php';
                                 <option value="completado" <?= $c['estado'] == 'completado' ? 'selected' : '' ?>>Completado</option>
                             </select>
                         </form>
+                        <?php else: ?>
+                            <?= estadoBadge($c['estado']) ?>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

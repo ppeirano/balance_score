@@ -44,11 +44,13 @@ $pageTitle = 'Calendario de Seguimientos';
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
+<?php if (isAdmin()): ?>
 <div class="d-flex justify-content-end align-items-center mb-4">
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSeguimiento" onclick="nuevoSeguimiento()">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Seguimiento
     </button>
 </div>
+<?php endif; ?>
 
 <!-- Leyenda -->
 <div class="d-flex gap-3 mb-3">
@@ -116,10 +118,12 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td><?= sanitize($seg['entidad_nombre'] ?? '-') ?></td>
                                 <td class="text-muted"><?= sanitize(mb_strimwidth($seg['descripcion'] ?? '-', 0, 60, '...')) ?></td>
                                 <td>
+                                    <?php if (isAdmin()): ?>
                                     <button type="button" class="btn btn-sm btn-outline-success" title="Marcar como completado"
                                             onclick="completarSeguimiento(<?= $seg['id'] ?>)">
                                         <i class="bi bi-check-lg"></i>
                                     </button>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -216,6 +220,7 @@ require_once __DIR__ . '/../layout/header.php';
                 <p><strong>Estado:</strong> <span id="detalleEstado"></span></p>
             </div>
             <div class="modal-footer">
+                <?php if (isAdmin()): ?>
                 <form method="POST" id="formEliminar" class="d-inline" onsubmit="return confirm('¿Eliminar este seguimiento?');">
                     <button type="submit" class="btn btn-outline-danger">
                         <i class="bi bi-trash me-1"></i>Eliminar
@@ -224,6 +229,7 @@ require_once __DIR__ . '/../layout/header.php';
                 <button type="button" class="btn btn-primary" id="btnEditar">
                     <i class="bi bi-pencil me-1"></i>Editar
                 </button>
+                <?php endif; ?>
             </div>
         </div>
     </div>

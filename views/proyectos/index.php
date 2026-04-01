@@ -4,11 +4,13 @@ $proyectos = Proyecto::getAll($pdo);
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
+<?php if (isAdmin()): ?>
 <div class="d-flex justify-content-end align-items-center mb-4">
     <a href="<?= BASE_URL ?>index.php?page=proyectos&action=crear" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Proyecto
     </a>
 </div>
+<?php endif; ?>
 
 <div class="card">
     <div class="card-body">
@@ -61,10 +63,12 @@ require_once __DIR__ . '/../layout/header.php';
                     <td>
                         <div class="d-flex gap-1 justify-content-end">
                             <a href="<?= BASE_URL ?>index.php?page=proyectos&action=detalle&id=<?= $p['id'] ?>" class="btn-action btn-action-primary" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                            <?php if (isAdmin()): ?>
                             <a href="<?= BASE_URL ?>index.php?page=proyectos&action=editar&id=<?= $p['id'] ?>" class="btn-action btn-action-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=proyectos&action=eliminar&id=<?= $p['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar este proyecto y todos sus entregables?')">
                                 <button class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </td>
                 </tr>

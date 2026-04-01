@@ -81,9 +81,11 @@ require_once __DIR__ . '/../layout/header.php';
         <a href="<?= BASE_URL ?>index.php?page=calendario&tipo=plan&entidad_id=<?= $plan['id'] ?>&nombre=<?= urlencode($plan['codigo'] . ' - ' . $plan['nombre']) ?>" class="btn btn-outline-info">
             <i class="bi bi-calendar-event me-1"></i>Agendar Seguimiento
         </a>
+        <?php if (isAdmin()): ?>
         <a href="<?= BASE_URL ?>index.php?page=planes&action=editar&id=<?= $plan['id'] ?>" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
         </a>
+        <?php endif; ?>
         <a href="<?= BASE_URL ?>index.php?page=planes" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver
         </a>
@@ -134,9 +136,11 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-check2-square me-2"></i>Actividades</h5>
+        <?php if (isAdmin()): ?>
         <a href="<?= BASE_URL ?>index.php?page=actividades&action=crear&plan_id=<?= $plan['id'] ?>" class="btn btn-sm btn-light">
             <i class="bi bi-plus-lg me-1"></i>Nueva Actividad
         </a>
+        <?php endif; ?>
     </div>
     <div class="card-body">
         <?php if (empty($actividades)): ?>
@@ -162,6 +166,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td><?= sanitize($act['descripcion']) ?></td>
                                 <td><?= sanitize($act['responsable'] ?? '-') ?></td>
                                 <td>
+                                    <?php if (isAdmin()): ?>
                                     <form method="POST" action="<?= BASE_URL ?>index.php?page=actividades&action=cambiar_estado&id=<?= $act['id'] ?>" class="d-inline">
                                         <input type="hidden" name="plan_accion_id" value="<?= $plan['id'] ?>">
                                         <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 130px;">
@@ -171,6 +176,9 @@ require_once __DIR__ . '/../layout/header.php';
                                             <option value="cancelado" <?= ($act['estado'] === 'cancelado') ? 'selected' : '' ?>>Cancelado</option>
                                         </select>
                                     </form>
+                                    <?php else: ?>
+                                        <?= estadoBadge($act['estado']) ?>
+                                    <?php endif; ?>
                                 </td>
                                 <td><?= formatDate($act['fecha_limite']) ?></td>
                                 <td>
@@ -187,6 +195,7 @@ require_once __DIR__ . '/../layout/header.php';
                                            class="btn-action btn-action-info" title="Agendar seguimiento">
                                             <i class="bi bi-calendar-event"></i>
                                         </a>
+                                        <?php if (isAdmin()): ?>
                                         <a href="<?= BASE_URL ?>index.php?page=actividades&action=editar&id=<?= $act['id'] ?>"
                                            class="btn-action btn-action-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>
@@ -198,6 +207,7 @@ require_once __DIR__ . '/../layout/header.php';
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
@@ -228,6 +238,7 @@ require_once __DIR__ . '/../layout/header.php';
                                                         <td><?= $rec['costo_estimado'] !== null ? '$' . number_format($rec['costo_estimado'], 2) : '-' ?></td>
                                                         <td><?= sanitize($rec['notas'] ?? '-') ?></td>
                                                         <td>
+                                                            <?php if (isAdmin()): ?>
                                                             <form method="POST" action="<?= BASE_URL ?>index.php?page=recursos&action=eliminar&id=<?= $rec['id'] ?>"
                                                                   class="d-inline"
                                                                   onsubmit="return confirm('¿Está seguro de que desea eliminar este recurso?');">
@@ -235,6 +246,7 @@ require_once __DIR__ . '/../layout/header.php';
                                                                     <i class="bi bi-trash"></i>
                                                                 </button>
                                                             </form>
+                                                            <?php endif; ?>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>
@@ -255,9 +267,11 @@ require_once __DIR__ . '/../layout/header.php';
 <div class="card mb-4">
     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-flag me-2"></i>Hitos</h5>
+        <?php if (isAdmin()): ?>
         <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#modalNuevoHito">
             <i class="bi bi-plus-lg me-1"></i>Nuevo Hito
         </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
         <?php if (empty($hitos)): ?>
@@ -296,7 +310,7 @@ require_once __DIR__ . '/../layout/header.php';
                                        class="btn-action btn-action-info" title="Agendar seguimiento">
                                         <i class="bi bi-calendar-event"></i>
                                     </a>
-                                    <?php if ($hito['estado'] !== 'alcanzado'): ?>
+                                    <?php if ($hito['estado'] !== 'alcanzado' && isAdmin()): ?>
                                         <form method="POST" action="<?= BASE_URL ?>index.php?page=hitos&action=cambiar_estado&id=<?= $hito['id'] ?>" class="d-inline">
                                             <input type="hidden" name="plan_accion_id" value="<?= $plan['id'] ?>">
                                             <input type="hidden" name="estado" value="alcanzado">
@@ -337,6 +351,7 @@ require_once __DIR__ . '/../layout/header.php';
                                class="btn-action btn-action-primary" title="Descargar">
                                 <i class="bi bi-download"></i>
                             </a>
+                            <?php if (isAdmin()): ?>
                             <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=eliminar&id=<?= $archivo['id'] ?>"
                                   class="d-inline"
                                   onsubmit="return confirm('¿Está seguro de que desea eliminar este archivo?');">
@@ -345,12 +360,14 @@ require_once __DIR__ . '/../layout/header.php';
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
 
+        <?php if (isAdmin()): ?>
         <!-- Formulario de subida -->
         <form method="POST" action="<?= BASE_URL ?>index.php?page=adjuntos&action=subir" enctype="multipart/form-data">
             <input type="hidden" name="entidad_tipo" value="plan_accion">
@@ -363,6 +380,7 @@ require_once __DIR__ . '/../layout/header.php';
                 </button>
             </div>
         </form>
+        <?php endif; ?>
     </div>
 </div>
 

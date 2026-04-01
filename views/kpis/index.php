@@ -19,6 +19,7 @@ if ($filtroTipo) {
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
+<?php if (isAdmin()): ?>
 <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalCargarDoc">
         <i class="bi bi-file-earmark-arrow-up me-1"></i>Cargar desde documento
@@ -27,6 +28,7 @@ require_once __DIR__ . '/../layout/header.php';
         <i class="bi bi-plus-lg me-1"></i>Nuevo KPI
     </a>
 </div>
+<?php endif; ?>
 
 <!-- Filtros -->
 <div class="card mb-4">
@@ -138,6 +140,7 @@ require_once __DIR__ . '/../layout/header.php';
                                    class="btn-action btn-action-info" title="Historial">
                                     <i class="bi bi-clock-history"></i>
                                 </a>
+                                <?php if (isAdmin()): ?>
                                 <a href="<?= BASE_URL ?>index.php?page=kpis&action=editar&id=<?= (int)$kpi['id'] ?><?= $filtroIE ? '&filtro_ie=' . (int)$filtroIE : '' ?><?= $filtroTipo ? '&filtro_tipo=' . urlencode($filtroTipo) : '' ?>"
                                    class="btn-action btn-action-primary" title="Editar">
                                     <i class="bi bi-pencil"></i>
@@ -150,6 +153,7 @@ require_once __DIR__ . '/../layout/header.php';
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>

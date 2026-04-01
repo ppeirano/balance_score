@@ -33,11 +33,13 @@ $pageTitle = 'Planes de Acción';
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
+<?php if (isAdmin()): ?>
 <div class="d-flex justify-content-end align-items-center mb-4">
     <a href="<?= BASE_URL ?>index.php?page=planes&action=crear" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Plan de Acción
     </a>
 </div>
+<?php endif; ?>
 
 <!-- Filtros -->
 <div class="card mb-4">
@@ -130,6 +132,7 @@ require_once __DIR__ . '/../layout/header.php';
                                            class="btn-action btn-action-primary" title="Ver detalle">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                        <?php if (isAdmin()): ?>
                                         <a href="<?= BASE_URL ?>index.php?page=planes&action=editar&id=<?= $plan['id'] ?>"
                                            class="btn-action btn-action-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>
@@ -147,6 +150,7 @@ require_once __DIR__ . '/../layout/header.php';
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

@@ -143,6 +143,7 @@
 
                     <hr>
 
+                    <?php if (isAdmin()): ?>
                     <!-- Admin -->
                     <div class="sidebar-section-label collapsed" data-bs-toggle="collapse" data-bs-target="#navAdmin">
                         Admin <i class="bi bi-chevron-down"></i>
@@ -159,8 +160,14 @@
                                     <i class="bi bi-calendar-range me-2"></i><span class="nav-text">Períodos</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= activeNav('admin_usuarios', $page) ?>" href="<?= BASE_URL ?>index.php?page=admin_usuarios">
+                                    <i class="bi bi-people me-2"></i><span class="nav-text">Usuarios</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
+                    <?php endif; ?>
                     <!-- Toggle sidebar -->
                     <div class="sidebar-toggle-wrap d-none d-md-block">
                         <button id="sidebarToggle" class="sidebar-toggle-btn" title="Colapsar/Expandir menú">
@@ -190,15 +197,33 @@
                     'evaluacion' => 'Evaluación IA',
                     'admin_responsables' => 'Admin. Responsables',
                     'periodos' => 'Períodos Estratégicos',
+                    'admin_usuarios' => 'Usuarios',
                     'actividades' => 'Actividades',
                 ];
                 $topbarTitle = $pageTitles[$page] ?? ucfirst($page);
                 ?>
-                <div class="view-topbar">
-                    <button class="btn btn-link text-dark d-md-none me-2 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-                        <i class="bi bi-list fs-4"></i>
-                    </button>
-                    <div class="view-topbar-title"><?= $topbarTitle ?></div>
+                <div class="view-topbar d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-link text-dark d-md-none me-2 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                            <i class="bi bi-list fs-4"></i>
+                        </button>
+                        <div class="view-topbar-title"><?= $topbarTitle ?></div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <?php $cu = currentUser(); if ($cu): ?>
+                        <small class="text-muted d-none d-sm-inline">
+                            <i class="bi bi-person-circle me-1"></i><?= sanitize($cu['nombre'] ?: $cu['email']) ?>
+                            <?php if ($cu['perfil'] === 'admin'): ?>
+                                <span class="badge bg-primary ms-1" style="font-size:10px;">Admin</span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary ms-1" style="font-size:10px;">Consultor</span>
+                            <?php endif; ?>
+                        </small>
+                        <a href="<?= BASE_URL ?>index.php?page=logout" class="btn btn-outline-secondary btn-sm" title="Cerrar sesión">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div class="px-md-4 px-3 pb-4">
                 <?php mostrarFlash(); ?>

@@ -4,11 +4,13 @@ $reuniones = Reunion::getAll($pdo);
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
+<?php if (isAdmin()): ?>
 <div class="d-flex justify-content-end align-items-center mb-4">
     <a href="<?= BASE_URL ?>index.php?page=reuniones&action=crear" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nueva Reunión
     </a>
 </div>
+<?php endif; ?>
 
 <div class="table-responsive">
     <table class="table table-hover">
@@ -45,10 +47,12 @@ require_once __DIR__ . '/../layout/header.php';
                 <td>
                     <div class="d-flex gap-1 justify-content-end">
                         <a href="<?= BASE_URL ?>index.php?page=reuniones&action=detalle&id=<?= $r['id'] ?>" class="btn-action btn-action-primary" title="Ver"><i class="bi bi-eye"></i></a>
+                        <?php if (isAdmin()): ?>
                         <a href="<?= BASE_URL ?>index.php?page=reuniones&action=editar&id=<?= $r['id'] ?>" class="btn-action btn-action-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
                         <form method="POST" action="<?= BASE_URL ?>index.php?page=reuniones&action=eliminar&id=<?= $r['id'] ?>" class="d-inline" onsubmit="return confirm('¿Eliminar esta reunión?')">
                             <button type="submit" class="btn-action btn-action-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
+                        <?php endif; ?>
                     </div>
                 </td>
             </tr>

@@ -99,6 +99,7 @@ require_once __DIR__ . '/../layout/header.php';
     </div>
 </div>
 
+<?php if (isAdmin()): ?>
 <!-- Registrar nuevo valor -->
 <div class="card mb-4">
     <div class="card-header">
@@ -151,6 +152,7 @@ require_once __DIR__ . '/../layout/header.php';
         </form>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Historial table -->
 <div class="card mb-4">
