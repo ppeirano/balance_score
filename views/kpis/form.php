@@ -207,72 +207,97 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
 ?>
 <?php if (!empty($historial)): ?>
 <div class="card mt-4">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historial de valores</h5>
+        <span class="badge-neutral"><?= count($historial) ?> registro<?= count($historial) > 1 ? 's' : '' ?></span>
     </div>
-    <div class="card-body">
-        <form method="POST" action="<?= BASE_URL ?>index.php?page=kpis&action=guardar_historial">
-            <input type="hidden" name="kpi_id" value="<?= (int)$kpi['id'] ?>">
-            <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width:140px;">Per&iacute;odo</th>
-                            <th>Valor</th>
-                            <th>Sem&aacute;foro</th>
-                            <th>Observaciones</th>
-                            <th style="width:100px;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach (array_reverse($historial) as $h): ?>
-                        <tr>
-                            <td>
-                                <input type="date" class="form-control form-control-sm"
-                                       name="historial[<?= (int)$h['id'] ?>][periodo]"
-                                       value="<?= sanitize($h['periodo']) ?>">
-                            </td>
-                            <td>
-                                <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
-                                    <input type="number" class="form-control form-control-sm"
-                                           name="historial[<?= (int)$h['id'] ?>][valor]"
-                                           value="<?= sanitize($h['valor']) ?>"
-                                           step="<?= ($kpi['es_entero'] ?? 0) ? '1' : 'any' ?>">
-                                <?php else: ?>
-                                    <select class="form-select form-select-sm"
-                                            name="historial[<?= (int)$h['id'] ?>][valor_cualitativo]">
-                                        <?php foreach ($opciones as $opcion): ?>
-                                            <option value="<?= sanitize($opcion) ?>"
-                                                <?= ($h['valor_cualitativo'] ?? '') === $opcion ? 'selected' : '' ?>>
-                                                <?= sanitize($opcion) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= semaforoBadge($h['semaforo'] ?? 'gris') ?></td>
-                            <td>
-                                <input type="text" class="form-control form-control-sm"
-                                       name="historial[<?= (int)$h['id'] ?>][observaciones]"
-                                       value="<?= sanitize($h['observaciones'] ?? '') ?>"
-                                       placeholder="Observaciones">
-                            </td>
-                            <td>
-                                <button type="button" class="btn-action btn-action-danger"
-                                        title="Eliminar"
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:120px;">Per&iacute;odo</th>
+                        <th>Valor</th>
+                        <th style="width:80px;">Sem&aacute;foro</th>
+                        <th>Observaciones</th>
+                        <th style="width:90px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach (array_reverse($historial) as $h): ?>
+                    <!-- Fila de lectura -->
+                    <tr id="hView<?= (int)$h['id'] ?>">
+                        <td><?= formatDate($h['periodo']) ?></td>
+                        <td>
+                            <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
+                                <strong><?= formatKpiValor($h['valor'], $kpi['es_entero'] ?? 0) ?></strong>
+                                <small class="text-muted"><?= sanitize($kpi['unidad'] ?? '') ?></small>
+                            <?php else: ?>
+                                <strong><?= sanitize($h['valor_cualitativo'] ?? '-') ?></strong>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= semaforoBadge($h['semaforo'] ?? 'gris') ?></td>
+                        <td><small class="text-muted"><?= sanitize($h['observaciones'] ?? '-') ?></small></td>
+                        <td class="text-end">
+                            <div class="d-flex gap-1 justify-content-end">
+                                <button type="button" class="btn-action btn-action-secondary" title="Editar"
+                                        onclick="toggleEditH(<?= (int)$h['id'] ?>)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn-action btn-action-danger" title="Eliminar"
                                         onclick="if(confirm('¿Eliminar este registro?')){document.getElementById('formElimH<?= (int)$h['id'] ?>').submit();}">
                                     <i class="bi bi-trash"></i>
                                 </button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-            <button type="submit" class="btn btn-success btn-sm">
-                <i class="bi bi-check-lg me-1"></i>Guardar cambios del historial
-            </button>
-        </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Fila de edición (oculta) -->
+                    <tr id="hEdit<?= (int)$h['id'] ?>" style="display:none;" class="table-warning">
+                        <td colspan="5">
+                            <form method="POST" action="<?= BASE_URL ?>index.php?page=kpis&action=guardar_historial" class="row g-2 align-items-end py-1">
+                                <input type="hidden" name="kpi_id" value="<?= (int)$kpi['id'] ?>">
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted mb-0">Per&iacute;odo</label>
+                                    <input type="date" class="form-control form-control-sm"
+                                           name="historial[<?= (int)$h['id'] ?>][periodo]"
+                                           value="<?= sanitize($h['periodo']) ?>">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small text-muted mb-0">Valor</label>
+                                    <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
+                                        <input type="number" class="form-control form-control-sm"
+                                               name="historial[<?= (int)$h['id'] ?>][valor]"
+                                               value="<?= sanitize($h['valor']) ?>"
+                                               step="<?= ($kpi['es_entero'] ?? 0) ? '1' : 'any' ?>">
+                                    <?php else: ?>
+                                        <select class="form-select form-select-sm"
+                                                name="historial[<?= (int)$h['id'] ?>][valor_cualitativo]">
+                                            <?php foreach ($opciones as $opcion): ?>
+                                                <option value="<?= sanitize($opcion) ?>"
+                                                    <?= ($h['valor_cualitativo'] ?? '') === $opcion ? 'selected' : '' ?>>
+                                                    <?= sanitize($opcion) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted mb-0">Observaciones</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                           name="historial[<?= (int)$h['id'] ?>][observaciones]"
+                                           value="<?= sanitize($h['observaciones'] ?? '') ?>">
+                                </div>
+                                <div class="col-md-3 d-flex gap-1">
+                                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleEditH(<?= (int)$h['id'] ?>)">Cancelar</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
         <?php foreach ($historial as $h): ?>
         <form id="formElimH<?= (int)$h['id'] ?>" method="POST"
@@ -285,6 +310,20 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
 </div>
 <?php endif; ?>
 <?php endif; ?>
+
+<script>
+function toggleEditH(id) {
+    var view = document.getElementById('hView' + id);
+    var edit = document.getElementById('hEdit' + id);
+    if (edit.style.display === 'none') {
+        edit.style.display = '';
+        view.style.opacity = '0.3';
+    } else {
+        edit.style.display = 'none';
+        view.style.opacity = '1';
+    }
+}
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
