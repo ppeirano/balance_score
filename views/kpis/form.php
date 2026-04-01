@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../models/Kpi.php';
 require_once __DIR__ . '/../../models/Iniciativa.php';
 require_once __DIR__ . '/../../models/PlanAccion.php';
+require_once __DIR__ . '/../../models/Responsable.php';
 
 $kpi = null;
 if ($id) {
@@ -9,6 +10,7 @@ if ($id) {
 }
 $iniciativas = Iniciativa::getAll($pdo);
 $planes = PlanAccion::getAll($pdo);
+$responsables = Responsable::getAll($pdo);
 
 require_once __DIR__ . '/../layout/header.php';
 $esEditar = ($kpi !== null);
@@ -62,6 +64,22 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
                                     data-ie="<?= (int)$pa['iniciativa_id'] ?>"
                                     <?= ($kpi && $kpi['plan_accion_id'] == $pa['id']) ? 'selected' : '' ?>>
                                 <?= sanitize($pa['codigo'] . ' - ' . $pa['nombre']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Responsable -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Responsable</label>
+                    <select class="form-select" name="responsable">
+                        <option value="">-- Sin asignar --</option>
+                        <?php foreach ($responsables as $resp): ?>
+                            <option value="<?= sanitize($resp['nombre']) ?>"
+                                <?= ($kpi && ($kpi['responsable'] ?? '') === $resp['nombre']) ? 'selected' : '' ?>>
+                                <?= sanitize($resp['nombre']) ?><?= $resp['cargo'] ? ' (' . sanitize($resp['cargo']) . ')' : '' ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

@@ -97,9 +97,11 @@ function renderNodo($nodo, $depth = 0) {
                                         $metaDisplay = $kpi['tipo'] === 'cualitativo'
                                             ? ''
                                             : ' / ' . formatKpiValor($kpi['meta'], $kpi['es_entero']) . ($kpi['unidad'] ? ' ' . $kpi['unidad'] : '');
+                                        $esPropio = !empty($kpi['responsable']) && $kpi['responsable'] === $nodo['nombre'];
                                     ?>
-                                        <a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= (int)$kpi['id'] ?>" class="org-ie-kpi-item">
+                                        <a href="<?= BASE_URL ?>index.php?page=kpis&action=historial&id=<?= (int)$kpi['id'] ?>" class="org-ie-kpi-item <?= $esPropio ? 'org-ie-kpi-own' : '' ?>">
                                             <span class="org-ie-semaforo" style="background-color: <?= $sColor ?>;"></span>
+                                            <?php if ($esPropio): ?><i class="bi bi-person-fill org-ie-kpi-owner-icon"></i><?php endif; ?>
                                             <span class="org-ie-kpi-name"><?= sanitize(mb_substr($kpi['nombre'], 0, 40)) ?><?= mb_strlen($kpi['nombre']) > 40 ? '...' : '' ?></span>
                                             <span class="org-ie-kpi-valor"><?= $valorDisplay ?><?= $metaDisplay ?></span>
                                         </a>
@@ -406,6 +408,20 @@ function renderNodo($nodo, $depth = 0) {
 .org-ie-kpi-item:hover {
     background: #f0f4f8;
     color: inherit;
+}
+.org-ie-kpi-own {
+    background: #eff6ff;
+    border-left: 2px solid #3b82f6;
+    padding-left: 4px;
+    font-weight: 600;
+}
+.org-ie-kpi-own:hover {
+    background: #dbeafe;
+}
+.org-ie-kpi-owner-icon {
+    font-size: 7px;
+    color: #3b82f6;
+    flex-shrink: 0;
 }
 .org-ie-semaforo {
     width: 7px;

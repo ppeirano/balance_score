@@ -34,7 +34,7 @@ class Kpi {
                     umbral_verde = ?, umbral_amarillo = ?, direccion = ?,
                     es_entero = ?,
                     escala_cualitativa = ?, opciones_cualitativas = ?,
-                    frecuencia = ?, activo = ?
+                    frecuencia = ?, activo = ?, responsable = ?
                 WHERE id = ?
             ");
             $stmt->execute([
@@ -53,6 +53,7 @@ class Kpi {
                 $data['opciones_cualitativas'] ?: null,
                 $data['frecuencia'] ?? 'mensual',
                 $data['activo'] ?? 1,
+                $data['responsable'] ?: null,
                 $data['id']
             ]);
             flash('success', 'KPI actualizado correctamente.');
@@ -60,8 +61,8 @@ class Kpi {
             Bitacora::registrar($pdo, 'kpi', $data['id'], $data['nombre'], 'editado');
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO kpis (iniciativa_id, plan_accion_id, periodo_id, nombre, tipo, unidad, meta, umbral_verde, umbral_amarillo, direccion, es_entero, escala_cualitativa, opciones_cualitativas, frecuencia, activo)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO kpis (iniciativa_id, plan_accion_id, periodo_id, nombre, tipo, unidad, meta, umbral_verde, umbral_amarillo, direccion, es_entero, escala_cualitativa, opciones_cualitativas, frecuencia, activo, responsable)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['iniciativa_id'] ?: null,
@@ -78,7 +79,8 @@ class Kpi {
                 $data['escala_cualitativa'] ?: null,
                 $data['opciones_cualitativas'] ?: null,
                 $data['frecuencia'] ?? 'mensual',
-                $data['activo'] ?? 1
+                $data['activo'] ?? 1,
+                $data['responsable'] ?: null
             ]);
             flash('success', 'KPI creado correctamente.');
             require_once __DIR__ . '/Bitacora.php';

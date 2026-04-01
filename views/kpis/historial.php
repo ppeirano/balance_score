@@ -61,13 +61,16 @@ require_once __DIR__ . '/../layout/header.php';
                         <span class="text-muted">Sin IE asignada</span>
                     <?php endif; ?>
                 </p>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 flex-wrap">
                     <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
                         <span class="badge-info">Cuantitativo</span>
                     <?php else: ?>
                         <span class="badge text-white" style="background-color: #6f42c1;">Cualitativo</span>
                     <?php endif; ?>
                     <span class="badge-neutral"><?= sanitize(ucfirst($kpi['frecuencia'] ?? '-')) ?></span>
+                    <?php if (!empty($kpi['responsable'])): ?>
+                        <span class="badge-neutral"><i class="bi bi-person me-1"></i><?= sanitize($kpi['responsable']) ?></span>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="col-md-3 text-center">
