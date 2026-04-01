@@ -60,15 +60,21 @@ class Iniciativa {
         $stmt->execute([$id]);
         $planes = $stmt->fetchAll();
 
+        if (empty($planes)) return 0;
+
         $totalPeso = 0;
         $sumaPonderada = 0;
         foreach ($planes as $plan) {
-            $totalPeso += $plan['peso'];
-            $sumaPonderada += $plan['peso'] * $plan['avance'];
+            if ($plan['peso'] > 0) {
+                $totalPeso += $plan['peso'];
+                $sumaPonderada += $plan['peso'] * $plan['avance'];
+            }
         }
 
-        if ($totalPeso == 0) return 0;
-        return round($sumaPonderada / $totalPeso);
+        if ($totalPeso > 0) {
+            return round($sumaPonderada / $totalPeso);
+        }
+        return round(array_sum(array_column($planes, 'avance')) / count($planes));
     }
 
     static function guardar($pdo, $data) {

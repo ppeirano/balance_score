@@ -30,20 +30,11 @@ $allPdas = $pdo->query("
 ")->fetchAll();
 $pdaByIE = [];
 $avanceByIE = [];
-$grouped = [];
 foreach ($allPdas as $pda) {
-    $grouped[$pda['iniciativa_id']][] = $pda;
+    $pdaByIE[$pda['iniciativa_id']][] = $pda;
 }
-foreach ($grouped as $ieId => $pdas) {
-    $pdaByIE[$ieId] = $pdas;
-    $pesoTotal = array_sum(array_column($pdas, 'peso'));
-    $av = 0;
-    if ($pesoTotal > 0) {
-        foreach ($pdas as $p) {
-            $av += ($p['avance'] * $p['peso'] / $pesoTotal);
-        }
-    }
-    $avanceByIE[$ieId] = round($av);
+foreach ($iniciativas as $ie) {
+    $avanceByIE[$ie['id']] = Iniciativa::calcularAvance($pdo, $ie['id']);
 }
 
 // KPIs activos por IE (con campos para recalcular semáforo)

@@ -44,20 +44,11 @@ $allPdas = $pdo->query("
     FROM planes_accion pa
     ORDER BY pa.nombre
 ")->fetchAll();
-$grouped = [];
 foreach ($allPdas as $pda) {
-    $grouped[$pda['iniciativa_id']][] = $pda;
+    $pdaByIE[$pda['iniciativa_id']][] = $pda;
 }
-foreach ($grouped as $ieId => $pdas) {
-    $pdaByIE[$ieId] = $pdas;
-    $pesoTotal = array_sum(array_column($pdas, 'peso'));
-    $avance = 0;
-    if ($pesoTotal > 0) {
-        foreach ($pdas as $pda) {
-            $avance += ($pda['avance'] * $pda['peso'] / $pesoTotal);
-        }
-    }
-    $avanceByIE[$ieId] = round($avance);
+foreach ($iniciativas as $ie) {
+    $avanceByIE[$ie['id']] = Iniciativa::calcularAvance($pdo, $ie['id']);
 }
 
 // Riesgos abiertos por IE

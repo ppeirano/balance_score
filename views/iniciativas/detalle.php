@@ -67,15 +67,7 @@ $stmtProy->execute([$id]);
 $proyectos = $stmtProy->fetchAll();
 
 // Calcular avance general de la IE
-$totalPeso = 0;
-$avancePonderado = 0;
-foreach ($pdas as $p) {
-    if ($p['peso'] > 0) {
-        $totalPeso += $p['peso'];
-        $avancePonderado += $p['avance'] * $p['peso'];
-    }
-}
-$avanceIe = ($totalPeso > 0) ? round($avancePonderado / $totalPeso) : 0;
+$avanceIe = Iniciativa::calcularAvance($pdo, $id);
 
 require_once __DIR__ . '/../layout/header.php';
 ?>

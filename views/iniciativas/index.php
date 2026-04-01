@@ -22,26 +22,12 @@ foreach ($iniciativas as $ie) {
 
 // Contar PDAs y calcular avance por iniciativa
 $pdaStats = [];
-$stmtPda = $pdo->prepare("
-    SELECT COUNT(*) as total_pdas,
-           COALESCE(AVG(avance), 0) as avance_promedio,
-           SUM(CASE WHEN peso > 0 THEN avance * peso ELSE 0 END) as avance_ponderado,
-           SUM(CASE WHEN peso > 0 THEN peso ELSE 0 END) as peso_total
-    FROM planes_accion
-    WHERE iniciativa_id = ?
-");
+$stmtCount = $pdo->prepare("SELECT COUNT(*) FROM planes_accion WHERE iniciativa_id = ?");
 foreach ($iniciativas as $ie) {
-    $stmtPda->execute([$ie['id']]);
-    $stats = $stmtPda->fetch();
-    $avance = 0;
-    if ($stats['peso_total'] > 0) {
-        $avance = round($stats['avance_ponderado'] / $stats['peso_total']);
-    } elseif ($stats['total_pdas'] > 0) {
-        $avance = round($stats['avance_promedio']);
-    }
+    $stmtCount->execute([$ie['id']]);
     $pdaStats[$ie['id']] = [
-        'total_pdas' => (int)$stats['total_pdas'],
-        'avance' => $avance
+        'total_pdas' => (int)$stmtCount->fetchColumn(),
+        'avance' => Iniciativa::calcularAvance($pdo, $ie['id'])
     ];
 }
 

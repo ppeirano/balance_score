@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../models/Iniciativa.php';
 // Dashboard - Recopilar datos
 $perspectivas = $pdo->query("SELECT * FROM perspectivas ORDER BY orden")->fetchAll();
 
@@ -12,20 +13,7 @@ foreach ($perspectivas as $p) {
     $totalAvance = 0;
     $totalIes = count($ies);
     foreach ($ies as &$ie) {
-        // Calcular avance ponderado de la IE
-        $stmt2 = $pdo->prepare("SELECT avance, peso FROM planes_accion WHERE iniciativa_id = ?");
-        $stmt2->execute([$ie['id']]);
-        $pdas = $stmt2->fetchAll();
-        $pesoTotal = array_sum(array_column($pdas, 'peso'));
-        $avancePonderado = 0;
-        if ($pesoTotal > 0) {
-            foreach ($pdas as $pda) {
-                $avancePonderado += ($pda['avance'] * $pda['peso']) / $pesoTotal;
-            }
-        } elseif (count($pdas) > 0) {
-            $avancePonderado = array_sum(array_column($pdas, 'avance')) / count($pdas);
-        }
-        $ie['avance'] = round($avancePonderado);
+        $ie['avance'] = Iniciativa::calcularAvance($pdo, $ie['id']);
         $totalAvance += $ie['avance'];
     }
     unset($ie);
