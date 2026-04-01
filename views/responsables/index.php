@@ -13,7 +13,7 @@ if ($ownerSeleccionado) {
     $stmt = $pdo->prepare("SELECT pa.*, ie.codigo as ie_codigo, ie.nombre as ie_nombre
                            FROM planes_accion pa
                            JOIN iniciativas_estrategicas ie ON pa.iniciativa_id = ie.id
-                           WHERE pa.owner = ? ORDER BY ie.codigo, pa.codigo");
+                           WHERE pa.owner = ? ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED), pa.codigo");
     $stmt->execute([$ownerSeleccionado]);
     $datosPorOwner['planes'] = $stmt->fetchAll();
 
@@ -23,7 +23,7 @@ if ($ownerSeleccionado) {
                            FROM actividades a
                            JOIN planes_accion pa ON a.plan_accion_id = pa.id
                            JOIN iniciativas_estrategicas ie ON pa.iniciativa_id = ie.id
-                           WHERE a.responsable = ? ORDER BY ie.codigo, pa.codigo, a.codigo");
+                           WHERE a.responsable = ? ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED), pa.codigo, a.codigo");
     $stmt->execute([$ownerSeleccionado]);
     $datosPorOwner['actividades'] = $stmt->fetchAll();
 

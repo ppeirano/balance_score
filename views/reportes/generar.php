@@ -9,7 +9,7 @@ if ($tipoReporte === 'csv_planes') {
                           ie.codigo as ie_codigo, ie.nombre as ie_nombre
                           FROM planes_accion pa
                           JOIN iniciativas_estrategicas ie ON pa.iniciativa_id = ie.id
-                          ORDER BY ie.codigo, pa.codigo");
+                          ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED), pa.codigo");
     $planes = $stmt->fetchAll();
 
     header('Content-Type: text/csv; charset=utf-8');
@@ -29,7 +29,7 @@ if ($tipoReporte === 'csv_kpis') {
                           ie.codigo as ie_codigo
                           FROM kpis k
                           LEFT JOIN iniciativas_estrategicas ie ON k.iniciativa_id = ie.id
-                          WHERE k.activo = 1 ORDER BY ie.codigo");
+                          WHERE k.activo = 1 ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED)");
     $kpis = $stmt->fetchAll();
 
     header('Content-Type: text/csv; charset=utf-8');
@@ -56,7 +56,7 @@ if ($tipoReporte === 'csv_actividades') {
                           FROM actividades a
                           JOIN planes_accion pa ON a.plan_accion_id = pa.id
                           JOIN iniciativas_estrategicas ie ON pa.iniciativa_id = ie.id
-                          ORDER BY ie.codigo, pa.codigo, a.codigo");
+                          ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED), pa.codigo, a.codigo");
     $actividades = $stmt->fetchAll();
 
     header('Content-Type: text/csv; charset=utf-8');

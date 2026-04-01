@@ -16,7 +16,7 @@ $iniciativas = $pdo->query("
     SELECT ie.*, p.nombre AS perspectiva_nombre, p.color AS perspectiva_color, p.icono AS perspectiva_icono
     FROM iniciativas_estrategicas ie
     JOIN perspectivas p ON ie.perspectiva_id = p.id
-    ORDER BY p.orden DESC, ie.orden ASC
+    ORDER BY p.orden DESC, CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED) ASC
 ")->fetchAll();
 $ieByPersp = [];
 foreach ($iniciativas as $ie) {

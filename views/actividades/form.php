@@ -25,7 +25,7 @@ $stmtPlanes = $pdo->query("
     SELECT pa.id, pa.codigo, pa.nombre, ie.codigo AS ie_codigo
     FROM planes_accion pa
     JOIN iniciativas_estrategicas ie ON ie.id = pa.iniciativa_id
-    ORDER BY ie.codigo, pa.prioridad
+    ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED), pa.prioridad
 ");
 $planes = $stmtPlanes->fetchAll();
 

@@ -24,7 +24,7 @@ if ($filtroEstado !== '') {
     $params[] = $filtroEstado;
 }
 
-$sql .= " ORDER BY ie.codigo, pa.codigo";
+$sql .= " ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED), pa.codigo";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $planes = $stmt->fetchAll();

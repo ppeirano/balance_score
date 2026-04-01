@@ -9,7 +9,7 @@ class Iniciativa {
             SELECT ie.*, p.nombre AS perspectiva_nombre, p.color AS perspectiva_color
             FROM iniciativas_estrategicas ie
             JOIN perspectivas p ON p.id = ie.perspectiva_id
-            ORDER BY ie.orden
+            ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED)
         ");
         return $stmt->fetchAll();
     }
@@ -31,7 +31,7 @@ class Iniciativa {
             FROM iniciativas_estrategicas ie
             JOIN perspectivas p ON p.id = ie.perspectiva_id
             WHERE ie.perspectiva_id = ?
-            ORDER BY ie.orden
+            ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED)
         ");
         $stmt->execute([$perspId]);
         return $stmt->fetchAll();

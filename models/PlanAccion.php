@@ -9,7 +9,7 @@ class PlanAccion {
             SELECT pa.*, ie.nombre AS iniciativa_nombre, ie.codigo AS iniciativa_codigo
             FROM planes_accion pa
             JOIN iniciativas_estrategicas ie ON ie.id = pa.iniciativa_id
-            ORDER BY ie.orden, pa.prioridad
+            ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED), pa.prioridad
         ");
         return $stmt->fetchAll();
     }

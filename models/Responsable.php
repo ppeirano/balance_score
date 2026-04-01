@@ -73,7 +73,7 @@ class Responsable {
             JOIN planes_accion pa ON pa.iniciativa_id = ie.id
             JOIN perspectivas p ON ie.perspectiva_id = p.id
             WHERE pa.owner IS NOT NULL AND pa.owner != ''
-            ORDER BY ie.codigo
+            ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED)
         ");
         foreach ($stmtIE->fetchAll() as $row) {
             $ieByResp[$row['owner']][$row['id']] = $row;

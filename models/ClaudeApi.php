@@ -103,7 +103,7 @@ class ClaudeApi {
         foreach ($perspectivas as $p) {
             $datos .= "## Perspectiva: " . $p['nombre'] . "\n";
 
-            $stmt = $pdo->prepare("SELECT * FROM iniciativas_estrategicas WHERE perspectiva_id = ? ORDER BY orden");
+            $stmt = $pdo->prepare("SELECT * FROM iniciativas_estrategicas WHERE perspectiva_id = ? ORDER BY CAST(SUBSTRING(codigo, 3) AS UNSIGNED)");
             $stmt->execute([$p['id']]);
             $iniciativas = $stmt->fetchAll();
 

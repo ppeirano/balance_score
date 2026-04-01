@@ -10,7 +10,7 @@ $iniciativas = $pdo->query("
     SELECT ie.*, p.nombre AS perspectiva_nombre, p.color AS perspectiva_color
     FROM iniciativas_estrategicas ie
     JOIN perspectivas p ON ie.perspectiva_id = p.id
-    ORDER BY ie.orden ASC
+    ORDER BY CAST(SUBSTRING(ie.codigo, 3) AS UNSIGNED) ASC
 ")->fetchAll();
 
 // Agrupar iniciativas por perspectiva
