@@ -9,13 +9,50 @@ $page = $_GET['page'] ?? 'dashboard';
 $action = $_GET['action'] ?? 'index';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 
+// --- Setup inicial: si no hay usuarios, mostrar formulario de primer ingreso ---
+if ($page === 'setup') {
+    require_once __DIR__ . '/models/Usuario.php';
+    $totalUsuarios = (int)$pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
+    if ($totalUsuarios > 0) {
+        redirect('index.php?page=login');
+    }
+    $setupError = null;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $password2 = $_POST['password2'] ?? '';
+        if (!$email || !$password) {
+            $setupError = 'Email y contraseña son obligatorios.';
+        } elseif (strlen($password) < 6) {
+            $setupError = 'La contraseña debe tener al menos 6 caracteres.';
+        } elseif ($password !== $password2) {
+            $setupError = 'Las contraseñas no coinciden.';
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO usuarios (email, password_hash, perfil) VALUES (?, ?, 'admin')");
+            $stmt->execute([$email, password_hash($password, PASSWORD_DEFAULT)]);
+            $user = Usuario::login($pdo, $email, $password);
+            if ($user) {
+                redirect('index.php?page=dashboard');
+            }
+            redirect('index.php?page=login');
+        }
+    }
+    require __DIR__ . '/views/auth/setup.php';
+    exit;
+}
+
 // --- Auth: login/logout ---
 if ($page === 'login') {
+    require_once __DIR__ . '/models/Usuario.php';
+    // Si no hay usuarios, redirigir a setup
+    $totalUsuarios = (int)$pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
+    if ($totalUsuarios === 0) {
+        redirect('index.php?page=setup');
+    }
     if (isLoggedIn()) { redirect('index.php?page=dashboard'); }
     $loginError = null;
     $loginEmail = '';
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        require_once __DIR__ . '/models/Usuario.php';
         $loginEmail = $_POST['email'] ?? '';
         $user = Usuario::login($pdo, $loginEmail, $_POST['password'] ?? '');
         if ($user) {
