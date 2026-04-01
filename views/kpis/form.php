@@ -198,6 +198,94 @@ $tipo = $kpi['tipo'] ?? 'cuantitativo';
     </div>
 </div>
 
+<?php if ($esEditar):
+    $historial = Kpi::getHistorial($pdo, $kpi['id']);
+    $opciones = [];
+    if ($kpi['tipo'] === 'cualitativo' && !empty($kpi['opciones_cualitativas'])) {
+        $opciones = array_map('trim', explode(',', $kpi['opciones_cualitativas']));
+    }
+?>
+<?php if (!empty($historial)): ?>
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historial de valores</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="<?= BASE_URL ?>index.php?page=kpis&action=guardar_historial">
+            <input type="hidden" name="kpi_id" value="<?= (int)$kpi['id'] ?>">
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:140px;">Per&iacute;odo</th>
+                            <th>Valor</th>
+                            <th>Sem&aacute;foro</th>
+                            <th>Observaciones</th>
+                            <th style="width:100px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach (array_reverse($historial) as $h): ?>
+                        <tr>
+                            <td>
+                                <input type="date" class="form-control form-control-sm"
+                                       name="historial[<?= (int)$h['id'] ?>][periodo]"
+                                       value="<?= sanitize($h['periodo']) ?>">
+                            </td>
+                            <td>
+                                <?php if ($kpi['tipo'] === 'cuantitativo'): ?>
+                                    <input type="number" class="form-control form-control-sm"
+                                           name="historial[<?= (int)$h['id'] ?>][valor]"
+                                           value="<?= sanitize($h['valor']) ?>"
+                                           step="<?= ($kpi['es_entero'] ?? 0) ? '1' : 'any' ?>">
+                                <?php else: ?>
+                                    <select class="form-select form-select-sm"
+                                            name="historial[<?= (int)$h['id'] ?>][valor_cualitativo]">
+                                        <?php foreach ($opciones as $opcion): ?>
+                                            <option value="<?= sanitize($opcion) ?>"
+                                                <?= ($h['valor_cualitativo'] ?? '') === $opcion ? 'selected' : '' ?>>
+                                                <?= sanitize($opcion) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= semaforoBadge($h['semaforo'] ?? 'gris') ?></td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm"
+                                       name="historial[<?= (int)$h['id'] ?>][observaciones]"
+                                       value="<?= sanitize($h['observaciones'] ?? '') ?>"
+                                       placeholder="Observaciones">
+                            </td>
+                            <td>
+                                <button type="button" class="btn-action btn-action-danger"
+                                        title="Eliminar"
+                                        onclick="if(confirm('¿Eliminar este registro?')){document.getElementById('formElimH<?= (int)$h['id'] ?>').submit();}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-success btn-sm">
+                <i class="bi bi-check-lg me-1"></i>Guardar cambios del historial
+            </button>
+        </form>
+
+        <?php foreach ($historial as $h): ?>
+        <form id="formElimH<?= (int)$h['id'] ?>" method="POST"
+              action="<?= BASE_URL ?>index.php?page=kpis&action=eliminar_historial" style="display:none;">
+            <input type="hidden" name="kpi_id" value="<?= (int)$kpi['id'] ?>">
+            <input type="hidden" name="historial_id" value="<?= (int)$h['id'] ?>">
+        </form>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
+<?php endif; ?>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const tipoCuantitativo = document.getElementById('tipoCuantitativo');

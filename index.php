@@ -80,7 +80,8 @@ $writeActions = ['crear','editar','guardar','eliminar','registrar_valor','confir
                  'guardar_entregable','eliminar_entregable','cambiar_estado_entregable',
                  'guardar_actividad','eliminar_actividad','cambiar_estado_actividad',
                  'guardar_nota','eliminar_nota','subir_imagen_nota','completar',
-                 'procesar_documento','cambiar_estado','solicitar'];
+                 'procesar_documento','cambiar_estado','solicitar',
+                 'guardar_historial','eliminar_historial'];
 $adminPages = ['admin_responsables','periodos','admin_usuarios'];
 
 if (in_array($page, $adminPages) && !isAdmin()) {
@@ -485,6 +486,30 @@ switch ($page) {
                     flash('warning', 'No se seleccionó ningún valor para registrar.');
                 }
                 redirect('index.php?page=kpis');
+                break;
+            case 'guardar_historial':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    require_once __DIR__ . '/models/Kpi.php';
+                    $kpiId = (int)($_POST['kpi_id'] ?? 0);
+                    $registros = $_POST['historial'] ?? [];
+                    if ($kpiId && !empty($registros)) {
+                        Kpi::actualizarHistorial($pdo, $kpiId, $registros);
+                        flash('success', 'Valores del historial actualizados.');
+                    }
+                    redirect('index.php?page=kpis&action=editar&id=' . $kpiId);
+                }
+                break;
+            case 'eliminar_historial':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    require_once __DIR__ . '/models/Kpi.php';
+                    $kpiId = (int)($_POST['kpi_id'] ?? 0);
+                    $historialId = (int)($_POST['historial_id'] ?? 0);
+                    if ($kpiId && $historialId) {
+                        Kpi::eliminarHistorial($pdo, $historialId, $kpiId);
+                        flash('success', 'Registro eliminado del historial.');
+                    }
+                    redirect('index.php?page=kpis&action=editar&id=' . $kpiId);
+                }
                 break;
             default:
                 require __DIR__ . '/views/kpis/index.php';

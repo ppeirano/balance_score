@@ -155,6 +155,63 @@ class Kpi {
         return $stmt->fetchAll();
     }
 
+    static function actualizarHistorial($pdo, $kpiId, $registros) {
+        $kpi = self::getById($pdo, $kpiId);
+        if (!$kpi) return;
+
+        $stmtUpdate = $pdo->prepare("
+            UPDATE kpi_historial SET valor = ?, valor_cualitativo = ?, semaforo = ?, periodo = ?, observaciones = ?
+            WHERE id = ? AND kpi_id = ?
+        ");
+
+        foreach ($registros as $hId => $row) {
+            $hId = (int)$hId;
+            $periodo = $row['periodo'] ?? '';
+            $observaciones = $row['observaciones'] ?? '';
+
+            if ($kpi['tipo'] === 'cuantitativo') {
+                $valor = $row['valor'] ?? '';
+                if ($valor === '') continue;
+                $semaforo = calcularSemaforo($valor, $kpi['meta'], $kpi['umbral_verde'], $kpi['umbral_amarillo'], $kpi['direccion']);
+                $stmtUpdate->execute([$valor, null, $semaforo, $periodo, $observaciones ?: null, $hId, $kpiId]);
+            } else {
+                $valorCual = $row['valor_cualitativo'] ?? '';
+                if ($valorCual === '') continue;
+                $semaforo = self::calcularSemaforoKpi(array_merge($kpi, ['valor_cualitativo' => $valorCual]));
+                $stmtUpdate->execute([null, $valorCual, $semaforo, $periodo, $observaciones ?: null, $hId, $kpiId]);
+            }
+        }
+
+        self::recalcularValorActual($pdo, $kpiId);
+    }
+
+    static function eliminarHistorial($pdo, $historialId, $kpiId) {
+        $pdo->prepare("DELETE FROM kpi_historial WHERE id = ? AND kpi_id = ?")->execute([$historialId, $kpiId]);
+        self::recalcularValorActual($pdo, $kpiId);
+    }
+
+    static function recalcularValorActual($pdo, $kpiId) {
+        $kpi = self::getById($pdo, $kpiId);
+        if (!$kpi) return;
+
+        $stmt = $pdo->prepare("SELECT * FROM kpi_historial WHERE kpi_id = ? ORDER BY periodo DESC, id DESC LIMIT 1");
+        $stmt->execute([$kpiId]);
+        $ultimo = $stmt->fetch();
+
+        if ($ultimo) {
+            if ($kpi['tipo'] === 'cuantitativo') {
+                $pdo->prepare("UPDATE kpis SET valor_actual = ?, estado_semaforo = ? WHERE id = ?")
+                    ->execute([$ultimo['valor'], $ultimo['semaforo'], $kpiId]);
+            } else {
+                $pdo->prepare("UPDATE kpis SET valor_cualitativo = ?, estado_semaforo = ? WHERE id = ?")
+                    ->execute([$ultimo['valor_cualitativo'], $ultimo['semaforo'], $kpiId]);
+            }
+        } else {
+            $pdo->prepare("UPDATE kpis SET valor_actual = NULL, valor_cualitativo = NULL, estado_semaforo = NULL WHERE id = ?")
+                ->execute([$kpiId]);
+        }
+    }
+
     static function calcularSemaforoKpi($kpi) {
         if ($kpi['tipo'] === 'cuantitativo') {
             return calcularSemaforo(
