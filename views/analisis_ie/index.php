@@ -13,6 +13,7 @@ $tipoDefaults = [
     'habilitador' => ['forma' => 'diamond',   'color' => '#50C878'],
     'riesgo'      => ['forma' => 'triangle',  'color' => '#FF6B6B'],
     'restriccion' => ['forma' => 'hexagon',   'color' => '#FFA500'],
+    'kpi'         => ['forma' => 'circle',    'color' => '#20B2AA'],
 ];
 
 $relacionLabels = [
@@ -167,6 +168,7 @@ $relacionLabels = [
                                 <option value="habilitador">Habilitador</option>
                                 <option value="riesgo">Riesgo</option>
                                 <option value="restriccion">Restricción</option>
+                                <option value="kpi">KPI</option>
                             </select>
                         </div>
                         <div class="col-md-3">
