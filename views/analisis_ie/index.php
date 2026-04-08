@@ -64,6 +64,17 @@ $relacionLabels = [
             <i class="bi bi-layout-sidebar-inset"></i>
         </button>
         <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-outline-secondary" onclick="zoomIn()" title="Acercar">
+                <i class="bi bi-zoom-in"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="zoomOut()" title="Alejar">
+                <i class="bi bi-zoom-out"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="network.fit({animation:true})" title="Ajustar a pantalla">
+                <i class="bi bi-fullscreen"></i>
+            </button>
+        </div>
+        <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm btn-primary active" id="btnModoDiseno" onclick="setModo('diseno')">
                 <i class="bi bi-pencil-square me-1"></i>Diseño
             </button>
@@ -324,6 +335,15 @@ let subModo = 'completa';
 let nodoSeleccionado = null;
 let pasoActual = 0;
 let nodosOrdenados = [];
+
+function zoomIn() {
+    const scale = network.getScale();
+    network.moveTo({ scale: scale * 1.3, animation: { duration: 300 } });
+}
+function zoomOut() {
+    const scale = network.getScale();
+    network.moveTo({ scale: scale / 1.3, animation: { duration: 300 } });
+}
 
 function initGrafo() {
     const container = document.getElementById('grafo-container');
