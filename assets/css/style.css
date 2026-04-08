@@ -231,6 +231,15 @@ body {
     }
 }
 
+/* Sidebar completamente oculta */
+body.sidebar-hidden .sidebar {
+    display: none !important;
+}
+body.sidebar-hidden .main-content {
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+}
+
 /* ── TOPBAR ───────────────────────────────────────────────────── */
 .view-topbar {
     height: 52px;
