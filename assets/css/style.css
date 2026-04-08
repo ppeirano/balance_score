@@ -229,15 +229,18 @@ body {
     body.sidebar-collapsed .sidebar-toggle-btn i {
         transform: rotate(180deg);
     }
-}
 
-/* Sidebar completamente oculta */
-body.sidebar-hidden .sidebar {
-    display: none !important;
-}
-body.sidebar-hidden .main-content {
-    max-width: 100% !important;
-    flex: 1 1 100% !important;
+    /* Sidebar completamente oculta */
+    body.sidebar-hidden .sidebar {
+        display: none !important;
+        max-width: 0 !important;
+        min-width: 0 !important;
+        flex: 0 0 0 !important;
+    }
+    body.sidebar-hidden .main-content {
+        max-width: 100% !important;
+        flex: 1 1 100% !important;
+    }
 }
 
 /* ── TOPBAR ───────────────────────────────────────────────────── */
