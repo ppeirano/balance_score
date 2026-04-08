@@ -60,6 +60,9 @@ $relacionLabels = [
 <!-- Toolbar -->
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-outline-secondary" id="btnToggleSidebar" onclick="document.body.classList.toggle('sidebar-hidden');" title="Ocultar/Mostrar menú lateral">
+            <i class="bi bi-layout-sidebar-inset"></i>
+        </button>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm btn-primary active" id="btnModoDiseno" onclick="setModo('diseno')">
                 <i class="bi bi-pencil-square me-1"></i>Diseño
@@ -74,9 +77,6 @@ $relacionLabels = [
         </div>
     </div>
     <div id="toolbarDiseno" class="d-flex gap-2">
-        <button class="btn btn-sm btn-outline-secondary" id="btnToggleSidebar" onclick="document.body.classList.toggle('sidebar-hidden');" title="Ocultar/Mostrar menú lateral">
-            <i class="bi bi-layout-sidebar-inset"></i>
-        </button>
         <?php if (isAdmin()): ?>
         <button class="btn btn-sm btn-primary" onclick="abrirModalNodo()">
             <i class="bi bi-plus-circle me-1"></i>Nuevo Elemento
