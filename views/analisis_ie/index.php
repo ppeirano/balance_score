@@ -60,7 +60,7 @@ $relacionLabels = [
 <!-- Toolbar -->
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-sm btn-outline-secondary" id="btnToggleSidebar" onclick="document.body.classList.toggle('sidebar-hidden');" title="Ocultar/Mostrar menú lateral">
+        <button class="btn btn-sm btn-outline-secondary" id="btnToggleSidebar" onclick="document.body.classList.toggle('sidebar-collapsed'); localStorage.setItem('sidebarCollapsed', document.body.classList.contains('sidebar-collapsed') ? '1' : '0');" title="Colapsar/Expandir menú lateral">
             <i class="bi bi-layout-sidebar-inset"></i>
         </button>
         <div class="btn-group" role="group">
