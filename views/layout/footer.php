@@ -10,6 +10,11 @@
     <script src="<?= BASE_URL ?>assets/js/app.js"></script>
     <script>
     (function() {
+        // Remover sidebar-hidden fuera de Análisis IE
+        if (!location.search.includes('page=analisis_ie')) {
+            document.body.classList.remove('sidebar-hidden');
+        }
+
         // Sidebar collapse toggle
         var toggle = document.getElementById('sidebarToggle');
         if (toggle) {
