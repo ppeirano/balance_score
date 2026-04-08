@@ -81,7 +81,8 @@ $writeActions = ['crear','editar','guardar','eliminar','registrar_valor','confir
                  'guardar_actividad','eliminar_actividad','cambiar_estado_actividad',
                  'guardar_nota','eliminar_nota','subir_imagen_nota','completar',
                  'procesar_documento','cambiar_estado','solicitar',
-                 'guardar_historial','eliminar_historial'];
+                 'guardar_historial','eliminar_historial',
+                 'guardar_nodo','eliminar_nodo','guardar_conexion','eliminar_conexion','api_posicion'];
 $adminPages = ['admin_responsables','periodos','admin_usuarios'];
 
 if (in_array($page, $adminPages) && !isAdmin()) {
@@ -117,6 +118,45 @@ switch ($page) {
                 break;
             default:
                 require __DIR__ . '/views/mapa/index.php';
+        }
+        break;
+    case 'analisis_ie':
+        switch ($action) {
+            case 'guardar_nodo':
+                require __DIR__ . '/models/AnalisisNodo.php';
+                AnalisisNodo::guardar($pdo, $_POST);
+                break;
+            case 'eliminar_nodo':
+                require __DIR__ . '/models/AnalisisNodo.php';
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    AnalisisNodo::eliminar($pdo, $id);
+                }
+                redirect('index.php?page=analisis_ie');
+                break;
+            case 'guardar_conexion':
+                require __DIR__ . '/models/AnalisisConexion.php';
+                AnalisisConexion::guardar($pdo, $_POST);
+                break;
+            case 'eliminar_conexion':
+                require __DIR__ . '/models/AnalisisConexion.php';
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    AnalisisConexion::eliminar($pdo, $id);
+                }
+                redirect('index.php?page=analisis_ie');
+                break;
+            case 'api_posicion':
+                require __DIR__ . '/models/AnalisisNodo.php';
+                header('Content-Type: application/json');
+                $input = json_decode(file_get_contents('php://input'), true);
+                if ($input && !empty($input['id'])) {
+                    AnalisisNodo::guardarPosicion($pdo, $input['id'], $input['x'], $input['y']);
+                    echo json_encode(['ok' => true]);
+                } else {
+                    echo json_encode(['ok' => false]);
+                }
+                exit;
+            default:
+                require __DIR__ . '/views/analisis_ie/index.php';
         }
         break;
     case 'iniciativas':
