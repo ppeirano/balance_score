@@ -173,12 +173,6 @@
                         </ul>
                     </div>
                     <?php endif; ?>
-                    <!-- Toggle sidebar -->
-                    <div class="sidebar-toggle-wrap d-none d-md-block">
-                        <button id="sidebarToggle" class="sidebar-toggle-btn" title="Colapsar/Expandir menú">
-                            <i class="bi bi-chevrons-left"></i>
-                        </button>
-                    </div>
                 </div>
             </nav>
 
