@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS analisis_nodos (
     observaciones TEXT,
     forma VARCHAR(30) DEFAULT 'box',
     color VARCHAR(20) DEFAULT '#4A90D9',
+    tamano ENUM('S','M','L','XL') DEFAULT 'M',
     pos_x FLOAT DEFAULT NULL,
     pos_y FLOAT DEFAULT NULL,
     orden INT DEFAULT 0,

@@ -246,6 +246,16 @@ $relacionLabels = [
                                    style="width:32px;height:32px;padding:2px;">
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tamaño</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="hidden" name="tamano" id="nodoTamano" value="M">
+                            <button type="button" class="btn btn-sm btn-outline-secondary tamano-btn" data-tamano="S" onclick="selTamano('S')">S</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary tamano-btn active" data-tamano="M" onclick="selTamano('M')">M</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary tamano-btn" data-tamano="L" onclick="selTamano('L')">L</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary tamano-btn" data-tamano="XL" onclick="selTamano('XL')">XL</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -328,6 +338,18 @@ const relacionColors = <?= json_encode(array_map(fn($r) => $r['color'], $relacio
 const relacionLabels = <?= json_encode(array_map(fn($r) => $r['label'], $relacionLabels)) ?>;
 const isAdmin = <?= isAdmin() ? 'true' : 'false' ?>;
 
+const tamanoConfig = {
+    'S':  { size: 15, font: 10, width: 80 },
+    'M':  { size: 25, font: 14, width: 120 },
+    'L':  { size: 35, font: 18, width: 170 },
+    'XL': { size: 50, font: 24, width: 230 }
+};
+
+function selTamano(t) {
+    document.getElementById('nodoTamano').value = t;
+    document.querySelectorAll('.tamano-btn').forEach(b => b.classList.toggle('active', b.dataset.tamano === t));
+}
+
 // === VIS.JS SETUP ===
 let network, nodes, edges;
 let modoActual = 'diseno';
@@ -351,16 +373,19 @@ function initGrafo() {
     // Build nodes
     const allHavePos = nodosData.length > 0 && nodosData.every(n => n.pos_x !== null && n.pos_y !== null);
     const visNodes = nodosData.map(n => {
+        const tc = tamanoConfig[n.tamano] || tamanoConfig['M'];
         const node = {
             id: n.id,
             label: n.nombre,
             shape: n.forma || 'box',
+            size: tc.size,
+            widthConstraint: { minimum: tc.width, maximum: tc.width },
             color: {
                 background: n.color || '#4A90D9',
                 border: shadeColor(n.color || '#4A90D9', -20),
                 highlight: { background: shadeColor(n.color || '#4A90D9', 20), border: shadeColor(n.color || '#4A90D9', -30) }
             },
-            font: { color: getContrastColor(n.color || '#4A90D9'), size: 14, face: 'Inter, sans-serif' },
+            font: { color: getContrastColor(n.color || '#4A90D9'), size: tc.font, face: 'Inter, sans-serif' },
             title: buildTooltip(n),
             _data: n
         };
@@ -632,6 +657,7 @@ function abrirModalNodo(data) {
     document.getElementById('nodoObservaciones').value = data ? (data.observaciones || '') : '';
     selForma(data ? (data.forma || 'box') : 'box');
     selColor(data ? (data.color || '#4A90D9') : '#4A90D9');
+    selTamano(data ? (data.tamano || 'M') : 'M');
     document.getElementById('modalNodoTitulo').textContent = data ? 'Editar Elemento' : 'Nuevo Elemento';
     new bootstrap.Modal(document.getElementById('modalNodo')).show();
 }

@@ -19,7 +19,7 @@ class AnalisisNodo {
             $stmt = $pdo->prepare("
                 UPDATE analisis_nodos
                 SET nombre = ?, tipo = ?, descripcion = ?, estado = ?,
-                    observaciones = ?, forma = ?, color = ?, orden = ?
+                    observaciones = ?, forma = ?, color = ?, tamano = ?, orden = ?
                 WHERE id = ?
             ");
             $stmt->execute([
@@ -30,6 +30,7 @@ class AnalisisNodo {
                 $data['observaciones'] ?: null,
                 $data['forma'] ?? 'box',
                 $data['color'] ?? '#4A90D9',
+                $data['tamano'] ?? 'M',
                 (int)($data['orden'] ?? 0),
                 $data['id']
             ]);
@@ -38,8 +39,8 @@ class AnalisisNodo {
             Bitacora::registrar($pdo, 'analisis_nodo', $data['id'], $data['nombre'], 'editado');
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO analisis_nodos (nombre, tipo, descripcion, estado, observaciones, forma, color, orden)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO analisis_nodos (nombre, tipo, descripcion, estado, observaciones, forma, color, tamano, orden)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['nombre'],
@@ -49,6 +50,7 @@ class AnalisisNodo {
                 $data['observaciones'] ?: null,
                 $data['forma'] ?? 'box',
                 $data['color'] ?? '#4A90D9',
+                $data['tamano'] ?? 'M',
                 (int)($data['orden'] ?? 0)
             ]);
             flash('success', 'Elemento creado.');
