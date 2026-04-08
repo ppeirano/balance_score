@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS analisis_nodos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Extender ENUM de bitacora para incluir los nuevos tipos
+ALTER TABLE bitacora MODIFY COLUMN entidad_tipo
+    ENUM('iniciativa','plan_accion','actividad','kpi','proyecto','riesgo','reunion','compromiso','analisis_nodo','analisis_conexion') NOT NULL;
+
 CREATE TABLE IF NOT EXISTS analisis_conexiones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nodo_origen_id INT NOT NULL,
