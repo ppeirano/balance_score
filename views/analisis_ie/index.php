@@ -73,6 +73,9 @@ $relacionLabels = [
             <button class="btn btn-sm btn-outline-secondary" onclick="network.fit({animation:true})" title="Ajustar a pantalla">
                 <i class="bi bi-fullscreen"></i>
             </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="exportarImagen()" title="Exportar como imagen">
+                <i class="bi bi-image"></i>
+            </button>
         </div>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm btn-primary active" id="btnModoDiseno" onclick="setModo('diseno')">
@@ -357,6 +360,38 @@ let subModo = 'completa';
 let nodoSeleccionado = null;
 let pasoActual = 0;
 let nodosOrdenados = [];
+
+function exportarImagen() {
+    const scale = 3;
+    const canvas = document.querySelector('#grafo-container canvas');
+    if (!canvas) return;
+
+    // Ajustar vista para capturar todo
+    network.fit();
+
+    // Esperar a que termine el fit
+    setTimeout(() => {
+        // Crear canvas de alta resolución
+        const hiRes = document.createElement('canvas');
+        hiRes.width = canvas.width * scale;
+        hiRes.height = canvas.height * scale;
+        const ctx = hiRes.getContext('2d');
+
+        // Fondo blanco
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, hiRes.width, hiRes.height);
+
+        // Dibujar el canvas original escalado
+        ctx.scale(scale, scale);
+        ctx.drawImage(canvas, 0, 0);
+
+        // Descargar
+        const link = document.createElement('a');
+        link.download = 'diseno_ie_' + new Date().toISOString().slice(0,10) + '.png';
+        link.href = hiRes.toDataURL('image/png', 1.0);
+        link.click();
+    }, 500);
+}
 
 function zoomIn() {
     const scale = network.getScale();
