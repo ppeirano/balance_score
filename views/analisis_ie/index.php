@@ -220,6 +220,26 @@ $relacionLabels = [
         <?php endif; ?>
     </div>
 
+    <!-- Panel info conexión (al seleccionar edge) -->
+    <div class="info-panel" id="infoConexionPanel" style="display:none;">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="mb-0" id="infoConexionTitulo"></h6>
+            <button class="btn-close btn-sm" onclick="cerrarInfoConexion()"></button>
+        </div>
+        <span class="badge mb-2" id="infoConexionTipo"></span>
+        <p class="small text-muted mb-1" id="infoConexionDesc"></p>
+        <?php if (isAdmin()): ?>
+        <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="editarConexionSeleccionada()">
+                <i class="bi bi-pencil me-1"></i>Editar
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="eliminarConexionSeleccionada()">
+                <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+        </div>
+        <?php endif; ?>
+    </div>
+
     <!-- Barra de presentación animada -->
     <div class="presentacion-bar d-none" id="barraAnimacion">
         <button class="btn btn-sm btn-outline-secondary" onclick="pasoAnterior()" id="btnAnterior" disabled>
@@ -481,6 +501,7 @@ let network, nodes, edges;
 let modoActual = 'diseno';
 let subModo = 'completa';
 let nodoSeleccionado = null;
+let conexionSeleccionada = null;
 let pasoActual = 0;
 let nodosOrdenados = [];
 
@@ -687,6 +708,18 @@ function initGrafo() {
         cerrarInfo();
     });
 
+    network.on('selectEdge', function(params) {
+        if (params.edges.length === 1 && params.nodes.length === 0) {
+            conexionSeleccionada = params.edges[0];
+            mostrarInfoConexion(conexionSeleccionada);
+        }
+    });
+
+    network.on('deselectEdge', function() {
+        conexionSeleccionada = null;
+        cerrarInfoConexion();
+    });
+
     network.on('doubleClick', function(params) {
         if (modoActual !== 'diseno' || !isAdmin) return;
         if (params.nodes.length === 1) {
@@ -873,6 +906,44 @@ function mostrarInfo(nodeId) {
 
 function cerrarInfo() {
     document.getElementById('infoPanel').style.display = 'none';
+}
+
+function mostrarInfoConexion(edgeId) {
+    cerrarInfo();
+    const edge = edges.get(edgeId);
+    if (!edge || !edge._data) return;
+    const d = edge._data;
+    const origen = nodes.get(edge.from);
+    const destino = nodes.get(edge.to);
+    document.getElementById('infoConexionTitulo').textContent =
+        (origen ? origen.label : '?') + ' → ' + (destino ? destino.label : '?');
+    const tipoBadge = document.getElementById('infoConexionTipo');
+    tipoBadge.textContent = relacionLabels[d.tipo_relacion] || d.tipo_relacion;
+    tipoBadge.style.backgroundColor = relacionColors[d.tipo_relacion] || '#999';
+    tipoBadge.style.color = '#fff';
+    document.getElementById('infoConexionDesc').textContent = d.descripcion || 'Sin descripción';
+    document.getElementById('infoConexionPanel').style.display = 'block';
+}
+
+function cerrarInfoConexion() {
+    document.getElementById('infoConexionPanel').style.display = 'none';
+}
+
+function editarConexionSeleccionada() {
+    if (conexionSeleccionada) editarConexion(conexionSeleccionada);
+}
+
+function eliminarConexionSeleccionada() {
+    if (!conexionSeleccionada) return;
+    const edge = edges.get(conexionSeleccionada);
+    if (!edge) return;
+    const origen = nodes.get(edge.from);
+    const destino = nodes.get(edge.to);
+    const desc = (origen ? origen.label : '?') + ' → ' + (destino ? destino.label : '?');
+    if (!confirm('¿Eliminar la conexión "' + desc + '"?')) return;
+    const form = document.getElementById('formEliminarConexion');
+    form.action = '<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_conexion&id=' + conexionSeleccionada + '&hoja=<?= (int)$hojaActiva ?>';
+    form.submit();
 }
 
 // === MODALS ===
