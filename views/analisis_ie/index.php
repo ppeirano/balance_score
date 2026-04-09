@@ -982,9 +982,6 @@ function editarNodoSeleccionado() {
 
 function eliminarNodoSeleccionado() {
     if (!nodoSeleccionado) return;
-    const node = nodes.get(nodoSeleccionado);
-    if (!node) return;
-    if (!confirm('Eliminar "' + node.label + '" y todas sus conexiones?')) return;
     const form = document.getElementById('formEliminarNodo');
     form.action = '<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_nodo&id=' + nodoSeleccionado;
     form.submit();
