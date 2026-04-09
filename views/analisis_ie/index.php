@@ -935,12 +935,6 @@ function editarConexionSeleccionada() {
 
 function eliminarConexionSeleccionada() {
     if (!conexionSeleccionada) return;
-    const edge = edges.get(conexionSeleccionada);
-    if (!edge) return;
-    const origen = nodes.get(edge.from);
-    const destino = nodes.get(edge.to);
-    const desc = (origen ? origen.label : '?') + ' \u2192 ' + (destino ? destino.label : '?');
-    if (!confirm('Eliminar la conexion "' + desc + '"?')) return;
     const form = document.getElementById('formEliminarConexion');
     form.action = '<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_conexion&id=' + conexionSeleccionada + '&hoja=<?= (int)$hojaActual ?>';
     form.submit();
