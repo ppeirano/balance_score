@@ -150,6 +150,9 @@ $relacionLabels = [
             <button class="btn btn-sm btn-outline-secondary" onclick="reordenarGrafo()" title="Reordenar nodos automáticamente">
                 <i class="bi bi-grid-3x3-gap"></i>
             </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleLeyenda()" title="Mostrar/Ocultar leyenda" id="btnLeyenda">
+                <i class="bi bi-card-list"></i>
+            </button>
         </div>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm btn-primary active" id="btnModoDiseno" onclick="setModo('diseno')">
@@ -177,7 +180,7 @@ $relacionLabels = [
 </div>
 
 <!-- Leyenda -->
-<div class="mb-2">
+<div class="mb-2" id="leyendaPanel">
     <?php foreach ($tipoDefaults as $tipo => $def): ?>
     <span class="leyenda-item">
         <span class="leyenda-dot" style="background:<?= $def['color'] ?>;"></span>
@@ -515,6 +518,18 @@ let nodoSeleccionado = null;
 let conexionSeleccionada = null;
 let pasoActual = 0;
 let nodosOrdenados = [];
+
+function toggleLeyenda() {
+    const panel = document.getElementById('leyendaPanel');
+    const btn = document.getElementById('btnLeyenda');
+    if (panel.style.display === 'none') {
+        panel.style.display = '';
+        btn.classList.remove('active');
+    } else {
+        panel.style.display = 'none';
+        btn.classList.add('active');
+    }
+}
 
 function reordenarGrafo() {
     // Limpiar posiciones fijas para que la física pueda moverlos
