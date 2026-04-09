@@ -1,9 +1,20 @@
 <?php
+require_once __DIR__ . '/../../models/AnalisisHoja.php';
 require_once __DIR__ . '/../../models/AnalisisNodo.php';
 require_once __DIR__ . '/../../models/AnalisisConexion.php';
 
-$nodos = AnalisisNodo::getAll($pdo);
-$conexiones = AnalisisConexion::getAll($pdo);
+$hojas = AnalisisHoja::getAll($pdo);
+if (empty($hojas)) {
+    AnalisisHoja::crear($pdo, 'Hoja 1');
+    $hojas = AnalisisHoja::getAll($pdo);
+}
+$hojaActual = isset($_GET['hoja']) ? (int)$_GET['hoja'] : $hojas[0]['id'];
+$hojaExiste = false;
+foreach ($hojas as $h) { if ($h['id'] == $hojaActual) { $hojaExiste = true; break; } }
+if (!$hojaExiste) $hojaActual = $hojas[0]['id'];
+
+$nodos = AnalisisNodo::getAllByHoja($pdo, $hojaActual);
+$conexiones = AnalisisConexion::getAllByHoja($pdo, $hojaActual);
 
 require_once __DIR__ . '/../layout/header.php';
 
@@ -81,6 +92,39 @@ $relacionLabels = [
 </style>
 
 <?php mostrarFlash(); ?>
+
+<!-- Tabs de hojas -->
+<div class="d-flex align-items-center gap-1 mb-2" style="border-bottom: 2px solid #dee2e6; padding-bottom: 0;">
+    <?php foreach ($hojas as $h): ?>
+    <div class="d-flex align-items-center position-relative" style="margin-bottom: -2px;">
+        <a href="<?= BASE_URL ?>index.php?page=analisis_ie&hoja=<?= (int)$h['id'] ?>"
+           class="btn btn-sm <?= $h['id'] == $hojaActual ? 'btn-primary' : 'btn-outline-secondary' ?>"
+           style="border-bottom-left-radius:0;border-bottom-right-radius:0;"
+           ondblclick="event.preventDefault(); renombrarHoja(<?= (int)$h['id'] ?>, '<?= addslashes(sanitize($h['nombre'])) ?>')">
+            <?= sanitize($h['nombre']) ?>
+        </a>
+        <?php if (isAdmin() && $h['id'] == $hojaActual && count($hojas) > 1): ?>
+        <form method="POST" action="<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_hoja&id=<?= (int)$h['id'] ?>"
+              onsubmit="return confirm('¿Eliminar esta hoja y todos sus elementos?');" class="d-inline" style="margin-left:-4px;">
+            <button type="submit" class="btn btn-sm btn-outline-danger" style="border-bottom-left-radius:0;border-bottom-right-radius:0;padding:2px 5px;font-size:10px;" title="Eliminar hoja">&times;</button>
+        </form>
+        <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+    <?php if (isAdmin()): ?>
+    <form method="POST" action="<?= BASE_URL ?>index.php?page=analisis_ie&action=crear_hoja" class="d-inline">
+        <button type="submit" class="btn btn-sm btn-outline-secondary" style="border-bottom-left-radius:0;border-bottom-right-radius:0;" title="Nueva hoja">
+            <i class="bi bi-plus"></i>
+        </button>
+    </form>
+    <?php endif; ?>
+</div>
+
+<!-- Form oculto para renombrar hoja -->
+<form id="formRenombrarHoja" method="POST" action="<?= BASE_URL ?>index.php?page=analisis_ie&action=renombrar_hoja" style="display:none;">
+    <input type="hidden" name="hoja_id" id="renombrarHojaId">
+    <input type="hidden" name="nombre" id="renombrarHojaNombre">
+</form>
 
 <!-- Toolbar -->
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
@@ -196,6 +240,7 @@ $relacionLabels = [
         <div class="modal-content">
             <form method="POST" action="<?= BASE_URL ?>index.php?page=analisis_ie&action=guardar_nodo">
                 <input type="hidden" name="id" id="nodoId">
+                <input type="hidden" name="hoja_id" value="<?= (int)$hojaActual ?>">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalNodoTitulo">Nuevo Elemento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -305,6 +350,7 @@ $relacionLabels = [
         <div class="modal-content">
             <form method="POST" action="<?= BASE_URL ?>index.php?page=analisis_ie&action=guardar_conexion">
                 <input type="hidden" name="id" id="conexionId">
+                <input type="hidden" name="hoja_id" value="<?= (int)$hojaActual ?>">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalConexionTitulo">Nueva Conexión</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -413,6 +459,15 @@ const tamanoConfig = {
     'L':  { size: 35, font: 18, width: 170 },
     'XL': { size: 50, font: 24, width: 230 }
 };
+
+function renombrarHoja(id, nombreActual) {
+    const nombre = prompt('Nuevo nombre para la hoja:', nombreActual);
+    if (nombre && nombre.trim()) {
+        document.getElementById('renombrarHojaId').value = id;
+        document.getElementById('renombrarHojaNombre').value = nombre.trim();
+        document.getElementById('formRenombrarHoja').submit();
+    }
+}
 
 function selTamano(t) {
     document.getElementById('nodoTamano').value = t;

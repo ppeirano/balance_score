@@ -82,7 +82,8 @@ $writeActions = ['crear','editar','guardar','eliminar','registrar_valor','confir
                  'guardar_nota','eliminar_nota','subir_imagen_nota','completar',
                  'procesar_documento','cambiar_estado','solicitar',
                  'guardar_historial','eliminar_historial',
-                 'guardar_nodo','eliminar_nodo','guardar_conexion','eliminar_conexion','api_posicion'];
+                 'guardar_nodo','eliminar_nodo','guardar_conexion','eliminar_conexion','api_posicion',
+                 'crear_hoja','renombrar_hoja','eliminar_hoja'];
 $adminPages = ['admin_responsables','periodos','admin_usuarios'];
 
 if (in_array($page, $adminPages) && !isAdmin()) {
@@ -122,6 +123,28 @@ switch ($page) {
         break;
     case 'analisis_ie':
         switch ($action) {
+            case 'crear_hoja':
+                require __DIR__ . '/models/AnalisisHoja.php';
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $newId = AnalisisHoja::crear($pdo, trim($_POST['nombre'] ?? ''));
+                    redirect('index.php?page=analisis_ie&hoja=' . $newId);
+                }
+                redirect('index.php?page=analisis_ie');
+                break;
+            case 'renombrar_hoja':
+                require __DIR__ . '/models/AnalisisHoja.php';
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['hoja_id']) && !empty($_POST['nombre'])) {
+                    AnalisisHoja::renombrar($pdo, $_POST['hoja_id'], $_POST['nombre']);
+                }
+                redirect('index.php?page=analisis_ie&hoja=' . (int)($_POST['hoja_id'] ?? 0));
+                break;
+            case 'eliminar_hoja':
+                require __DIR__ . '/models/AnalisisHoja.php';
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+                    AnalisisHoja::eliminar($pdo, $id);
+                }
+                redirect('index.php?page=analisis_ie');
+                break;
             case 'guardar_nodo':
                 require __DIR__ . '/models/AnalisisNodo.php';
                 AnalisisNodo::guardar($pdo, $_POST);
@@ -129,7 +152,8 @@ switch ($page) {
             case 'eliminar_nodo':
                 require __DIR__ . '/models/AnalisisNodo.php';
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
-                    AnalisisNodo::eliminar($pdo, $id);
+                    $hojaId = AnalisisNodo::eliminar($pdo, $id);
+                    redirect('index.php?page=analisis_ie&hoja=' . (int)$hojaId);
                 }
                 redirect('index.php?page=analisis_ie');
                 break;
@@ -142,7 +166,8 @@ switch ($page) {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
                     AnalisisConexion::eliminar($pdo, $id);
                 }
-                redirect('index.php?page=analisis_ie');
+                $hojaBack = $_POST['hoja_id'] ?? ($_GET['hoja'] ?? '');
+                redirect('index.php?page=analisis_ie&hoja=' . (int)$hojaBack);
                 break;
             case 'api_posicion':
                 require __DIR__ . '/models/AnalisisNodo.php';

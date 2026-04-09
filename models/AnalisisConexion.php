@@ -4,14 +4,17 @@ require_once __DIR__ . '/../includes/functions.php';
 
 class AnalisisConexion {
 
-    static function getAll($pdo) {
-        return $pdo->query("
+    static function getAllByHoja($pdo, $hojaId) {
+        $stmt = $pdo->prepare("
             SELECT c.*, o.nombre AS origen_nombre, d.nombre AS destino_nombre
             FROM analisis_conexiones c
             JOIN analisis_nodos o ON c.nodo_origen_id = o.id
             JOIN analisis_nodos d ON c.nodo_destino_id = d.id
+            WHERE o.hoja_id = ?
             ORDER BY c.id
-        ")->fetchAll();
+        ");
+        $stmt->execute([(int)$hojaId]);
+        return $stmt->fetchAll();
     }
 
     static function guardar($pdo, $data) {
@@ -46,7 +49,8 @@ class AnalisisConexion {
             require_once __DIR__ . '/Bitacora.php';
             Bitacora::registrar($pdo, 'analisis_conexion', $pdo->lastInsertId(), $data['tipo_relacion'], 'creado');
         }
-        redirect('index.php?page=analisis_ie');
+        $hojaId = $data['hoja_id'] ?? '';
+        redirect('index.php?page=analisis_ie&hoja=' . (int)$hojaId);
     }
 
     static function eliminar($pdo, $id) {

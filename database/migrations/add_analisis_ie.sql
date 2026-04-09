@@ -1,7 +1,18 @@
 -- Migración: Análisis IE - Tablero de diseño y análisis estratégico
 
+CREATE TABLE IF NOT EXISTS analisis_hojas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(200) NOT NULL DEFAULT 'Hoja 1',
+    orden INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insertar hoja por defecto
+INSERT INTO analisis_hojas (nombre, orden) VALUES ('Hoja 1', 0);
+
 CREATE TABLE IF NOT EXISTS analisis_nodos (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    hoja_id INT NOT NULL DEFAULT 1,
     nombre VARCHAR(200) NOT NULL,
     tipo ENUM('iniciativa','plan','habilitador','riesgo','restriccion','kpi') NOT NULL,
     descripcion TEXT,
@@ -13,7 +24,8 @@ CREATE TABLE IF NOT EXISTS analisis_nodos (
     pos_x FLOAT DEFAULT NULL,
     pos_y FLOAT DEFAULT NULL,
     orden INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (hoja_id) REFERENCES analisis_hojas(id) ON DELETE CASCADE
 );
 
 -- Extender ENUM de bitacora para incluir los nuevos tipos

@@ -4,8 +4,10 @@ require_once __DIR__ . '/../includes/functions.php';
 
 class AnalisisNodo {
 
-    static function getAll($pdo) {
-        return $pdo->query("SELECT * FROM analisis_nodos ORDER BY orden ASC, nombre ASC")->fetchAll();
+    static function getAllByHoja($pdo, $hojaId) {
+        $stmt = $pdo->prepare("SELECT * FROM analisis_nodos WHERE hoja_id = ? ORDER BY orden ASC, nombre ASC");
+        $stmt->execute([(int)$hojaId]);
+        return $stmt->fetchAll();
     }
 
     static function getById($pdo, $id) {
@@ -39,10 +41,11 @@ class AnalisisNodo {
             Bitacora::registrar($pdo, 'analisis_nodo', $data['id'], $data['nombre'], 'editado');
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO analisis_nodos (nombre, tipo, descripcion, estado, observaciones, forma, color, tamano, orden)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO analisis_nodos (hoja_id, nombre, tipo, descripcion, estado, observaciones, forma, color, tamano, orden)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
+                (int)$data['hoja_id'],
                 $data['nombre'],
                 $data['tipo'],
                 $data['descripcion'] ?: null,
@@ -57,17 +60,21 @@ class AnalisisNodo {
             require_once __DIR__ . '/Bitacora.php';
             Bitacora::registrar($pdo, 'analisis_nodo', $pdo->lastInsertId(), $data['nombre'], 'creado');
         }
-        redirect('index.php?page=analisis_ie');
+        $hojaId = $data['hoja_id'] ?? '';
+        redirect('index.php?page=analisis_ie&hoja=' . (int)$hojaId);
     }
 
     static function eliminar($pdo, $id) {
-        $stmt = $pdo->prepare("SELECT nombre FROM analisis_nodos WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT nombre, hoja_id FROM analisis_nodos WHERE id = ?");
         $stmt->execute([$id]);
-        $nombre = $stmt->fetchColumn() ?: 'Desconocido';
+        $row = $stmt->fetch();
+        $nombre = $row ? $row['nombre'] : 'Desconocido';
+        $hojaId = $row ? $row['hoja_id'] : '';
         $pdo->prepare("DELETE FROM analisis_nodos WHERE id = ?")->execute([$id]);
         require_once __DIR__ . '/Bitacora.php';
         Bitacora::registrar($pdo, 'analisis_nodo', $id, $nombre, 'eliminado');
         flash('success', 'Elemento eliminado.');
+        return $hojaId;
     }
 
     static function guardarPosicion($pdo, $id, $x, $y) {
