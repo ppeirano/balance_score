@@ -467,8 +467,8 @@ $relacionLabels = [
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <script>
 // === DATA ===
-const nodosData = <?= json_encode(array_values($nodos)) ?>;
-const conexionesData = <?= json_encode(array_values($conexiones)) ?>;
+const nodosData = <?= json_encode(array_values($nodos), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>;
+const conexionesData = <?= json_encode(array_values($conexiones), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>;
 const tipoDefaults = <?= json_encode($tipoDefaults) ?>;
 const relacionColors = <?= json_encode(array_map(fn($r) => $r['color'], $relacionLabels)) ?>;
 const relacionDashes = <?= json_encode(array_map(fn($r) => $r['negativo'], $relacionLabels)) ?>;
@@ -891,7 +891,7 @@ function mostrarInfo(nodeId) {
     tipoBadge.textContent = d.tipo;
     tipoBadge.style.backgroundColor = d.color || '#4A90D9';
     tipoBadge.style.color = getContrastColor(d.color || '#4A90D9');
-    document.getElementById('infoDesc').textContent = d.descripcion || 'Sin descripción';
+    document.getElementById('infoDesc').textContent = d.descripcion || 'Sin descripcion';
     document.getElementById('infoEstado').textContent = d.estado || 'activo';
     const obsWrap = document.getElementById('infoObsWrap');
     const obs = document.getElementById('infoObs');
@@ -916,12 +916,12 @@ function mostrarInfoConexion(edgeId) {
     const origen = nodes.get(edge.from);
     const destino = nodes.get(edge.to);
     document.getElementById('infoConexionTitulo').textContent =
-        (origen ? origen.label : '?') + ' → ' + (destino ? destino.label : '?');
+        (origen ? origen.label : '?') + ' \u2192 ' + (destino ? destino.label : '?');
     const tipoBadge = document.getElementById('infoConexionTipo');
     tipoBadge.textContent = relacionLabels[d.tipo_relacion] || d.tipo_relacion;
     tipoBadge.style.backgroundColor = relacionColors[d.tipo_relacion] || '#999';
     tipoBadge.style.color = '#fff';
-    document.getElementById('infoConexionDesc').textContent = d.descripcion || 'Sin descripción';
+    document.getElementById('infoConexionDesc').textContent = d.descripcion || 'Sin descripcion';
     document.getElementById('infoConexionPanel').style.display = 'block';
 }
 
@@ -939,8 +939,8 @@ function eliminarConexionSeleccionada() {
     if (!edge) return;
     const origen = nodes.get(edge.from);
     const destino = nodes.get(edge.to);
-    const desc = (origen ? origen.label : '?') + ' → ' + (destino ? destino.label : '?');
-    if (!confirm('¿Eliminar la conexión "' + desc + '"?')) return;
+    const desc = (origen ? origen.label : '?') + ' \u2192 ' + (destino ? destino.label : '?');
+    if (!confirm('Eliminar la conexion "' + desc + '"?')) return;
     const form = document.getElementById('formEliminarConexion');
     form.action = '<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_conexion&id=' + conexionSeleccionada + '&hoja=<?= (int)$hojaActiva ?>';
     form.submit();
@@ -968,7 +968,7 @@ function abrirModalConexion(data) {
     document.getElementById('conexionTipo').value = data ? data.tipo_relacion : '';
     document.getElementById('conexionDestino').value = data ? data.nodo_destino_id : '';
     document.getElementById('conexionDescripcion').value = data ? (data.descripcion || '') : '';
-    document.getElementById('modalConexionTitulo').textContent = data ? 'Editar Conexión' : 'Nueva Conexión';
+    document.getElementById('modalConexionTitulo').textContent = data ? 'Editar Conexion' : 'Nueva Conexion';
     new bootstrap.Modal(document.getElementById('modalConexion')).show();
 }
 
@@ -990,7 +990,7 @@ function eliminarNodoSeleccionado() {
     if (!nodoSeleccionado) return;
     const node = nodes.get(nodoSeleccionado);
     if (!node) return;
-    if (!confirm('¿Eliminar "' + node.label + '" y todas sus conexiones?')) return;
+    if (!confirm('Eliminar "' + node.label + '" y todas sus conexiones?')) return;
     const form = document.getElementById('formEliminarNodo');
     form.action = '<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_nodo&id=' + nodoSeleccionado;
     form.submit();
