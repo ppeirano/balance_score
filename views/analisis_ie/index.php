@@ -25,6 +25,7 @@ $tipoDefaults = [
     'riesgo'      => ['forma' => 'triangle',  'color' => '#FF6B6B'],
     'restriccion' => ['forma' => 'hexagon',   'color' => '#FFA500'],
     'kpi'         => ['forma' => 'circle',    'color' => '#20B2AA'],
+    'entidad'     => ['forma' => 'star',      'color' => '#DAA520'],
 ];
 
 $relacionLabels = [
@@ -261,6 +262,7 @@ $relacionLabels = [
                                 <option value="riesgo">Riesgo</option>
                                 <option value="restriccion">Restricción</option>
                                 <option value="kpi">KPI</option>
+                                <option value="entidad">Entidad</option>
                             </select>
                         </div>
                         <div class="col-md-3">

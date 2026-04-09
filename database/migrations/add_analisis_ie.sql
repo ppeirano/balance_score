@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS analisis_nodos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     hoja_id INT NOT NULL DEFAULT 1,
     nombre VARCHAR(200) NOT NULL,
-    tipo ENUM('iniciativa','plan','habilitador','riesgo','restriccion','kpi') NOT NULL,
+    tipo ENUM('iniciativa','plan','habilitador','riesgo','restriccion','kpi','entidad') NOT NULL,
     descripcion TEXT,
     estado VARCHAR(50) DEFAULT 'activo',
     observaciones TEXT,
