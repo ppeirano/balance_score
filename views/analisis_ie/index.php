@@ -454,10 +454,10 @@ const relacionLabels = <?= json_encode(array_map(fn($r) => $r['label'], $relacio
 const isAdmin = <?= isAdmin() ? 'true' : 'false' ?>;
 
 const tamanoConfig = {
-    'S':  { size: 15, font: 10, width: 80 },
-    'M':  { size: 25, font: 14, width: 120 },
-    'L':  { size: 35, font: 18, width: 170 },
-    'XL': { size: 50, font: 24, width: 230 }
+    'S':  { size: 15, font: 10, width: 80,  height: 40 },
+    'M':  { size: 25, font: 14, width: 120, height: 60 },
+    'L':  { size: 35, font: 18, width: 170, height: 90 },
+    'XL': { size: 50, font: 24, width: 230, height: 120 }
 };
 
 function renombrarHoja(id, nombreActual) {
@@ -594,6 +594,7 @@ function initGrafo() {
             shape: n.forma || 'box',
             size: tc.size,
             widthConstraint: { minimum: tc.width, maximum: tc.width },
+            heightConstraint: { minimum: tc.height },
             color: {
                 background: n.color || '#4A90D9',
                 border: shadeColor(n.color || '#4A90D9', -20),
