@@ -17,11 +17,36 @@ $tipoDefaults = [
 ];
 
 $relacionLabels = [
-    'habilita'   => ['label' => 'Habilita',    'color' => '#50C878'],
-    'depende_de' => ['label' => 'Depende de',   'color' => '#4A90D9'],
-    'bloquea'    => ['label' => 'Bloquea',      'color' => '#FF6B6B'],
-    'genera'     => ['label' => 'Genera',       'color' => '#FFA500'],
-    'mitiga'     => ['label' => 'Mitiga',       'color' => '#7B68EE'],
+    // Par 1: Fortalece / Debilita
+    'fortalece'  => ['label' => 'Fortalece',   'color' => '#2E8B57', 'negativo' => false],
+    'debilita'   => ['label' => 'Debilita',    'color' => '#2E8B57', 'negativo' => true],
+    // Par 2: Activa / Inhibe
+    'activa'     => ['label' => 'Activa',      'color' => '#4A90D9', 'negativo' => false],
+    'inhibe'     => ['label' => 'Inhibe',      'color' => '#4A90D9', 'negativo' => true],
+    // Par 3: Genera / Elimina
+    'genera'     => ['label' => 'Genera',      'color' => '#FF8C00', 'negativo' => false],
+    'elimina'    => ['label' => 'Elimina',     'color' => '#FF8C00', 'negativo' => true],
+    // Par 4: Acelera / Demora
+    'acelera'    => ['label' => 'Acelera',     'color' => '#DC143C', 'negativo' => false],
+    'demora'     => ['label' => 'Demora',      'color' => '#DC143C', 'negativo' => true],
+    // Par 5: Expande / Contrae
+    'expande'    => ['label' => 'Expande',     'color' => '#8A2BE2', 'negativo' => false],
+    'contrae'    => ['label' => 'Contrae',     'color' => '#8A2BE2', 'negativo' => true],
+    // Par 6: Habilita / Bloquea
+    'habilita'   => ['label' => 'Habilita',    'color' => '#20B2AA', 'negativo' => false],
+    'bloquea'    => ['label' => 'Bloquea',     'color' => '#20B2AA', 'negativo' => true],
+    // Par 7: Aumenta / Reduce
+    'aumenta'    => ['label' => 'Aumenta',     'color' => '#DAA520', 'negativo' => false],
+    'reduce'     => ['label' => 'Reduce',      'color' => '#DAA520', 'negativo' => true],
+    // Par 8: Integra / Fragmenta
+    'integra'    => ['label' => 'Integra',     'color' => '#FF69B4', 'negativo' => false],
+    'fragmenta'  => ['label' => 'Fragmenta',   'color' => '#FF69B4', 'negativo' => true],
+    // Par 9: Depende / No Depende
+    'depende'    => ['label' => 'Depende',     'color' => '#708090', 'negativo' => false],
+    'no_depende' => ['label' => 'No Depende',  'color' => '#708090', 'negativo' => true],
+    // Par 10: Amplifica / Amortigua
+    'amplifica'  => ['label' => 'Amplifica',   'color' => '#00CED1', 'negativo' => false],
+    'amortigua'  => ['label' => 'Amortigua',   'color' => '#00CED1', 'negativo' => true],
 ];
 ?>
 
@@ -114,10 +139,12 @@ $relacionLabels = [
     </span>
     <?php endforeach; ?>
     <span class="text-muted mx-2">|</span>
-    <?php foreach ($relacionLabels as $key => $rel): ?>
+    <?php
+    $pares = array_chunk(array_values($relacionLabels), 2);
+    foreach ($pares as $par): ?>
     <span class="leyenda-item">
-        <span style="color:<?= $rel['color'] ?>; font-weight:bold;">→</span>
-        <?= $rel['label'] ?>
+        <span style="color:<?= $par[0]['color'] ?>; font-weight:bold;">—</span>
+        <?= $par[0]['label'] ?>/<?= $par[1]['label'] ?>
     </span>
     <?php endforeach; ?>
 </div>
@@ -296,11 +323,46 @@ $relacionLabels = [
                         <label class="form-label">Tipo de relación <span class="text-danger">*</span></label>
                         <select class="form-select" name="tipo_relacion" id="conexionTipo" required>
                             <option value="">Seleccionar...</option>
-                            <option value="habilita">Habilita</option>
-                            <option value="depende_de">Depende de</option>
-                            <option value="bloquea">Bloquea</option>
-                            <option value="genera">Genera</option>
-                            <option value="mitiga">Mitiga</option>
+                            <optgroup label="1. Fortalece / Debilita">
+                                <option value="fortalece">+ Fortalece</option>
+                                <option value="debilita">− Debilita</option>
+                            </optgroup>
+                            <optgroup label="2. Activa / Inhibe">
+                                <option value="activa">+ Activa</option>
+                                <option value="inhibe">− Inhibe</option>
+                            </optgroup>
+                            <optgroup label="3. Genera / Elimina">
+                                <option value="genera">+ Genera</option>
+                                <option value="elimina">− Elimina</option>
+                            </optgroup>
+                            <optgroup label="4. Acelera / Demora">
+                                <option value="acelera">+ Acelera</option>
+                                <option value="demora">− Demora</option>
+                            </optgroup>
+                            <optgroup label="5. Expande / Contrae">
+                                <option value="expande">+ Expande</option>
+                                <option value="contrae">− Contrae</option>
+                            </optgroup>
+                            <optgroup label="6. Habilita / Bloquea">
+                                <option value="habilita">+ Habilita</option>
+                                <option value="bloquea">− Bloquea</option>
+                            </optgroup>
+                            <optgroup label="7. Aumenta / Reduce">
+                                <option value="aumenta">+ Aumenta</option>
+                                <option value="reduce">− Reduce</option>
+                            </optgroup>
+                            <optgroup label="8. Integra / Fragmenta">
+                                <option value="integra">+ Integra</option>
+                                <option value="fragmenta">− Fragmenta</option>
+                            </optgroup>
+                            <optgroup label="9. Depende / No Depende">
+                                <option value="depende">+ Depende</option>
+                                <option value="no_depende">− No Depende</option>
+                            </optgroup>
+                            <optgroup label="10. Amplifica / Amortigua">
+                                <option value="amplifica">+ Amplifica</option>
+                                <option value="amortigua">− Amortigua</option>
+                            </optgroup>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -341,6 +403,7 @@ const nodosData = <?= json_encode(array_values($nodos)) ?>;
 const conexionesData = <?= json_encode(array_values($conexiones)) ?>;
 const tipoDefaults = <?= json_encode($tipoDefaults) ?>;
 const relacionColors = <?= json_encode(array_map(fn($r) => $r['color'], $relacionLabels)) ?>;
+const relacionDashes = <?= json_encode(array_map(fn($r) => $r['negativo'], $relacionLabels)) ?>;
 const relacionLabels = <?= json_encode(array_map(fn($r) => $r['label'], $relacionLabels)) ?>;
 const isAdmin = <?= isAdmin() ? 'true' : 'false' ?>;
 
@@ -487,6 +550,7 @@ function initGrafo() {
         label: relacionLabels[c.tipo_relacion] || c.tipo_relacion,
         arrows: 'to',
         color: { color: relacionColors[c.tipo_relacion] || '#999', highlight: relacionColors[c.tipo_relacion] || '#999' },
+        dashes: relacionDashes[c.tipo_relacion] ? [8, 4] : false,
         font: { size: 11, color: '#666', strokeWidth: 2, strokeColor: '#fff' },
         smooth: { type: 'curvedCW', roundness: 0.15 },
         width: 2,

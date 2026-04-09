@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS analisis_conexiones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nodo_origen_id INT NOT NULL,
     nodo_destino_id INT NOT NULL,
-    tipo_relacion ENUM('habilita','depende_de','bloquea','genera','mitiga') NOT NULL,
+    tipo_relacion ENUM('fortalece','debilita','activa','inhibe','genera','elimina','acelera','demora','expande','contrae','habilita','bloquea','aumenta','reduce','integra','fragmenta','depende','no_depende','amplifica','amortigua') NOT NULL,
     descripcion VARCHAR(200) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (nodo_origen_id) REFERENCES analisis_nodos(id) ON DELETE CASCADE,
