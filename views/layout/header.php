@@ -58,7 +58,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link <?= activeNav('analisis_ie', $page) ?>" href="<?= BASE_URL ?>index.php?page=analisis_ie">
-                                    <i class="bi bi-bezier2 me-2"></i><span class="nav-text">Análisis IE</span>
+                                    <i class="bi bi-bezier2 me-2"></i><span class="nav-text">Diseño IE</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -182,7 +182,7 @@
                 $pageTitles = [
                     'dashboard' => 'Dashboard Estratégico',
                     'mapa' => 'Mapa Estratégico',
-                    'analisis_ie' => 'Análisis de Iniciativas',
+                    'analisis_ie' => 'Diseño IE',
                     'organigrama' => 'Organigrama CODI',
                     'iniciativas' => 'Iniciativas Estratégicas',
                     'planes' => 'Planes de Acción',
