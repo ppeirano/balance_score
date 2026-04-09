@@ -467,8 +467,8 @@ $relacionLabels = [
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <script>
 // === DATA ===
-const nodosData = <?= json_encode(array_values($nodos), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>;
-const conexionesData = <?= json_encode(array_values($conexiones), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>;
+const nodosData = <?= json_encode(array_values($nodos ?: []), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_INVALID_UTF8_SUBSTITUTE) ?>;
+const conexionesData = <?= json_encode(array_values($conexiones ?: []), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_INVALID_UTF8_SUBSTITUTE) ?>;
 const tipoDefaults = <?= json_encode($tipoDefaults) ?>;
 const relacionColors = <?= json_encode(array_map(fn($r) => $r['color'], $relacionLabels)) ?>;
 const relacionDashes = <?= json_encode(array_map(fn($r) => $r['negativo'], $relacionLabels)) ?>;
@@ -942,7 +942,7 @@ function eliminarConexionSeleccionada() {
     const desc = (origen ? origen.label : '?') + ' \u2192 ' + (destino ? destino.label : '?');
     if (!confirm('Eliminar la conexion "' + desc + '"?')) return;
     const form = document.getElementById('formEliminarConexion');
-    form.action = '<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_conexion&id=' + conexionSeleccionada + '&hoja=<?= (int)$hojaActiva ?>';
+    form.action = '<?= BASE_URL ?>index.php?page=analisis_ie&action=eliminar_conexion&id=' + conexionSeleccionada + '&hoja=<?= (int)$hojaActual ?>';
     form.submit();
 }
 
