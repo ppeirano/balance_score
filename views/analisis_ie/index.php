@@ -588,6 +588,7 @@ function initGrafo() {
     const allHavePos = nodosData.length > 0 && nodosData.every(n => n.pos_x !== null && n.pos_y !== null);
     const visNodes = nodosData.map(n => {
         const tc = tamanoConfig[n.tamano] || tamanoConfig['M'];
+        const hasPos = n.pos_x !== null && n.pos_y !== null;
         const node = {
             id: n.id,
             label: n.nombre,
@@ -604,9 +605,13 @@ function initGrafo() {
             title: buildTooltip(n),
             _data: n
         };
-        if (n.pos_x !== null && n.pos_y !== null) {
+        if (hasPos) {
             node.x = parseFloat(n.pos_x);
             node.y = parseFloat(n.pos_y);
+            // Fijar nodos que ya tienen posición para que no se muevan con la física
+            if (!allHavePos) {
+                node.fixed = { x: true, y: true };
+            }
         }
         return node;
     });
@@ -689,9 +694,15 @@ function initGrafo() {
         }
     });
 
-    // After stabilization, disable physics so nodes stay where dragged
+    // After stabilization, disable physics and unfix nodes so they can be dragged
     network.on('stabilizationIterationsDone', function() {
         network.setOptions({ physics: { enabled: false } });
+        // Desfijar nodos que se fijaron temporalmente durante la estabilización
+        nodes.forEach(n => {
+            if (n.fixed && (n.fixed.x || n.fixed.y)) {
+                nodes.update({ id: n.id, fixed: false });
+            }
+        });
     });
 
     // Sorted nodes for presentation
