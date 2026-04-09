@@ -488,7 +488,7 @@ function reordenarGrafo() {
         nodes.update({ id: n.id, x: undefined, y: undefined, fixed: false });
     });
 
-    // Activar física con layout jerárquico temporal
+    // Activar física con layout
     network.setOptions({
         physics: {
             enabled: true,
@@ -500,16 +500,29 @@ function reordenarGrafo() {
                 springConstant: 0.08,
                 damping: 0.4
             },
-            stabilization: { iterations: 300 }
+            stabilization: { enabled: true, iterations: 300 }
         }
     });
 
-    network.once('stabilizationIterationsDone', () => {
+    network.stabilize(300);
+
+    let reordenCompleto = false;
+    network.once('stabilized', () => {
+        if (reordenCompleto) return;
+        reordenCompleto = true;
         network.setOptions({ physics: { enabled: false } });
         network.fit({ animation: true });
-        // Guardar posiciones nuevas
         guardarTodasLasPosiciones();
     });
+
+    // Fallback: si el evento no se dispara, forzar desactivación de física
+    setTimeout(() => {
+        if (reordenCompleto) return;
+        reordenCompleto = true;
+        network.setOptions({ physics: { enabled: false } });
+        network.fit({ animation: true });
+        guardarTodasLasPosiciones();
+    }, 5000);
 }
 
 function guardarTodasLasPosiciones() {
