@@ -76,6 +76,9 @@ $relacionLabels = [
             <button class="btn btn-sm btn-outline-secondary" onclick="exportarImagen()" title="Exportar como imagen">
                 <i class="bi bi-image"></i>
             </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="reordenarGrafo()" title="Reordenar nodos automáticamente">
+                <i class="bi bi-grid-3x3-gap"></i>
+            </button>
         </div>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm btn-primary active" id="btnModoDiseno" onclick="setModo('diseno')">
@@ -360,6 +363,51 @@ let subModo = 'completa';
 let nodoSeleccionado = null;
 let pasoActual = 0;
 let nodosOrdenados = [];
+
+function reordenarGrafo() {
+    // Limpiar posiciones fijas para que la física pueda moverlos
+    nodes.forEach(n => {
+        nodes.update({ id: n.id, x: undefined, y: undefined, fixed: false });
+    });
+
+    // Activar física con layout jerárquico temporal
+    network.setOptions({
+        physics: {
+            enabled: true,
+            solver: 'forceAtlas2Based',
+            forceAtlas2Based: {
+                gravitationalConstant: -80,
+                centralGravity: 0.01,
+                springLength: 150,
+                springConstant: 0.08,
+                damping: 0.4
+            },
+            stabilization: { iterations: 300 }
+        }
+    });
+
+    network.once('stabilizationIterationsDone', () => {
+        network.setOptions({ physics: { enabled: false } });
+        network.fit({ animation: true });
+        // Guardar posiciones nuevas
+        guardarTodasLasPosiciones();
+    });
+}
+
+function guardarTodasLasPosiciones() {
+    const positions = network.getPositions();
+    const datos = Object.entries(positions).map(([id, pos]) => ({
+        id: parseInt(id), x: pos.x, y: pos.y
+    }));
+    if (datos.length === 0) return;
+    datos.forEach(d => {
+        fetch(BASE_URL + 'index.php?page=analisis_ie&action=api_posicion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(d)
+        });
+    });
+}
 
 function exportarImagen() {
     const scale = 3;
