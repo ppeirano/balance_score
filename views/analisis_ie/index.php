@@ -26,6 +26,7 @@ $tipoDefaults = [
     'restriccion' => ['forma' => 'hexagon',   'color' => '#FFA500'],
     'kpi'         => ['forma' => 'circle',    'color' => '#20B2AA'],
     'entidad'     => ['forma' => 'star',      'color' => '#DAA520'],
+    'enlace'      => ['forma' => 'box',       'color' => '#778899'],
 ];
 
 $relacionLabels = [
@@ -283,6 +284,16 @@ $relacionLabels = [
                                 <option value="restriccion">Restricción</option>
                                 <option value="kpi">KPI</option>
                                 <option value="entidad">Entidad</option>
+                                <option value="enlace">Enlace a Hoja</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="hojaDestinoWrap" style="display:none;">
+                            <label class="form-label">Hoja destino <span class="text-danger">*</span></label>
+                            <select class="form-select" name="hoja_destino_id" id="nodoHojaDestino">
+                                <option value="">Seleccionar...</option>
+                                <?php foreach ($hojas as $h): ?>
+                                <option value="<?= (int)$h['id'] ?>"><?= sanitize($h['nombre']) ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -614,7 +625,7 @@ function initGrafo() {
         const hasPos = n.pos_x !== null && n.pos_y !== null;
         const node = {
             id: n.id,
-            label: n.nombre,
+            label: n.tipo === 'enlace' ? '\u2192 ' + n.nombre : n.nombre,
             shape: n.forma || 'box',
             size: tc.size,
             widthConstraint: { minimum: tc.width, maximum: tc.width },
@@ -721,10 +732,16 @@ function initGrafo() {
     });
 
     network.on('doubleClick', function(params) {
-        if (modoActual !== 'diseno' || !isAdmin) return;
         if (params.nodes.length === 1) {
+            const node = nodes.get(params.nodes[0]);
+            if (node && node._data && node._data.tipo === 'enlace' && node._data.hoja_destino_id) {
+                window.location.href = '<?= BASE_URL ?>index.php?page=analisis_ie&hoja=' + node._data.hoja_destino_id;
+                return;
+            }
+            if (modoActual !== 'diseno' || !isAdmin) return;
             editarNodo(params.nodes[0]);
         } else if (params.edges.length === 1 && params.nodes.length === 0) {
+            if (modoActual !== 'diseno' || !isAdmin) return;
             editarConexion(params.edges[0]);
         }
     });
@@ -952,6 +969,8 @@ function abrirModalNodo(data) {
     selForma(data ? (data.forma || 'box') : 'box');
     selColor(data ? (data.color || '#4A90D9') : '#4A90D9');
     selTamano(data ? (data.tamano || 'M') : 'M');
+    document.getElementById('nodoHojaDestino').value = data ? (data.hoja_destino_id || '') : '';
+    document.getElementById('hojaDestinoWrap').style.display = (data && data.tipo === 'enlace') ? '' : 'none';
     document.getElementById('modalNodoTitulo').textContent = data ? 'Editar Elemento' : 'Nuevo Elemento';
     new bootstrap.Modal(document.getElementById('modalNodo')).show();
 }
@@ -1009,6 +1028,7 @@ function sugerirDefaults() {
         selForma(tipoDefaults[tipo].forma);
         selColor(tipoDefaults[tipo].color);
     }
+    document.getElementById('hojaDestinoWrap').style.display = tipo === 'enlace' ? '' : 'none';
 }
 
 // === UTILS ===

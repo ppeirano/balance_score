@@ -21,9 +21,10 @@ class AnalisisNodo {
             $stmt = $pdo->prepare("
                 UPDATE analisis_nodos
                 SET nombre = ?, tipo = ?, descripcion = ?, estado = ?,
-                    observaciones = ?, forma = ?, color = ?, tamano = ?, orden = ?
+                    observaciones = ?, forma = ?, color = ?, tamano = ?, orden = ?, hoja_destino_id = ?
                 WHERE id = ?
             ");
+            $hojaDestino = !empty($data['hoja_destino_id']) ? (int)$data['hoja_destino_id'] : null;
             $stmt->execute([
                 $data['nombre'],
                 $data['tipo'],
@@ -34,15 +35,17 @@ class AnalisisNodo {
                 $data['color'] ?? '#4A90D9',
                 $data['tamano'] ?? 'M',
                 (int)($data['orden'] ?? 0),
+                $hojaDestino,
                 $data['id']
             ]);
             flash('success', 'Elemento actualizado.');
             require_once __DIR__ . '/Bitacora.php';
             Bitacora::registrar($pdo, 'analisis_nodo', $data['id'], $data['nombre'], 'editado');
         } else {
+            $hojaDestino = !empty($data['hoja_destino_id']) ? (int)$data['hoja_destino_id'] : null;
             $stmt = $pdo->prepare("
-                INSERT INTO analisis_nodos (hoja_id, nombre, tipo, descripcion, estado, observaciones, forma, color, tamano, orden)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO analisis_nodos (hoja_id, nombre, tipo, descripcion, estado, observaciones, forma, color, tamano, orden, hoja_destino_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 (int)$data['hoja_id'],
@@ -54,7 +57,8 @@ class AnalisisNodo {
                 $data['forma'] ?? 'box',
                 $data['color'] ?? '#4A90D9',
                 $data['tamano'] ?? 'M',
-                (int)($data['orden'] ?? 0)
+                (int)($data['orden'] ?? 0),
+                $hojaDestino
             ]);
             flash('success', 'Elemento creado.');
             require_once __DIR__ . '/Bitacora.php';
