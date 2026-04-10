@@ -80,6 +80,10 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
 
         .section {
             margin-bottom: 16px;
+        }
+        /* Solo secciones cortas deben evitar romperse */
+        .section-participantes,
+        .section-header {
             page-break-inside: avoid;
         }
         .section h2 {
@@ -172,7 +176,9 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
             }
             .print-toolbar { display: none; }
             .header { page-break-after: avoid; }
-            .section { page-break-inside: avoid; }
+            .section h2 { page-break-after: avoid; }
+            tr { page-break-inside: avoid; }
+            thead { display: table-header-group; }
             @page {
                 margin: 1.2cm 1.5cm;
                 size: A4;
@@ -200,7 +206,7 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
     </div>
 
     <?php if (!empty($reunion['participantes'])): ?>
-    <div class="section">
+    <div class="section section-participantes">
         <h2>Participantes</h2>
         <div class="participantes-box">
             <?= sanitize($reunion['participantes']) ?>
