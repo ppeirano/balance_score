@@ -608,6 +608,9 @@ switch ($page) {
             case 'detalle':
                 require __DIR__ . '/views/reuniones/detalle.php';
                 break;
+            case 'imprimir':
+                require __DIR__ . '/views/reuniones/imprimir.php';
+                break;
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
                     $stmtN = $pdo->prepare("SELECT titulo FROM reuniones WHERE id = ?");

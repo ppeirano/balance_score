@@ -24,6 +24,7 @@ require_once __DIR__ . '/../layout/header.php';
         </p>
     </div>
     <div>
+        <a href="<?= BASE_URL ?>index.php?page=reuniones&action=imprimir&id=<?= $id ?>" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Generar PDF</a>
         <?php if (isAdmin()): ?>
         <a href="<?= BASE_URL ?>index.php?page=reuniones&action=editar&id=<?= $id ?>" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1"></i>Editar</a>
         <?php endif; ?>
