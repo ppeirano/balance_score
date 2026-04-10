@@ -19,11 +19,11 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             color: #222;
-            line-height: 1.5;
+            line-height: 1.4;
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px 30px;
-            font-size: 13px;
+            padding: 20px 30px;
+            font-size: 12px;
         }
         .print-toolbar {
             background: #f3f4f6;
@@ -54,40 +54,40 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
         .print-toolbar a:hover { text-decoration: underline; }
 
         .header {
-            border-bottom: 3px solid #3b82f6;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
         }
         .header .brand {
-            font-size: 11px;
+            font-size: 10px;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         .header h1 {
-            font-size: 26px;
-            margin: 0 0 10px 0;
+            font-size: 22px;
+            margin: 0 0 6px 0;
             color: #111827;
             font-weight: 700;
         }
         .header .meta {
             color: #6b7280;
-            font-size: 13px;
+            font-size: 12px;
         }
-        .header .meta span { margin-right: 20px; }
+        .header .meta span { margin-right: 16px; }
         .header .meta strong { color: #374151; }
 
         .section {
-            margin-bottom: 28px;
+            margin-bottom: 16px;
             page-break-inside: avoid;
         }
         .section h2 {
-            font-size: 15px;
+            font-size: 13px;
             color: #111827;
-            margin: 0 0 12px 0;
-            padding-bottom: 6px;
-            border-bottom: 2px solid #e5e7eb;
+            margin: 0 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e5e7eb;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -98,19 +98,19 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
 
         .participantes-box {
             background: #f9fafb;
-            padding: 14px 18px;
-            border-left: 4px solid #3b82f6;
-            border-radius: 4px;
-            font-size: 13px;
+            padding: 8px 14px;
+            border-left: 3px solid #3b82f6;
+            border-radius: 3px;
+            font-size: 12px;
         }
 
         .minuta-box {
             white-space: pre-wrap;
-            font-size: 13px;
-            line-height: 1.7;
-            padding: 4px 0;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 2px 0;
         }
-        .minuta-box p { margin: 0 0 10px 0; }
+        .minuta-box p { margin: 0 0 6px 0; }
 
         table {
             width: 100%;
@@ -155,12 +155,12 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
         }
 
         .footer {
-            margin-top: 50px;
-            padding-top: 20px;
+            margin-top: 24px;
+            padding-top: 10px;
             border-top: 1px solid #e5e7eb;
             text-align: center;
             color: #9ca3af;
-            font-size: 11px;
+            font-size: 10px;
         }
 
         /* Estilos específicos para impresión */
@@ -174,7 +174,7 @@ $compromisos = Compromiso::getByReunion($pdo, $id);
             .header { page-break-after: avoid; }
             .section { page-break-inside: avoid; }
             @page {
-                margin: 2cm 1.5cm;
+                margin: 1.2cm 1.5cm;
                 size: A4;
             }
         }
