@@ -2,7 +2,7 @@
 require_once __DIR__ . '/config/database.php';
 
 $pdo = getDB();
-$email = 'pablo.peirano@temislostalo.com.ar';
+$email = 'admin@temislostalo.com';
 $newPassword = 'admin123';
 $hash = password_hash($newPassword, PASSWORD_DEFAULT);
 
